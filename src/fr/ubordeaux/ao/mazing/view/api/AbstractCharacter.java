@@ -102,6 +102,7 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
     }
 
     protected void turnPlayer(Direction targetDirection, int delayMs, Runnable onFinished) {
+
         Direction currentDirection = getCurrentDirection();
         int currentAngle = currentDirection.getAngle();
         int targetAngle = targetDirection.getAngle();

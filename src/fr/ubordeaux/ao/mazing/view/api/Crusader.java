@@ -307,7 +307,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 vy = speed;
             }
         }
-
         setSpeed(vx, vy, vz);
     }
 

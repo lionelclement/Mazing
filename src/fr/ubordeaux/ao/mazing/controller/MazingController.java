@@ -22,6 +22,10 @@ public class MazingController extends KeyAdapter {
             case KeyEvent.VK_DOWN -> model.setPlayerSpeed(0, 0.05f, 0);
             case KeyEvent.VK_LEFT -> model.setPlayerSpeed(-0.05f, 0, 0);
             case KeyEvent.VK_RIGHT -> model.setPlayerSpeed(0.05f, 0, 0);
+            case KeyEvent.VK_Q -> {
+                System.exit(0);
+            }
+            default -> model.setPlayerSpeed(0, 0, 0);
         }
         // après modification du modèle → demander à la vue de se rafraîchir
         view.refresh(model);

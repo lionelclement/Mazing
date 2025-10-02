@@ -1,6 +1,5 @@
 package fr.ubordeaux.ao.mazing;
 
-import fr.ubordeaux.ao.mazing.view.*;
 import fr.ubordeaux.ao.mazing.view.api.Crusader;
 import fr.ubordeaux.ao.mazing.view.api.Direction;
 import fr.ubordeaux.ao.mazing.view.api.IBoardGame;

@@ -8,21 +8,27 @@ import fr.ubordeaux.ao.mazing.view.api.Window;
 public class MazingView {
 
 	private Window window;
+	private IBoardGame boardGame;
 
 	public MazingView() {
 		window = new Window();
+		boardGame = window.getBoardGame();
 	}
 
 	public void refresh(MazingModel model) {
 		System.out.println("Window method 'refresh'");
-		IBoardGame boardGame = window.getBoardGame();
 
+		// Ajuster la vitesse
 		float speedX = model.getPlayerSpeedX();
 		float speedY = model.getPlayerSpeedY();
 		float speedZ = model.getPlayerSpeedZ();
 		boardGame.setPlayerSpeed(speedX, speedY, speedZ);
+
+		// Faire que le personnage marche si la vitesse est suffisante
 		if (Math.sqrt(speedX * speedX + speedY * speedY + speedZ * speedZ) > 0.01f) {
 			boardGame.changePlayerMode("WALK");
+		} else {
+			boardGame.changePlayerMode("IDLE");
 		}
 
 	}
