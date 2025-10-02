@@ -1,27 +1,22 @@
-package fr.ubordeaux.ao.mazing.view.api;
+package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-public class Crusader extends AbstractCharacter<CharacterMode> {
+public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final int DELAY = 60;
     private static final float WALK_SPEED = 0.03f;
-    private static final float RUN_SPEED = 0.08f;
-    private static final float JUMP_SPEED = 1.5f;
     private static final float SCALE = 2.5f;
     private static final int OFFSET_X = 0;
-    private static final int OFFSET_Y = 8;
+    private static final int OFFSET_Y = 0;
 
     public enum Mode implements CharacterMode {
-        WALK("walk", 15, true),
-        RUN("run", 17, true),
-        JUMP("jump", 16, false),
-        GOTHIT("gothit", 13, false),
-        ATTACK("attack", 18, false),
-        FALL("death", 9, false),
-        DEATH("death", 9, false),
-        IDLE("idle", 16, true);
+        IDLE("idle", 1, true),
+        WALK("walk", 25, true),
+        ATTACK("attack", 8, false),
+        FALL("death", 8, false),
+        DEATH("death", 8, false);
 
         private final String name;
         private final int numFrames;
@@ -47,21 +42,14 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         }
     }
 
-    public enum Sounds {
-        CARPET, CARPET_SOFT,
-        WOOD, WOOD_SOFT, JUMP, GOTHIT, ATTACK, DEATH;
-
-    }
-
     private Mode currentState;
     SoundManager soundManager = new SoundManager();
     private Mode previousState;
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
-    private float previousZ;
 
-    public Crusader() {
+    public Spider() {
         super(Mode.values().length, OFFSET_X, OFFSET_Y);
-        currentState = Mode.IDLE;
+        currentState = Mode.WALK;
         currentDirection = Direction.EAST;
         soundManager = new SoundManager();
         initSounds();
@@ -71,50 +59,18 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private void initSounds() {
         String name = null;
         // String key = null;
-        for (Sounds footstepSound : Sounds.values()) {
-            switch (footstepSound) {
-                case Sounds.CARPET:
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    soundManager.loadSound(Sounds.CARPET.name(), name);
-                    soundManager.setVolume(Sounds.CARPET.name(), 0.8f);
-                    break;
-                case Sounds.CARPET_SOFT:
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    soundManager.loadSound(Sounds.CARPET_SOFT.name(), name);
-                    soundManager.setVolume(Sounds.CARPET_SOFT.name(), 0.2f);
-                    break;
-                case Sounds.WOOD:
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
-                    soundManager.loadSound(Sounds.WOOD.name(), name);
-                    soundManager.setVolume(Sounds.WOOD.name(), 0.8f);
-                    break;
-                case Sounds.WOOD_SOFT:
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
-                    soundManager.loadSound(Sounds.WOOD_SOFT.name(), name);
-                    soundManager.setVolume(Sounds.WOOD_SOFT.name(), 0.2f);
-                    break;
-                case Sounds.JUMP:
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    soundManager.loadSound(Sounds.JUMP.name(), name);
-                    soundManager.setVolume(Sounds.JUMP.name(), 0.8f);
+        for (Mode state : Mode.values()) {
+            switch (state) {
+                case Mode.ATTACK:
+                    name = String.format("/kenney_impact-sounds/Audio/footstep_snow_000.wav");
+                    soundManager.loadSound(state.name(), name);
+                    soundManager.setVolume(state.name(), 0.4f);
                     break;
 
-                case Sounds.GOTHIT:
-                    name = String.format("/kenney_impact-sounds/Audio/impactTin_medium_000.wav");
-                    soundManager.loadSound(Sounds.GOTHIT.name(), name);
-                    soundManager.setVolume(Sounds.GOTHIT.name(), 0.8f);
-                    break;
-
-                case Sounds.ATTACK:
-                    name = String.format("/kenney_impact-sounds/Audio/impactPlate_heavy_000.wav");
-                    soundManager.loadSound(Sounds.ATTACK.name(), name);
-                    soundManager.setVolume(Sounds.ATTACK.name(), 0.8f);
-                    break;
-
-                case Sounds.DEATH:
-                    name = String.format("/kenney_impact-sounds/Audio/impactWood_heavy_000.wav");
-                    soundManager.loadSound(Sounds.DEATH.name(), name);
-                    soundManager.setVolume(Sounds.DEATH.name(), 0.8f);
+                case Mode.DEATH:
+                    name = String.format("/kenney_impact-sounds/Audio/impactSoft_heavy_000.wav");
+                    soundManager.loadSound(state.name(), name);
+                    soundManager.setVolume(state.name(), 0.4f);
                     break;
 
                 default:
@@ -134,16 +90,16 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             for (Direction direction : directions) {
                 images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
                         numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
+                        (direction.ordinal() + 6) % 8,
+                        String.format("/bw_spider/%s/%s-BW_Spider_",
                                 state.getName(),
                                 state.getName()),
                         SCALE);
 
                 shadow_images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
                         numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
+                        (direction.ordinal() + 6) % 8,
+                        String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
                                 state.getName(),
                                 state.getName()),
                         SCALE);
@@ -163,20 +119,18 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     public void stop() {
         super.setSpeed(0, 0, 0);
-        changeMode(Mode.IDLE);
+        changeMode(Mode.WALK);
     }
 
     @Override
-    public void changeMode(CharacterMode mode) {
-        Mode s = (Mode) mode;
+    public void changeMode(CharacterMode state) {
+        Mode s = (Mode) state;
         System.out.println("changeState: " + currentState + " -> " + s);
         previousState = currentState;
         previousSpeedX = speedX;
         previousSpeedY = speedY;
         previousSpeedZ = speedZ;
-        if (mode != Mode.JUMP) {
-            speedX = speedY = speedZ = 0;
-        }
+        speedX = speedY = speedZ = 0;
         currentState = s;
         animations[currentState.ordinal()][currentDirection.ordinal()].reset();
     }
@@ -209,56 +163,14 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    protected void tick(int frameIndex) {
-        switch (currentState) {
-            case RUN:
-            case WALK:
-            case JUMP:
-                if (frameIndex % 8 == 0) {
-                    soundManager.stop(currentState.name());
-                    soundManager.play(currentState.name());
-                }
-                break;
-            default:
-                break;
-        }
-        super.tick(frameIndex);
-    }
-
-    @Override
     public void callBeginLoopTrigger() {
-        switch (currentState) {
-            case GOTHIT:
-                soundManager.play(currentState.name());
-                break;
-            case JUMP:
-                previousZ = z;
-                previousSpeedZ = speedZ;
-                speedZ = (float) Math.sqrt(speedX * speedX + speedY * speedY) * JUMP_SPEED;
-            default:
-                break;
-        }
-
-        super.callBeginLoopTrigger();
-    }
-
-    @Override
-    public void callMidLoopTrigger() {
-        switch (currentState) {
-            case JUMP:
-                speedZ = -speedZ;
-            default:
-                break;
-        }
-
-        super.callMidLoopTrigger();
+        super.callEndLoopTrigger();
     }
 
     @Override
     public void callEndLoopTrigger() {
         switch (currentState) {
             case ATTACK:
-            case GOTHIT:
                 soundManager.play(currentState.name());
                 currentState = previousState;
                 speedX = previousSpeedX;
@@ -266,15 +178,10 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 speedZ = previousSpeedZ;
                 break;
             case FALL:
-                currentState = Mode.IDLE;
                 currentState = Mode.DEATH;
                 soundManager.play(currentState.name());
                 animations[currentState.ordinal()][currentDirection.ordinal()].lastFrame();
                 break;
-            case JUMP:
-                z = previousZ;
-                currentState = previousState;
-                speedZ = previousSpeedZ;
             default:
                 break;
         }
@@ -307,6 +214,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 vy = speed;
             }
         }
+
         setSpeed(vx, vy, vz);
     }
 
@@ -318,8 +226,16 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void run() {
-        changeMode(Mode.RUN);
-        moveForward(RUN_SPEED);
+    }
+
+    @Override
+    public void changeDirection(String newDirection) {
+        try {
+            changeDirection(Direction.valueOf(newDirection));
+        } catch (IllegalArgumentException e) {
+            // Gérer le cas où la direction est inconnue
+            System.err.println("Direction invalide : " + newDirection);
+        }
     }
 
     public void changeDirection(Direction newDirection) {
@@ -377,7 +293,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             // Obtenir la vitesse scalaire selon l'état actuel
             float speed = switch (currentState) {
                 case WALK -> WALK_SPEED;
-                case RUN -> RUN_SPEED;
                 default -> 0;
             };
 
@@ -395,16 +310,12 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void update() {
-        System.out.println("Crusader method 'update'");
         float speed = (float) Math.sqrt((speedX * speedX + speedY * speedY + speedZ * speedZ));
         if (speed < 0.02f)
-            changeMode(Crusader.Mode.IDLE);
-        else if (speed < 0.04f)
-            changeMode(Crusader.Mode.WALK);
-        else {
-            System.out.println("XXX");
-            changeMode(Crusader.Mode.RUN);
-        }
+            changeMode(Spider.Mode.IDLE);
+        else
+            changeMode(Spider.Mode.WALK);
+
     }
 
     @Override
@@ -414,16 +325,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         } catch (IllegalArgumentException e) {
             // Gérer le cas où la direction est inconnue
             System.err.println("Mode invalide : " + mode);
-        }
-    }
-
-    @Override
-    public void changeDirection(String newDirection) {
-        try {
-            changeDirection(Direction.valueOf(newDirection));
-        } catch (IllegalArgumentException e) {
-            // Gérer le cas où la direction est inconnue
-            System.err.println("Direction invalide : " + newDirection);
         }
     }
 

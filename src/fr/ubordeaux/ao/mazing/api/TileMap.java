@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.view.api;
+package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -6,31 +6,29 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
-public class OldTileMap {
+public class TileMap {
     private final int tileWidth;
     private final int tileHeight;
     private int originX;
     private int originY;
-    private static OldTileMap instance;
-    // Facteur vertical pour dimétrie (1/2 = isométrie classique, 1/3 = dimétrie)
-    private static float verticalScale = 1f / 3f;
+    private static TileMap instance;
 
-    private OldTileMap(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols, int rows) {
+    private TileMap(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols, int rows) {
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
         originX = 0;
         originY = windowHeight / 4;
     }
 
-    public static OldTileMap getInstance(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols,
+    public static TileMap getInstance(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols,
             int rows) {
         if (instance == null) {
-            instance = new OldTileMap(tileWidth, tileHeight, windowWidth, windowHeight, cols, rows);
+            instance = new TileMap(tileWidth, tileHeight, windowWidth, windowHeight, cols, rows);
         }
         return instance;
     }
 
-    public static OldTileMap getInstance() {
+    public static TileMap getInstance() {
         if (instance == null) {
             throw new IllegalStateException("TileMap instance not initialized");
         }
@@ -51,14 +49,8 @@ public class OldTileMap {
         int originY = origin ? this.originY : 0;
 
         // Projection isométrique
-        // float isoX = originX + (col - row) * tileWidth / 2;
-        // float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight *
-        // 0.60f;
-
-        // Projection dimétrique
-        float isoX = originX + (col - row) * tileWidth / 2f;
-        float isoY = originY + (col + row) * (tileHeight * verticalScale)
-                - step * tileHeight * 0.60f;
+        float isoX = originX + (col - row) * tileWidth / 2;
+        float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight * 0.60f;
 
         return new Point2D.Float(isoX, isoY);
     }
@@ -68,14 +60,9 @@ public class OldTileMap {
             int offsetX, int offsetY, RenderType renderType) {
 
         // Projection isométrique
-        // int anchorY = (renderType == RenderType.FLOOR) ? tileHeight / 2 : tileHeight
-        // / 2 - 8;
-
-        // Projection dimétrique
-        int scaledTileHeight = (int) (tileHeight * verticalScale);
-        int anchorY = (renderType == RenderType.FLOOR)
-                ? scaledTileHeight
-                : scaledTileHeight - 8;
+        int anchorY = (renderType == RenderType.FLOOR) ? tileHeight / 2
+                : tileHeight
+                        / 2 - 8;
 
         Point2D p = gridToScreen(x, y, z, true);
         int screenX = (int) p.getX() + offsetX;
@@ -91,30 +78,13 @@ public class OldTileMap {
         Point2D p = gridToScreen(col, row, step, true);
 
         // isométrique
-        // int halfW = tileWidth / 2;
-        // int quarterH = tileHeight / 4;
-        // int[] xPoints = { (int) p.getX(), (int) p.getX() + halfW, (int) p.getX(),
-        // (int) p.getX() - halfW };
-        // int[] yPoints = { (int) p.getY(), (int) p.getY() + quarterH, (int) p.getY() +
-        // tileHeight / 2,
-        // (int) p.getY() + quarterH };
-
         int halfW = tileWidth / 2;
-        int halfH = (int) (tileHeight * verticalScale); // sommet vertical ajusté
-
-        int[] xPoints = {
-                (int) p.getX(),
-                (int) p.getX() + halfW,
-                (int) p.getX(),
-                (int) p.getX() - halfW
-        };
-
-        int[] yPoints = {
-                (int) p.getY(),
-                (int) p.getY() + halfH,
-                (int) p.getY() + 2 * halfH,
-                (int) p.getY() + halfH
-        };
+        int quarterH = tileHeight / 4;
+        int[] xPoints = { (int) p.getX(), (int) p.getX() + halfW, (int) p.getX(),
+                (int) p.getX() - halfW };
+        int[] yPoints = { (int) p.getY(), (int) p.getY() + quarterH, (int) p.getY() +
+                tileHeight / 2,
+                (int) p.getY() + quarterH };
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(color);

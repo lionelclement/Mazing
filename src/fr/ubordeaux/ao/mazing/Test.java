@@ -1,11 +1,11 @@
 package fr.ubordeaux.ao.mazing;
 
-import fr.ubordeaux.ao.mazing.view.api.Crusader;
-import fr.ubordeaux.ao.mazing.view.api.Direction;
-import fr.ubordeaux.ao.mazing.view.api.IBoardGame;
-import fr.ubordeaux.ao.mazing.view.api.IWindow;
-import fr.ubordeaux.ao.mazing.view.api.Spider;
-import fr.ubordeaux.ao.mazing.view.api.Window;
+import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.IWindow;
+import fr.ubordeaux.ao.mazing.api.Spider;
+import fr.ubordeaux.ao.mazing.api.Window;
 
 public final class Test {
         public static void main(String[] args) {

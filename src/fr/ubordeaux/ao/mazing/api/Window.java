@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.view.api;
+package fr.ubordeaux.ao.mazing.api;
 
 import javax.swing.JFrame;
 

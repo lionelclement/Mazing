@@ -1,9 +1,10 @@
-package fr.ubordeaux.ao.mazing.view;
+package fr.ubordeaux.ao.mazing.project1.view;
 
-import fr.ubordeaux.ao.mazing.controller.MazingController;
-import fr.ubordeaux.ao.mazing.model.MazingModel;
-import fr.ubordeaux.ao.mazing.view.api.IBoardGame;
-import fr.ubordeaux.ao.mazing.view.api.Window;
+import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.Window;
+import fr.ubordeaux.ao.mazing.project1.controller.MazingController;
+import fr.ubordeaux.ao.mazing.project1.model.MazingModel;
 
 public class MazingView {
 
@@ -13,6 +14,10 @@ public class MazingView {
 	public MazingView() {
 		window = new Window();
 		boardGame = window.getBoardGame();
+
+		Crusader crusader = new Crusader();
+		boardGame.assignPlayer(crusader);
+		boardGame.addToSceneMap(crusader);
 	}
 
 	public void refresh(MazingModel model) {

@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.model;
+package fr.ubordeaux.ao.mazing.project1.model;
 
 public class MazingModel {
 

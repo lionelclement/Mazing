@@ -1,10 +1,10 @@
-package fr.ubordeaux.ao.mazing.controller;
-
-import fr.ubordeaux.ao.mazing.model.MazingModel;
-import fr.ubordeaux.ao.mazing.view.MazingView;
+package fr.ubordeaux.ao.mazing.project1.controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import fr.ubordeaux.ao.mazing.project1.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project1.view.MazingView;
 
 public class MazingController extends KeyAdapter {
     private MazingModel model;

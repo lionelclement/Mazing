@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.view.api;
+package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
-
-import fr.ubordeaux.ao.mazing.model.MazingModel;
 
 public class BoardGame extends JPanel implements IBoardGame {
 
@@ -76,7 +74,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 		gameLoop.start();
 	}
 
-	public BoardGame(MazingModel model) {
+	public BoardGame() {
 		this(1024, 800);
 	}
 

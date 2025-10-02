@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.view.api;
+package fr.ubordeaux.ao.mazing.api;
 
 public interface InternCharacter<S extends CharacterMode> extends IRenderable3D {
 
