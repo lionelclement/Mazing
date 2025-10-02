@@ -16,13 +16,13 @@ public interface IBoardGame {
 
     void assignPlayer(Character<? extends CharacterMode> character);
 
-    void setPlayerPosition(float x, float y, float f);
+    void updatePlayerPosition(float x, float y, float f);
 
-    void setPlayerSpeed(float vx, float vy, float vz);
+    void updatePlayerSpeed(float vx, float vy, float vz);
 
-    void changePlayerMode(String mode);
+    void updatePlayerMode(String mode);
 
-    void changePlayerDirection(String direction);
+    void updatePlayerDirection(String direction);
 
     void addToSceneMap(Character<?> character);
 

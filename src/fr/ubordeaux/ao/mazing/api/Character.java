@@ -26,16 +26,16 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
 
     void changeMode(String mode);
 
-    void setLoopTrigger(Runnable callback);
+    void setLoopAnimationTrigger(Runnable callback);
 
-    void setBeginLoopTrigger(Runnable callback);
+    void setBeginAnimationTrigger(Runnable callback);
 
-    void setMidLoopTrigger(Runnable callback);
+    void setMidAnimationTrigger(Runnable callback);
 
-    void setEndLoopTrigger(Runnable callback);
+    void setEndAnimationTrigger(Runnable callback);
 
     void setOnTileTrigger(Runnable callback);
 
-    void update();
+    void setTickAnimationTrigger(Runnable callback);
 
 }

@@ -163,12 +163,12 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void callBeginLoopTrigger() {
-        super.callEndLoopTrigger();
+    public void callBeginTrigger() {
+        super.callEndTrigger();
     }
 
     @Override
-    public void callEndLoopTrigger() {
+    public void callEndTrigger() {
         switch (currentState) {
             case ATTACK:
                 soundManager.play(currentState.name());
@@ -185,7 +185,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             default:
                 break;
         }
-        super.callEndLoopTrigger();
+        super.callEndTrigger();
     }
 
     private void moveForward(float speed) {
@@ -309,16 +309,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void update() {
-        float speed = (float) Math.sqrt((speedX * speedX + speedY * speedY + speedZ * speedZ));
-        if (speed < 0.02f)
-            changeMode(Spider.Mode.IDLE);
-        else
-            changeMode(Spider.Mode.WALK);
-
-    }
-
-    @Override
     public void changeMode(String mode) {
         try {
             changeMode(Mode.valueOf(mode));
@@ -326,6 +316,15 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             // Gérer le cas où la direction est inconnue
             System.err.println("Mode invalide : " + mode);
         }
+    }
+
+    @Override
+    protected void callTickTrigger(int frameIndex) {
+        float speed = (float) Math.sqrt((speedX * speedX + speedY * speedY + speedZ * speedZ));
+        if (speed < 0.02f)
+            changeMode(Spider.Mode.IDLE);
+        else
+            changeMode(Spider.Mode.WALK);
     }
 
 }

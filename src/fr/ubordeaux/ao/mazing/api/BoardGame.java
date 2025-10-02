@@ -112,7 +112,6 @@ public class BoardGame extends JPanel implements IBoardGame {
 		for (Character<CharacterMode> c : characters) {
 			Animation<CharacterMode> animation = c.getCurrentAnimation(c.getCurrentMode().ordinal());
 			animation.tick((AbstractCharacter<? extends CharacterMode>) c);
-
 		}
 		repaint();
 	}
@@ -204,7 +203,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	@Override
-	public void setPlayerPosition(float x, float y, float z) {
+	public void updatePlayerPosition(float x, float y, float z) {
 		player.setPosition(x, y, z);
 	}
 
@@ -302,7 +301,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	@Override
-	public void setPlayerSpeed(float vx, float vy, float vz) {
+	public void updatePlayerSpeed(float vx, float vy, float vz) {
 		player.setSpeed(vx, vy, vz);
 	}
 
@@ -318,12 +317,12 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	@Override
-	public void changePlayerMode(String state) {
+	public void updatePlayerMode(String state) {
 		player.changeMode(state);
 	}
 
 	@Override
-	public void changePlayerDirection(String direction) {
+	public void updatePlayerDirection(String direction) {
 		player.changeDirection(direction);
 	}
 

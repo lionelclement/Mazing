@@ -5,6 +5,7 @@ import fr.ubordeaux.ao.mazing.api.IBoardGame;
 import fr.ubordeaux.ao.mazing.api.Window;
 import fr.ubordeaux.ao.mazing.project1.controller.MazingController;
 import fr.ubordeaux.ao.mazing.project1.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project1.model.Point;
 
 public class MazingView {
 
@@ -20,24 +21,6 @@ public class MazingView {
 		boardGame.addToSceneMap(crusader);
 	}
 
-	public void refresh(MazingModel model) {
-		System.out.println("Window method 'refresh'");
-
-		// Ajuster la vitesse
-		float speedX = model.getPlayerSpeedX();
-		float speedY = model.getPlayerSpeedY();
-		float speedZ = model.getPlayerSpeedZ();
-		boardGame.setPlayerSpeed(speedX, speedY, speedZ);
-
-		// Faire que le personnage marche si la vitesse est suffisante
-		if (Math.sqrt(speedX * speedX + speedY * speedY + speedZ * speedZ) > 0.01f) {
-			boardGame.changePlayerMode("WALK");
-		} else {
-			boardGame.changePlayerMode("IDLE");
-		}
-
-	}
-
 	public void addKeyListener(MazingController controller) {
 		window.addKeyListener(controller);
 	}
@@ -49,4 +32,32 @@ public class MazingView {
 	public IBoardGame getBoardGame() {
 		return window.getBoardGame();
 	}
+
+	public void bindToModel(MazingModel model) {
+		model.setListener(event -> {
+			switch (event.type) {
+				case PLAYER_POS:
+					Point pos = (Point) event.data;
+					boardGame.updatePlayerPosition(
+							(float) pos.getX(),
+							(float) pos.getY(),
+							(float) pos.getZ());
+					break;
+
+				case PLAYER_SPEED:
+					Point speed = (Point) event.data;
+					boardGame.updatePlayerSpeed(
+							(float) speed.getX(),
+							(float) speed.getY(),
+							(float) speed.getZ());
+					break;
+
+				case PLAYER_MODE:
+					String mode = (String) event.data;
+					boardGame.updatePlayerMode(mode);
+					break;
+			}
+		});
+	}
+
 }

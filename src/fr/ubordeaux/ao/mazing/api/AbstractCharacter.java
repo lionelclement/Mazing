@@ -9,17 +9,19 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
     protected BufferedImage[][][] shadow_images; // [state][direction][frame]
     protected Animation<? extends CharacterMode>[][] animations; // [state][direction]
 
-    protected float x, y, z; // case actuelle
+    protected float x, y, z;
+    protected float targetX, targetY, targetZ;
     protected float speedX, speedY, speedZ;
     protected Direction currentDirection;
     protected int offsetX;
     protected int offsetY;
 
     private Runnable onTileTrigger;
-    private Runnable loopTrigger;
-    private Runnable beginLoopTrigger;
-    private Runnable midLoopTrigger;
-    private Runnable endLoopTrigger;
+    private Runnable loopAnimationTrigger;
+    private Runnable beginLoopAnimationTrigger;
+    private Runnable midLoopAnimationTrigger;
+    private Runnable endLoopAnimationTrigger;
+    private Runnable tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
     public AbstractCharacter(int numberStates, int offsetX, int offsetY) {
@@ -47,7 +49,7 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         return currentDirection;
     }
 
-    protected void tick(int frameIndex) {
+    protected void callTickTrigger(int frameIndex) {
         x += speedX;
         y += speedY;
         z += speedZ;
@@ -65,6 +67,7 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
 
     @Override
     public void setSpeed(float speedX, float speedY, float speedZ) {
+        Direction lastDirection = getCurrentDirection();
         Direction newDirection = getCurrentDirection();
         if (speedX > 0 && speedY == 0)
             newDirection = Direction.EAST;
@@ -85,13 +88,18 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
 
         this.speedX = this.speedY = this.speedZ = 0;
 
-        // Change la direction et lance le déplacement
-        turnPlayer(newDirection, 75, () -> {
+        if (newDirection != lastDirection) {
+            // Change la direction et lance le déplacement
+            turnPlayer(newDirection, 75, () -> {
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.speedZ = speedZ;
+            });
+        } else {
             this.speedX = speedX;
             this.speedY = speedY;
             this.speedZ = speedZ;
-        });
-
+        }
     }
 
     // Déplace le personnage vers une case et ajuste la direction progressivement
@@ -229,9 +237,9 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         return z;
     }
 
-    public abstract void changeMode(String state);
+    public abstract void changeMode(String mode);
 
-    public abstract void changeMode(CharacterMode state);
+    public abstract void changeMode(CharacterMode mode);
 
     public abstract RenderType getRenderType();
 
@@ -244,33 +252,33 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         return getX() + getY() + 0.5f;
     }
 
-    public void callTikTrigger() {
-        if (endLoopTrigger != null) {
-            endLoopTrigger.run();
+    public void callTickTrigger() {
+        if (tickAnimationTrigger != null) {
+            tickAnimationTrigger.run();
         }
     }
 
-    public void callBeginLoopTrigger() {
-        if (beginLoopTrigger != null) {
-            beginLoopTrigger.run();
+    public void callBeginTrigger() {
+        if (beginLoopAnimationTrigger != null) {
+            beginLoopAnimationTrigger.run();
         }
     }
 
-    public void callMidLoopTrigger() {
-        if (midLoopTrigger != null) {
-            midLoopTrigger.run();
+    public void callMidTrigger() {
+        if (midLoopAnimationTrigger != null) {
+            midLoopAnimationTrigger.run();
         }
     }
 
-    public void callEndLoopTrigger() {
-        if (endLoopTrigger != null) {
-            endLoopTrigger.run();
+    public void callEndTrigger() {
+        if (endLoopAnimationTrigger != null) {
+            endLoopAnimationTrigger.run();
         }
     }
 
     public void callLoopTrigger() {
-        if (loopTrigger != null) {
-            loopTrigger.run();
+        if (loopAnimationTrigger != null) {
+            loopAnimationTrigger.run();
         }
     }
 
@@ -281,23 +289,28 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
     }
 
     @Override
-    public void setLoopTrigger(Runnable callback) {
-        loopTrigger = callback;
+    public void setTickAnimationTrigger(Runnable callback) {
+        tickAnimationTrigger = callback;
     }
 
     @Override
-    public void setBeginLoopTrigger(Runnable callback) {
-        endLoopTrigger = callback;
+    public void setBeginAnimationTrigger(Runnable callback) {
+        beginLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setMidLoopTrigger(Runnable callback) {
-        midLoopTrigger = callback;
+    public void setMidAnimationTrigger(Runnable callback) {
+        midLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setEndLoopTrigger(Runnable callback) {
-        endLoopTrigger = callback;
+    public void setEndAnimationTrigger(Runnable callback) {
+        endLoopAnimationTrigger = callback;
+    }
+
+    @Override
+    public void setLoopAnimationTrigger(Runnable callback) {
+        loopAnimationTrigger = callback;
     }
 
     @Override
