@@ -71,6 +71,7 @@ public class MazingView {
 
 				case MAZE: {
 					Maze maze = (Maze) event.data;
+					boardGame.clearMap();
 					generateMazeViewFromMazeModel(maze, (int) boardGame.getPlayerZ());
 				}
 					break;
@@ -150,9 +151,7 @@ public class MazingView {
 		int height = maze.getHeight();
 		int depth = maze.getDepth();
 
-		System.err.println("???");
 		boardGame.clearMap();
-
 		for (int z = 0; z <= level + 1 && z < depth; z++) {
 			float alpha = 0;
 			if (z <= level) {

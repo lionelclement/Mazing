@@ -28,6 +28,7 @@ public class MazingModel {
                 position = new Point(playerPositionX, playerPositionY, playerPositionZ);
                 if (listener != null) {
                         listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POS, position));
+                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
                 }
 
         }
@@ -74,6 +75,8 @@ public class MazingModel {
         }
 
         public void mazeGenerate() {
+                System.err.println("MazingModel@mazeGenerate()");
+                maze.clear();
                 maze.generate();
                 if (listener != null) {
                         listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE,

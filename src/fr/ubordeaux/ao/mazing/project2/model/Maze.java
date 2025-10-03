@@ -12,6 +12,10 @@ public class Maze {
         this.height = height;
         this.depth = depth;
         grid = new Cell[depth][height][width];
+        clear();
+    }
+
+    public void clear() {
         for (int z = 0; z < depth; z++) {
             for (int y = 0; y < width; y++) {
                 for (int x = 0; x < height; x++) {
@@ -27,10 +31,6 @@ public class Maze {
                 }
             }
         }
-    }
-
-    public Cell cell(int x, int y, int z) {
-        return grid[z][y][x];
     }
 
     public void generate() {
