@@ -24,37 +24,49 @@ public class MazingModel {
                 float dx = playerPositionX - x;
                 float dy = playerPositionY - y;
                 float dz = playerPositionZ - z;
-                this.playerPositionX = x;
-                this.playerPositionY = y;
-                this.playerPositionZ = z;
-                Point position;
-                position = new Point(playerPositionX, playerPositionY, playerPositionZ);
-                System.err.println(String.format("MazingMode@setPlayerPosition (%f, %f, %f)", x, y, z));
+                playerPositionX = x;
+                playerPositionY = y;
+                playerPositionZ = z;
+                System.err.println(String.format("MazingMode@setPlayerPosition (%f, %f, %f)",
+                                x, y, z));
 
                 if (listener != null) {
+                        Point position;
+                        position = new Point(playerPositionX, playerPositionY, playerPositionZ);
                         if (dz * dz > 0) {
+                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POS, position));
                                 listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
+
                         }
                         if (checkCollision(position)) {
-                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_MODE, "GOTHIT"));
                                 setPlayerSpeed(0, 0, 0);
 
                         }
                 }
+
         }
 
         public boolean checkCollision(Point p) {
-                // Ici tu testes si (x,y,z) est un mur, ou hors du labyrinthe
-                if (p.getX() < 0 || p.getX() >= maze.getWidth()
-                                || p.getY() < 0 || p.getY() >= maze.getHeight()
-                                || p.getZ() < 0 || p.getZ() >= maze.getDepth()) {
-                        return true;
-                }
-                return false;
-                // Cell c = maze.getCell(x, y, z);
-                // return c == null || c.isWall(Direction.NORTH) || c.isWall(Direction.SOUTH);
-                // etc selon les règles de collision
+                float oldX = (float) p.getX();
+                float oldY = (float) p.getY();
+
+                // clamp la position dans les bornes du labyrinthe
+                float clampedX = Math.max(0, Math.min(oldX, maze.getWidth() - 0.4f));
+                float clampedY = Math.max(0, Math.min(oldY, maze.getHeight() - 0.4f));
+
+                // si on a dû corriger, il y a collision
+                boolean collided = (clampedX != oldX) || (clampedY != oldY);
+
+                // mettre à jour la position du joueur si nécessaire
+                playerPositionX = clampedX;
+                playerPositionY = clampedY;
+
+                return collided;
         }
+
+        // Cell c = maze.getCell(x, y, z);
+        // return c == null || c.isWall(Direction.NORTH) || c.isWall(Direction.SOUTH);
+        // etc selon les règles de collision
 
         public void setPlayerSpeed(float playerSpeedX, float playerSpeedY, float playerSpeedZ) {
                 this.playerSpeedX = playerSpeedX;

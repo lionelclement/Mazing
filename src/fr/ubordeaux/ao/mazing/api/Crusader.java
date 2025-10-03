@@ -384,7 +384,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public float getIsoDepth() {
-        return getX() + getY() + 0.6f;
+        return getX() + getY() + 0.9f;
     }
 
     @Override

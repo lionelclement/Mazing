@@ -85,12 +85,14 @@ public class MazingView {
 		Crusader crusader = new Crusader();
 		boardGame.assignPlayer(crusader);
 		crusader.setTickAnimationTrigger(() -> {
-			System.err.println("VIEW -> MODEL");
-			// Si on avance, on envoie au modèle "PLAYER_MOVE" avec la position
-			if (viewListener != null) {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_POSITION,
-								new Point(crusader.getX() / 3, crusader.getY() / 3, crusader.getZ())));
+			if ((crusader.getSpeedX() * crusader.getSpeedX() + crusader.getSpeedY() * crusader.getSpeedY()) > 0) {
+				System.err.println("VIEW -> MODEL");
+				// Si on avance, on envoie au modèle "PLAYER_MOVE" avec la position
+				if (viewListener != null) {
+					viewListener.onViewEvent(
+							new ViewEvent(ViewEvent.Type.PLAYER_POSITION,
+									new Point(crusader.getX() / 3, crusader.getY() / 3, crusader.getZ())));
+				}
 			}
 		});
 
