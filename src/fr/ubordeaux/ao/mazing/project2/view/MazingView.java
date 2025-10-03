@@ -15,10 +15,16 @@ public class MazingView {
 	private Window window;
 	private IBoardGame boardGame;
 
+	private ViewListener viewListener;
+
 	public MazingView() {
 		window = new Window();
 		boardGame = window.getBoardGame();
 		init();
+	}
+
+	public void setViewListener(ViewListener listener) {
+		this.viewListener = listener;
 	}
 
 	public void addKeyListener(MazingController controller) {
@@ -81,16 +87,13 @@ public class MazingView {
 		crusader.setTickAnimationTrigger(() -> {
 			System.err.println(String.format("(%f, %f, %f)", crusader.getX(), crusader.getY(), crusader.getZ()));
 
-			// envoyer au model position ???
+			if (viewListener != null) {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_MOVE,
+								new Point(crusader.getX(), crusader.getY(), crusader.getZ())));
+			}
 		});
-		crusader.setBeginAnimationTrigger(() -> {
-		});
-		crusader.setMidAnimationTrigger(() -> {
-		});
-		crusader.setEndAnimationTrigger(() -> {
-		});
-		crusader.setLoopAnimationTrigger(() -> {
-		});
+
 		boardGame.addToSceneMap(crusader);
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {

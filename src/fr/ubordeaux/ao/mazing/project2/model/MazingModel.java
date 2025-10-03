@@ -10,17 +10,11 @@ public class MazingModel {
         private float playerPositionY;
         private float playerPositionZ;
         private Maze maze;
+        private ModelListener listener;
 
         public MazingModel(int width, int height, int depth) {
                 maze = new Maze(width, height, depth);
         }
-
-        // Interface pour le callback
-        public interface ModelListener {
-                void onModelUpdated(ModelEvent event);
-        }
-
-        private ModelListener listener;
 
         public void setListener(ModelListener listener) {
                 this.listener = listener;

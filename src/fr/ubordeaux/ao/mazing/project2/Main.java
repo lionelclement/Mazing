@@ -2,6 +2,7 @@ package fr.ubordeaux.ao.mazing.project2;
 
 import fr.ubordeaux.ao.mazing.project2.controller.MazingController;
 import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project2.model.Point;
 import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 
 public class Main {
@@ -12,6 +13,20 @@ public class Main {
 
         MazingController controller = new MazingController(model, view);
         view.addKeyListener(controller);
+
+        // Vue notifie aussi le modèle
+        view.setViewListener(event -> {
+            switch (event.type) {
+                case PLAYER_MOVE -> {
+                    Point p = (Point) event.data;
+                    model.setPlayerPosition((float) p.getX(), (float) p.getY(), (float) p.getZ());
+                }
+                case OTHER_ACTION -> {
+                    // tu pourrais rajouter d'autres actions (tir, ramasser un objet, etc.)
+                }
+            }
+        });
+
         view.setVisible(true);
         model.mazeGenerate();
     }
