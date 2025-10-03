@@ -12,10 +12,11 @@ import fr.ubordeaux.ao.mazing.project2.model.Point;
 
 public class MazingView {
 
-	private Window window;
-	private IBoardGame boardGame;
+	private final Window window;
+	private final IBoardGame boardGame;
 
 	private ViewListener viewListener;
+	private boolean gothit;
 
 	public MazingView() {
 		window = new Window();
@@ -42,42 +43,40 @@ public class MazingView {
 	public void bindToModel(MazingModel model) {
 		model.setListener((event) -> {
 			switch (event.type) {
-				case PLAYER_POS: {
+				case PLAYER_POS -> {
 					Point pos = (Point) event.data;
 					boardGame.updatePlayerPosition(
 							(float) pos.getX(),
 							(float) pos.getY(),
 							(float) pos.getZ());
 				}
-					break;
 
-				case PLAYER_SPEED:
+				case PLAYER_SPEED -> {
 					Point speed = (Point) event.data;
 					boardGame.updatePlayerSpeed(
 							(float) speed.getX(),
 							(float) speed.getY(),
 							(float) speed.getZ());
-					break;
+				}
 
-				case PLAYER_MODE:
+				case PLAYER_MODE -> {
 					String mode = (String) event.data;
 					boardGame.updatePlayerMode(mode);
-					break;
+				}
 
-				case WALLS:
+				case WALLS -> {
 					int[][][] walls = (int[][][]) event.data;
 					boardGame.addToSceneMap(walls);
-					break;
+				}
 
-				case MAZE: {
+				case MAZE -> {
 					Maze maze = (Maze) event.data;
 					boardGame.clearMap();
 					generateMazeViewFromMazeModel(maze, (int) boardGame.getPlayerZ());
 				}
-					break;
 
-				default:
-					break;
+				default -> {
+				}
 			}
 		});
 	}
@@ -86,23 +85,33 @@ public class MazingView {
 		Crusader crusader = new Crusader();
 		boardGame.assignPlayer(crusader);
 		crusader.setTickAnimationTrigger(() -> {
-			// System.err.println(String.format("(%f, %f, %f)", crusader.getX(),
-			// crusader.getY(), crusader.getZ()));
-			if (crusader.getSpeedX() + crusader.getSpeedY() + crusader.getSpeedZ() > 0) {
-				if (viewListener != null) {
-					viewListener.onViewEvent(
-							new ViewEvent(ViewEvent.Type.PLAYER_MOVE,
-									new Point(crusader.getX(), crusader.getY(), crusader.getZ())));
-				}
+			System.err.println("VIEW -> MODEL");
+			// Si on avance, on envoie au modèle "PLAYER_MOVE" avec la position
+			if (viewListener != null) {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_POSITION,
+								new Point(crusader.getX() / 3, crusader.getY() / 3, crusader.getZ())));
+			}
+		});
+
+		crusader.setBeginAnimationTrigger(() -> {
+			// Si on est GOTHIT, ons'arrète
+			if (crusader.getCurrentMode().name().equals("GOTHIT")) {
+				crusader.setSpeed(0, 0, 0);
+				gothit = true;
+			}
+		});
+
+		crusader.setEndAnimationTrigger(() -> {
+			// Si on est GOTHIT, ons'arrète
+			if (gothit) {
+				gothit = false;
+				crusader.setSpeed(0, 0, 0);
+				crusader.changeMode("IDLE");
 			}
 		});
 
 		boardGame.addToSceneMap(crusader);
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				boardGame.addToSceneMap(72, i, j, 0, 1.0f);
-			}
-		}
 		boardGame.fillTilesBackground(12, 1.0f);
 	}
 
@@ -112,37 +121,33 @@ public class MazingView {
 
 	private void addLineCell(int tileId, int baseX, int baseY, int baseZ, Direction dir, float alpha) {
 		switch (dir) {
-			case WEST:
+			case WEST -> {
 				for (int k = 0; k < 3; k++) {
 					boardGame.addToSceneMap(tileId, baseX, baseY + k, baseZ, alpha);
 				}
-				break;
+			}
 
-			case EAST:
+			case EAST -> {
 				for (int k = 0; k < 3; k++) {
 					boardGame.addToSceneMap(tileId, baseX + 2, baseY + k, baseZ, alpha);
 				}
-				break;
+			}
 
-			case NORTH:
+			case NORTH -> {
 				for (int k = 0; k < 3; k++) {
 					boardGame.addToSceneMap(tileId, baseX + k, baseY, baseZ, alpha);
 				}
-				break;
+			}
 
-			case SOUTH:
+			case SOUTH -> {
 				for (int k = 0; k < 3; k++) {
 					boardGame.addToSceneMap(tileId, baseX + k, baseY + 2, baseZ, alpha);
 				}
-				break;
+			}
 
-			case UP:
-				boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
-				break;
+			case UP -> boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
 
-			case DOWN:
-				boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
-				break;
+			case DOWN -> boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
 		}
 	}
 
@@ -152,8 +157,15 @@ public class MazingView {
 		int depth = maze.getDepth();
 
 		boardGame.clearMap();
+
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				boardGame.addToSceneMap(72, x, y, 0, 1.0f);
+			}
+		}
+
 		for (int z = 0; z <= level + 1 && z < depth; z++) {
-			float alpha = 0;
+			float alpha;
 			if (z <= level) {
 				alpha = 1;
 			} else {

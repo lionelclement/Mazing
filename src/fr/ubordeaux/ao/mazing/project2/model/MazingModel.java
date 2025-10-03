@@ -21,16 +21,39 @@ public class MazingModel {
         }
 
         public void setPlayerPosition(float x, float y, float z) {
+                float dx = playerPositionX - x;
+                float dy = playerPositionY - y;
+                float dz = playerPositionZ - z;
                 this.playerPositionX = x;
                 this.playerPositionY = y;
                 this.playerPositionZ = z;
                 Point position;
                 position = new Point(playerPositionX, playerPositionY, playerPositionZ);
-                if (listener != null) {
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POS, position));
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
-                }
+                System.err.println(String.format("MazingMode@setPlayerPosition (%f, %f, %f)", x, y, z));
 
+                if (listener != null) {
+                        if (dz * dz > 0) {
+                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
+                        }
+                        if (checkCollision(position)) {
+                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_MODE, "GOTHIT"));
+                                setPlayerSpeed(0, 0, 0);
+
+                        }
+                }
+        }
+
+        public boolean checkCollision(Point p) {
+                // Ici tu testes si (x,y,z) est un mur, ou hors du labyrinthe
+                if (p.getX() < 0 || p.getX() >= maze.getWidth()
+                                || p.getY() < 0 || p.getY() >= maze.getHeight()
+                                || p.getZ() < 0 || p.getZ() >= maze.getDepth()) {
+                        return true;
+                }
+                return false;
+                // Cell c = maze.getCell(x, y, z);
+                // return c == null || c.isWall(Direction.NORTH) || c.isWall(Direction.SOUTH);
+                // etc selon les règles de collision
         }
 
         public void setPlayerSpeed(float playerSpeedX, float playerSpeedY, float playerSpeedZ) {

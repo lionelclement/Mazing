@@ -18,20 +18,29 @@ public class MazingController extends KeyAdapter {
 
         if (e.getKeyChar() == 'a') {
             model.setPlayerMode("ATTACK");
+            return;
+        }
+
+        if (e.getKeyChar() == 'g') {
+            model.setPlayerMode("GOTHIT");
+            return;
         }
 
         if (e.getKeyChar() == 'j') {
             model.setPlayerMode("JUMP");
+            return;
         }
 
         if (e.getKeyChar() == 'd') {
             model.setPlayerMode("DEATH");
             model.setPlayerSpeed(0, 0, 0);
+            return;
         }
 
         if (e.getKeyChar() == 's') {
             model.setPlayerMode("IDLE");
             model.setPlayerSpeed(0, 0, 0);
+            return;
         }
 
         switch (e.getKeyCode()) {

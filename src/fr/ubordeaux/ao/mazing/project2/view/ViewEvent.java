@@ -2,7 +2,7 @@ package fr.ubordeaux.ao.mazing.project2.view;
 
 public class ViewEvent {
     public enum Type {
-        PLAYER_MOVE, OTHER_ACTION
+        PLAYER_POSITION, PLAYER_GOTHIT, OTHER_ACTION
     }
 
     public final Type type;

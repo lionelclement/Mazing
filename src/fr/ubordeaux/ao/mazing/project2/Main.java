@@ -17,10 +17,16 @@ public class Main {
         // Vue notifie aussi le modèle
         view.setViewListener(event -> {
             switch (event.type) {
-                case PLAYER_MOVE -> {
+                case PLAYER_POSITION -> {
                     Point p = (Point) event.data;
+                    System.err.println(String.format("PLAYER_POSITION: %s", p));
                     model.setPlayerPosition((float) p.getX(), (float) p.getY(), (float) p.getZ());
                 }
+
+                case PLAYER_GOTHIT -> {
+                    System.err.println("GOTHIT");
+                }
+
                 case OTHER_ACTION -> {
                     // tu pourrais rajouter d'autres actions (tir, ramasser un objet, etc.)
                 }

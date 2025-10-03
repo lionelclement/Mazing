@@ -222,6 +222,9 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 previousSpeedZ = speedZ;
                 break;
             case GOTHIT:
+                previousSpeedX = speedX;
+                previousSpeedY = speedY;
+                previousSpeedZ = speedZ;
                 soundManager.play(currentMode.name());
                 break;
             case JUMP:

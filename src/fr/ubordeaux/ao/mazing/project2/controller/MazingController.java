@@ -7,7 +7,7 @@ import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
 import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 
 public class MazingController extends KeyAdapter {
-    private MazingModel model;
+    private final MazingModel model;
 
     public MazingController(MazingModel model, MazingView view) {
         this.model = model;
@@ -18,6 +18,10 @@ public class MazingController extends KeyAdapter {
 
         if (e.getKeyChar() == 'a') {
             model.setPlayerMode("ATTACK");
+        }
+
+        if (e.getKeyChar() == 'g') {
+            model.setPlayerMode("GOTHIT");
         }
 
         if (e.getKeyChar() == 'j') {
