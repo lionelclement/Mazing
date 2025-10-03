@@ -182,21 +182,27 @@ public class MazingView {
 							if (d == Direction.WEST) {
 								addLineCell(108, x * 3, y * 3, z, d, alpha);
 							}
+							if (d == Direction.EAST) {
+								addLineCell(111, x * 3, y * 3, z, d, alpha);
+							}
 							if (d == Direction.NORTH) {
 								addLineCell(110, x * 3, y * 3, z, d, alpha);
+							}
+							if (d == Direction.SOUTH) {
+								addLineCell(109, x * 3, y * 3, z, d, alpha);
 							}
 						}
 						if (!cell.isPath(d)) {
 							if (x > 0 && d == Direction.WEST) {
 								addLineCell(172, x * 3, y * 3, z, d, alpha);
 							}
-							if (x < width && d == Direction.EAST) {
+							if (x < width - 1 && d == Direction.EAST) {
 								addLineCell(175, x * 3, y * 3, z, d, alpha);
 							}
 							if (y > 0 && d == Direction.NORTH) {
 								addLineCell(174, x * 3, y * 3, z, d, alpha);
 							}
-							if (y < height && d == Direction.SOUTH) {
+							if (y < height - 1 && d == Direction.SOUTH) {
 								addLineCell(173, x * 3, y * 3, z, d, alpha);
 							}
 							if (z > 0 && d == Direction.DOWN) {

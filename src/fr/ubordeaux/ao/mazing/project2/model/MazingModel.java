@@ -36,7 +36,6 @@ public class MazingModel {
                         if (dz * dz > 0) {
                                 listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POS, position));
                                 listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
-
                         }
                         if (checkCollision(position)) {
                                 setPlayerSpeed(0, 0, 0);
