@@ -1,6 +1,8 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
@@ -55,9 +57,8 @@ public class TileMap {
         return new Point2D.Float(isoX, isoY);
     }
 
-    public void drawImage(float x, float y, float z,
-            BufferedImage image, Graphics g,
-            int offsetX, int offsetY, RenderType renderType) {
+    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g, int offsetX, int offsetY,
+            RenderType renderType, float alpha) {
 
         // Projection isométrique
         int anchorY = (renderType == RenderType.FLOOR) ? tileHeight / 2
@@ -67,6 +68,16 @@ public class TileMap {
         Point2D p = gridToScreen(x, y, z, true);
         int screenX = (int) p.getX() + offsetX;
         int screenY = (int) p.getY() + offsetY;
+
+        // Cast Graphics en Graphics2D pour pouvoir gérer alpha
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Sauvegarder l'ancien composite
+        Composite oldComposite = g2d.getComposite();
+
+        // Définir l'alpha
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
         g.drawImage(image,
                 screenX - image.getWidth() / 2,
                 screenY - image.getHeight() + anchorY,

@@ -78,13 +78,13 @@ public final class Test {
                                         }
                         };
 
-                        boardGame.addToSceneMap(72, 1, 1, 0);
+                        boardGame.addToSceneMap(72, 1, 1, 0, 1.0f);
                         int k = 500;
                         int lenght = 7;
                         for (int i = 1; i <= lenght; i++) {
                                 for (int j = 1; j <= lenght; j++) {
                                         if ((Math.abs(i) + Math.abs(j)) % 2 == 1) {
-                                                boardGame.addToSceneMap(k++, i, j, 0);
+                                                boardGame.addToSceneMap(k++, i, j, 0, 1.0f);
                                         }
                                 }
                         }

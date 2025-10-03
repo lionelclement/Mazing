@@ -34,6 +34,16 @@ public class MazingController extends KeyAdapter {
             model.setPlayerSpeed(0, 0, 0);
         }
 
+        if (e.getKeyChar() == 'm') {
+            model.mazeGenerate();
+        }
+
+        if (e.getKeyChar() == 'h') {
+            model.setPlayerMode("IDLE");
+            model.setPlayerPosition(model.getPlayerPositionX(), model.getPlayerPositionY(),
+                    model.getPlayerPositionZ() + 1);
+        }
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP -> {
                 model.setPlayerMode("WALK");

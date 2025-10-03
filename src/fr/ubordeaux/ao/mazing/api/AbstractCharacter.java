@@ -41,28 +41,12 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
     public void render(Graphics g, int state) {
         Animation<T> anim = getCurrentAnimation(state);
         BufferedImage image = anim.getCurrentFrame();
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, getRenderType());
+        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, getRenderType(), 1.0f);
     }
 
     @Override
     public Direction getCurrentDirection() {
         return currentDirection;
-    }
-
-    protected void callTickTrigger(int frameIndex) {
-        x += speedX;
-        y += speedY;
-        z += speedZ;
-        float epsilon = 0.05f; // tolérance pour dire "proche d'un entier"
-
-        boolean onTileX = Math.abs(x - Math.round(x)) < epsilon;
-        boolean onTileY = Math.abs(y - Math.round(y)) < epsilon;
-        boolean onTileZ = Math.abs(z - Math.round(z)) < epsilon;
-
-        if (onTileX && onTileY && onTileZ) {
-            if (onTileTrigger != null)
-                onTileTrigger.run();
-        }
     }
 
     @Override
@@ -252,7 +236,20 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         return getX() + getY() + 0.5f;
     }
 
-    public void callTickTrigger() {
+    protected void callTickTrigger(int frameIndex) {
+        x += speedX;
+        y += speedY;
+        z += speedZ;
+        float epsilon = 0.05f; // tolérance pour dire "proche d'un entier"
+
+        boolean onTileX = Math.abs(x - Math.round(x)) < epsilon;
+        boolean onTileY = Math.abs(y - Math.round(y)) < epsilon;
+        boolean onTileZ = Math.abs(z - Math.round(z)) < epsilon;
+
+        if (onTileX && onTileY && onTileZ) {
+            if (onTileTrigger != null)
+                onTileTrigger.run();
+        }
         if (tickAnimationTrigger != null) {
             tickAnimationTrigger.run();
         }

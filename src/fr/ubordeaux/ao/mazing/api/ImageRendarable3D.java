@@ -13,10 +13,11 @@ public class ImageRendarable3D implements IRenderable3D {
     private int rank;
     private int offsetX;
     private int offsetY;
+    private float alpha;
 
     public ImageRendarable3D(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
             int rank,
-            RenderType renderType) {
+            RenderType renderType, float alpha) {
         this.bufferedImage = bufferedImage;
         this.x = x;
         this.y = y;
@@ -25,6 +26,7 @@ public class ImageRendarable3D implements IRenderable3D {
         this.offsetY = offsetY;
         this.rank = rank;
         this.renderType = renderType;
+        this.alpha = alpha;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class ImageRendarable3D implements IRenderable3D {
 
     @Override
     public void render(Graphics g) {
-        TileMap.getInstance().drawImage(x, y, z, bufferedImage, g, offsetX, offsetY, renderType);
+        TileMap.getInstance().drawImage(x, y, z, bufferedImage, g, offsetX, offsetY, renderType, alpha);
     }
 
     @Override

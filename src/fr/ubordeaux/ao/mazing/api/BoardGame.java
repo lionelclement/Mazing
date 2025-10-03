@@ -171,7 +171,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	@Override
-	public void fillTilesBackground(int code) {
+	public void fillTilesBackground(int code, float alpha) {
 
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = background.createGraphics();
@@ -194,7 +194,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 				for (int x = XMINBG; x < XMAXBG; x++) {
 					TileMap.getInstance().drawImage(x, y, 0, tileImg.getBufferedImage(),
 							g, tileImg.getOffsetX(), tileImg.getOffsetY(),
-							RenderType.FLOOR);
+							RenderType.FLOOR, alpha);
 				}
 			}
 		}
@@ -230,7 +230,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	@Override
-	public void addToSceneMap(int code, int x, int y, int z) {
+	public void addToSceneMap(int code, int x, int y, int z, float alpha) {
 		if (code != -1) {
 			Image image = codeToImageMap.get(code);
 			int rank = codeToRank(code);
@@ -238,7 +238,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 				ImageRendarable3D imageRendarable3D = new ImageRendarable3D(
 						image.getBufferedImage(), x, y, z, image.getOffsetX(),
 						image.getOffsetY(), rank,
-						image.getRenderType());
+						image.getRenderType(), alpha);
 				sceneObjects.add(imageRendarable3D);
 			}
 		}
@@ -265,7 +265,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 						if (image != null) {
 							ImageRendarable3D imageRendarable3D = new ImageRendarable3D(
 									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
-									image.getRenderType());
+									image.getRenderType(), 1.0f);
 
 							sceneObjects.add(imageRendarable3D);
 
@@ -324,6 +324,11 @@ public class BoardGame extends JPanel implements IBoardGame {
 	@Override
 	public void updatePlayerDirection(String direction) {
 		player.changeDirection(direction);
+	}
+
+	@Override
+	public void clearMap() {
+		sceneObjects.clear();
 	}
 
 }

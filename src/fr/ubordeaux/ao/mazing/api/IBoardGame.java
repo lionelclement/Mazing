@@ -2,7 +2,7 @@ package fr.ubordeaux.ao.mazing.api;
 
 public interface IBoardGame {
 
-    void fillTilesBackground(int code);
+    void fillTilesBackground(int code, float alpha);
 
     void fillCheckerboardBackground(int size);
 
@@ -26,8 +26,10 @@ public interface IBoardGame {
 
     void addToSceneMap(Character<?> character);
 
-    void addToSceneMap(int code, int x, int y, int z);
+    void addToSceneMap(int code, int x, int y, int z, float alpha);
 
     void addToSceneMap(int[][][] content);
+
+    void clearMap();
 
 }

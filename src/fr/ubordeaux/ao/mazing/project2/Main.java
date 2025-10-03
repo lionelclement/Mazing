@@ -13,8 +13,6 @@ public class Main {
         MazingController controller = new MazingController(model, view);
         view.addKeyListener(controller);
         view.setVisible(true);
-
-        model.mazeGenerate();
     }
 
 }
