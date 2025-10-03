@@ -2,6 +2,7 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 public class ImageRendarable3D implements IRenderable3D {
 

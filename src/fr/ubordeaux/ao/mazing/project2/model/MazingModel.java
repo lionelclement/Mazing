@@ -9,6 +9,11 @@ public class MazingModel {
         private float playerPositionX;
         private float playerPositionY;
         private float playerPositionZ;
+        private Maze maze;
+
+        public MazingModel(int width, int height, int depth) {
+                maze = new Maze(width, height, depth);
+        }
 
         // Interface pour le callback
         public interface ModelListener {
@@ -17,7 +22,6 @@ public class MazingModel {
 
         private ModelListener listener;
 
-        // Méthode pour enregistrer la vue
         public void setListener(ModelListener listener) {
                 this.listener = listener;
         }
@@ -26,10 +30,11 @@ public class MazingModel {
                 this.playerPositionX = x;
                 this.playerPositionY = y;
                 this.playerPositionZ = z;
+                Point position;
+                position = new Point(playerPositionX, playerPositionY, playerPositionZ);
                 if (listener != null) {
-                        Point position;
-                        position = new Point(playerPositionX, playerPositionY, playerPositionZ);
                         listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POS, position));
+                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
                 }
 
         }
@@ -54,6 +59,8 @@ public class MazingModel {
         }
 
         public float getPlayerPositionZ() {
+                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE,
+                                maze));
                 return playerPositionZ;
         }
 
@@ -74,7 +81,6 @@ public class MazingModel {
         }
 
         public void mazeGenerate() {
-                Maze maze = new Maze(3, 3, 3);
                 maze.generate();
                 if (listener != null) {
                         listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE,

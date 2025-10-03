@@ -34,8 +34,6 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
 
     void setEndAnimationTrigger(Runnable callback);
 
-    void setOnTileTrigger(Runnable callback);
-
     void setTickAnimationTrigger(Runnable callback);
 
 }

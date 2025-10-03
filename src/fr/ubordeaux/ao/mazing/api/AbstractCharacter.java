@@ -242,14 +242,6 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         z += speedZ;
         float epsilon = 0.05f; // tolérance pour dire "proche d'un entier"
 
-        boolean onTileX = Math.abs(x - Math.round(x)) < epsilon;
-        boolean onTileY = Math.abs(y - Math.round(y)) < epsilon;
-        boolean onTileZ = Math.abs(z - Math.round(z)) < epsilon;
-
-        if (onTileX && onTileY && onTileZ) {
-            if (onTileTrigger != null)
-                onTileTrigger.run();
-        }
         if (tickAnimationTrigger != null) {
             tickAnimationTrigger.run();
         }
@@ -279,12 +271,6 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         }
     }
 
-    public void callOnTileTrigger() {
-        if (onTileTrigger != null) {
-            onTileTrigger.run();
-        }
-    }
-
     @Override
     public void setTickAnimationTrigger(Runnable callback) {
         tickAnimationTrigger = callback;
@@ -310,8 +296,4 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         loopAnimationTrigger = callback;
     }
 
-    @Override
-    public void setOnTileTrigger(Runnable callback) {
-        onTileTrigger = callback;
-    }
 }

@@ -39,9 +39,13 @@ public class MazingController extends KeyAdapter {
         }
 
         if (e.getKeyChar() == 'h') {
-            model.setPlayerMode("IDLE");
             model.setPlayerPosition(model.getPlayerPositionX(), model.getPlayerPositionY(),
                     model.getPlayerPositionZ() + 1);
+        }
+
+        if (e.getKeyChar() == 'H') {
+            model.setPlayerPosition(model.getPlayerPositionX(), model.getPlayerPositionY(),
+                    model.getPlayerPositionZ() - 1);
         }
 
         switch (e.getKeyCode()) {

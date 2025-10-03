@@ -7,12 +7,13 @@ import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 public class Main {
     public static void main(String[] args) {
         MazingView view = new MazingView();
-        MazingModel model = new MazingModel();
+        MazingModel model = new MazingModel(3, 3, 3);
         view.bindToModel(model);
 
         MazingController controller = new MazingController(model, view);
         view.addKeyListener(controller);
         view.setVisible(true);
+        model.mazeGenerate();
     }
 
 }

@@ -79,7 +79,9 @@ public class MazingView {
 		Crusader crusader = new Crusader();
 		boardGame.assignPlayer(crusader);
 		crusader.setTickAnimationTrigger(() -> {
-			System.out.println(crusader.getX());
+			System.err.println(String.format("(%f, %f, %f)", crusader.getX(), crusader.getY(), crusader.getZ()));
+
+			// envoyer au model position ???
 		});
 		crusader.setBeginAnimationTrigger(() -> {
 		});
@@ -146,12 +148,12 @@ public class MazingView {
 		boardGame.clearMap();
 		// init();
 
-		for (int z = level; z <= level + 1 && z < depth; z++) {
+		for (int z = 0; z <= level + 1 && z < depth; z++) {
 			float alpha = 0;
-			if (z == level) {
+			if (z <= level) {
 				alpha = 1;
 			} else {
-				alpha = 0.5f;
+				alpha = 0f;
 			}
 			for (int y = 0; y < width; y++) {
 				for (int x = 0; x < height; x++) {
