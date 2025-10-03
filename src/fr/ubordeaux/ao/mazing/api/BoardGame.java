@@ -22,8 +22,8 @@ public class BoardGame extends JPanel implements IBoardGame {
 	private BufferedImage background;
 
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
-	List<IRenderable3D> _sceneObjects = new ArrayList<>();
-	List<IRenderable3D> _sceneCharacters = new ArrayList<>();
+	List<IRenderable3D> sceneObjects = new ArrayList<>();
+	List<IRenderable3D> sceneCharacters = new ArrayList<>();
 
 	@SuppressWarnings("rawtypes")
 	private List<Character> characters;
@@ -145,9 +145,9 @@ public class BoardGame extends JPanel implements IBoardGame {
 		// Centre de l'écran pour le rendu
 		g.translate(width / 2, TILE_HEIGHT);
 
-		List<IRenderable3D> renderableScene = new ArrayList<>(_sceneObjects.size() + _sceneCharacters.size());
-		renderableScene.addAll(_sceneObjects);
-		renderableScene.addAll(_sceneCharacters);
+		List<IRenderable3D> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
+		renderableScene.addAll(sceneObjects);
+		renderableScene.addAll(sceneCharacters);
 		renderScene(g, renderableScene);
 
 	}
@@ -243,7 +243,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 						image.getBufferedImage(), x, y, z, image.getOffsetX(),
 						image.getOffsetY(), rank,
 						image.getRenderType(), alpha);
-				_sceneObjects.add(imageRendarable3D);
+				sceneObjects.add(imageRendarable3D);
 			}
 		}
 	}
@@ -271,7 +271,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
 									image.getRenderType(), 1.0f);
 
-							_sceneObjects.add(imageRendarable3D);
+							sceneObjects.add(imageRendarable3D);
 
 						}
 
@@ -285,7 +285,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	@Override
 	public void addToSceneMap(Character<?> character) {
 		characters.add(character);
-		_sceneCharacters.add(character);
+		sceneCharacters.add(character);
 	}
 
 	// getter pour position actuelle du joueur en grille
@@ -332,7 +332,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 
 	@Override
 	public void clearMap() {
-		_sceneObjects.clear();
+		sceneObjects.clear();
 	}
 
 }

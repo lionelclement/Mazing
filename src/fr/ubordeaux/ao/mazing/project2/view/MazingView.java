@@ -85,12 +85,14 @@ public class MazingView {
 		Crusader crusader = new Crusader();
 		boardGame.assignPlayer(crusader);
 		crusader.setTickAnimationTrigger(() -> {
-			System.err.println(String.format("(%f, %f, %f)", crusader.getX(), crusader.getY(), crusader.getZ()));
-
-			if (viewListener != null) {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_MOVE,
-								new Point(crusader.getX(), crusader.getY(), crusader.getZ())));
+			// System.err.println(String.format("(%f, %f, %f)", crusader.getX(),
+			// crusader.getY(), crusader.getZ()));
+			if (crusader.getSpeedX() + crusader.getSpeedY() + crusader.getSpeedZ() > 0) {
+				if (viewListener != null) {
+					viewListener.onViewEvent(
+							new ViewEvent(ViewEvent.Type.PLAYER_MOVE,
+									new Point(crusader.getX(), crusader.getY(), crusader.getZ())));
+				}
 			}
 		});
 
@@ -148,8 +150,8 @@ public class MazingView {
 		int height = maze.getHeight();
 		int depth = maze.getDepth();
 
+		System.err.println("???");
 		boardGame.clearMap();
-		// init();
 
 		for (int z = 0; z <= level + 1 && z < depth; z++) {
 			float alpha = 0;

@@ -8,7 +8,7 @@ import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 public class Main {
     public static void main(String[] args) {
         MazingView view = new MazingView();
-        MazingModel model = new MazingModel(3, 3, 3);
+        MazingModel model = new MazingModel(3, 3, 2);
         view.bindToModel(model);
 
         MazingController controller = new MazingController(model, view);
@@ -18,6 +18,7 @@ public class Main {
         view.setViewListener(event -> {
             switch (event.type) {
                 case PLAYER_MOVE -> {
+                    System.err.println("Receive view -> model");
                     Point p = (Point) event.data;
                     model.setPlayerPosition((float) p.getX(), (float) p.getY(), (float) p.getZ());
                 }
@@ -27,8 +28,8 @@ public class Main {
             }
         });
 
-        view.setVisible(true);
         model.mazeGenerate();
+        view.setVisible(true);
     }
 
 }

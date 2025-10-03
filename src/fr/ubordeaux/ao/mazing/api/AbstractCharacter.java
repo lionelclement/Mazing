@@ -33,6 +33,18 @@ abstract class AbstractCharacter<T extends CharacterMode> implements Character<T
         currentDirection = Direction.SOUTH;
     }
 
+    public float getSpeedX() {
+        return speedX;
+    }
+
+    public float getSpeedY() {
+        return speedY;
+    }
+
+    public float getSpeedZ() {
+        return speedZ;
+    }
+
     @SuppressWarnings("unchecked")
     public Animation<T> getCurrentAnimation(int state) {
         return (Animation<T>) animations[state][currentDirection.ordinal()];
