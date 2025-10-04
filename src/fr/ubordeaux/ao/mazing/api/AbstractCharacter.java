@@ -3,7 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-abstract class AbstractCharacter<T extends CharacterMode> implements Character<T> {
+public abstract class AbstractCharacter<T extends CharacterMode> implements Character<T> {
 
     protected BufferedImage[][][] images; // [state][direction][frame]
     protected BufferedImage[][][] shadow_images; // [state][direction][frame]

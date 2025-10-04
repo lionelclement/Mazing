@@ -36,6 +36,9 @@ public class Maze {
     public void generate() {
         Stack<Cell> stack = new Stack<>();
         Cell start = grid[0][0][0];
+        // mettre une porte entre current et next
+        // grid[0][0][0].paths.put(Direction.WEST, true);
+
         start.visited = true;
         stack.push(start);
 
@@ -59,6 +62,7 @@ public class Maze {
                 stack.pop();
             }
         }
+        System.err.println("Maze generated:");
         System.err.println(this);
     }
 

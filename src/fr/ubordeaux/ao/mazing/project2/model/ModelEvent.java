@@ -2,7 +2,7 @@ package fr.ubordeaux.ao.mazing.project2.model;
 
 public class ModelEvent {
     public enum Type {
-        PLAYER_POS, PLAYER_SPEED, PLAYER_MODE, WALLS, MAZE
+        PLAYER_POSITIONZ, PLAYER_SPEED, PLAYER_MODE, WALLS, MAZE
     }
 
     public final Type type;

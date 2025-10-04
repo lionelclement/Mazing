@@ -8,6 +8,7 @@ import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 
 public class MazingController extends KeyAdapter {
     private final MazingModel model;
+    private final static float SPEED_WALK = 0.05f;
 
     public MazingController(MazingModel model, MazingView view) {
         this.model = model;
@@ -43,31 +44,33 @@ public class MazingController extends KeyAdapter {
         }
 
         if (e.getKeyChar() == 'h') {
-            model.setPlayerPosition(model.getPlayerPositionX(), model.getPlayerPositionY(),
-                    model.getPlayerPositionZ() + 1);
+            if (model.isOnSteps() && model.getPlayerPositionZ() < model.getMazeDepth() - 1) {
+                model.setPlayerPositionZ(model.getPlayerPositionZ() + 1);
+            }
         }
 
         if (e.getKeyChar() == 'H') {
-            model.setPlayerPosition(model.getPlayerPositionX(), model.getPlayerPositionY(),
-                    model.getPlayerPositionZ() - 1);
+            if (model.isOnTrapdoor() && model.getPlayerPositionZ() > 0) {
+                model.setPlayerPositionZ(model.getPlayerPositionZ() - 1);
+            }
         }
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP -> {
                 model.setPlayerMode("WALK");
-                model.setPlayerSpeed(0, -0.05f, 0);
+                model.setPlayerSpeed(0, -SPEED_WALK, 0);
             }
             case KeyEvent.VK_DOWN -> {
                 model.setPlayerMode("WALK");
-                model.setPlayerSpeed(0, 0.05f, 0);
+                model.setPlayerSpeed(0, SPEED_WALK, 0);
             }
             case KeyEvent.VK_LEFT -> {
                 model.setPlayerMode("WALK");
-                model.setPlayerSpeed(-0.05f, 0, 0);
+                model.setPlayerSpeed(-SPEED_WALK, 0, 0);
             }
             case KeyEvent.VK_RIGHT -> {
                 model.setPlayerMode("WALK");
-                model.setPlayerSpeed(0.05f, 0, 0);
+                model.setPlayerSpeed(SPEED_WALK, 0, 0);
             }
             case KeyEvent.VK_Q -> {
                 System.exit(0);

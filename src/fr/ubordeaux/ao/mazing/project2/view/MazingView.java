@@ -10,6 +10,10 @@ import fr.ubordeaux.ao.mazing.project2.model.Maze;
 import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
 import fr.ubordeaux.ao.mazing.project2.model.Point;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class MazingView {
 
 	private final Window window;
@@ -17,6 +21,12 @@ public class MazingView {
 
 	private ViewListener viewListener;
 	private boolean gothit;
+
+	Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(111, 175));
+	Set<Integer> southBarrier = new HashSet<>(Arrays.asList(109, 173));
+
+	Set<Integer> westBarrier = new HashSet<>(Arrays.asList(108, 172));
+	Set<Integer> northBarrier = new HashSet<>(Arrays.asList(110, 174));
 
 	public MazingView() {
 		window = new Window();
@@ -43,12 +53,9 @@ public class MazingView {
 	public void bindToModel(MazingModel model) {
 		model.setListener((event) -> {
 			switch (event.type) {
-				case PLAYER_POS -> {
-					Point pos = (Point) event.data;
-					boardGame.updatePlayerPosition(
-							(float) pos.getX(),
-							(float) pos.getY(),
-							(float) pos.getZ());
+				case PLAYER_POSITIONZ -> {
+					Float pos = (Float) event.data;
+					boardGame.updatePlayerPosition(boardGame.getPlayerX(), boardGame.getPlayerY(), pos);
 				}
 
 				case PLAYER_SPEED -> {
@@ -83,20 +90,109 @@ public class MazingView {
 
 	private void init() {
 		Crusader crusader = new Crusader();
+		crusader.setPosition(1, 1, 0);
 		boardGame.assignPlayer(crusader);
 		crusader.setTickAnimationTrigger(() -> {
-			if ((crusader.getSpeedX() * crusader.getSpeedX() + crusader.getSpeedY() * crusader.getSpeedY()) > 0) {
-				System.err.println("VIEW -> MODEL");
-				// Si on avance, on envoie au modèle "PLAYER_MOVE" avec la position
-				if (viewListener != null) {
-					viewListener.onViewEvent(
-							new ViewEvent(ViewEvent.Type.PLAYER_POSITION,
-									new Point(crusader.getX() / 3, crusader.getY() / 3, crusader.getZ())));
+
+			Set<Integer> set = new HashSet<>();
+
+			int cx = (int) crusader.getX();
+			int cy = (int) crusader.getY();
+			int cz = (int) crusader.getZ();
+
+			// boucle sur x-1 à x+1 et y-1 à y+1
+			for (int dx = -1; dx <= 1; dx++) {
+				for (int dy = -1; dy <= 1; dy++) {
+					Set<Integer> objects = boardGame.getSceneObjectsFromPoint(cx + dx, cy + dy, cz);
+					if (objects != null) {
+						set.addAll(objects);
+					}
 				}
 			}
+			if (set.contains(308)) {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_ON_STEPS, true));
+			} else {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_ON_STEPS, false));
+			}
+
+			if (set.contains(76)) {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_ON_TRAPDOOR, true));
+			} else {
+				viewListener.onViewEvent(
+						new ViewEvent(ViewEvent.Type.PLAYER_ON_TRAPDOOR, false));
+			}
+
+			set = boardGame.getSceneObjectsFromPoint((int) crusader.getX(),
+					(int) crusader.getY(),
+					(int) crusader.getZ());
+			if (set != null && !set.isEmpty()) {
+
+				// System.err.println(set);
+
+				Set<Integer> copy;
+
+				// South barrier
+				copy = new HashSet<>(set);
+				copy.retainAll(southBarrier);
+				if (!copy.isEmpty()) {
+					if (crusader.getSpeedY() > 0 && crusader.getY() % 1 < 0.1f) {
+						// replace
+						crusader.setPosition(crusader.getX(), crusader.getY() - 0.2f, crusader.getZ());
+						// send to Model
+						viewListener.onViewEvent(
+								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
+					}
+				}
+
+				// North barrier
+				copy = new HashSet<>(set);
+				copy.retainAll(northBarrier);
+				if (!copy.isEmpty()) {
+					if (crusader.getSpeedY() < 0 && crusader.getY() % 1 < 0.1f) {
+						// replace
+						crusader.setPosition(crusader.getX(), crusader.getY() + 0.1f, crusader.getZ());
+						// send to Model
+						viewListener.onViewEvent(
+								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
+					}
+				}
+
+				// East barrier
+				copy = new HashSet<>(set);
+				copy.retainAll(eastBarrier);
+				if (!copy.isEmpty()) {
+					if (crusader.getSpeedX() > 0 && crusader.getX() % 1 < 0.1f) {
+						// replace
+						crusader.setPosition(crusader.getX() - 0.2f, crusader.getY(), crusader.getZ());
+						// send to Model
+						viewListener.onViewEvent(
+								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
+					}
+				}
+
+				// West barrier
+				copy = new HashSet<>(set);
+				copy.retainAll(westBarrier);
+				if (!copy.isEmpty()) {
+					if (crusader.getSpeedX() < 0 && crusader.getX() % 1 < 0.1f) {
+						// replace
+						crusader.setPosition(crusader.getX() + 0.1f, crusader.getY(), crusader.getZ());
+						// send to Model
+						viewListener.onViewEvent(
+								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
+
+					}
+				}
+			}
+			// }
 		});
 
-		crusader.setBeginAnimationTrigger(() -> {
+		crusader.setBeginAnimationTrigger(() ->
+
+		{
 			// Si on est GOTHIT, ons'arrète
 			if (crusader.getCurrentMode().name().equals("GOTHIT")) {
 				crusader.setSpeed(0, 0, 0);
@@ -214,15 +310,13 @@ public class MazingView {
 							if (z > 0 && d == Direction.DOWN) {
 								addLineCell(24, x * 3, y * 3, z, Direction.NORTH, alpha);
 								addCell(24, x * 3, y * 3 + 1, z, alpha);
+								addCell(76, x * 3 + 1, y * 3 + 1, z, alpha);
 								addCell(24, x * 3 + 2, y * 3 + 1, z, alpha);
 								addLineCell(24, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
 							}
 							if (z < depth && d == Direction.UP) {
 								addLineCell(308, x * 3, y * 3, z, d, alpha);
 							}
-							// if (z < depth && d == Direction.UP) {
-							// addWallForCell(20, x * 3, y * 3, z, d);
-							// }
 						}
 					}
 				}

@@ -51,8 +51,11 @@ public class TileMap {
         int originY = origin ? this.originY : 0;
 
         // Projection isométrique
-        float isoX = originX + (col - row) * tileWidth / 2;
-        float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight * 0.60f;
+        // float isoX = originX + (col - row) * tileWidth / 2;
+        // float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight *
+        // 0.60f;
+        float isoX = originX + (col - row) * (tileWidth / 2.0f);
+        float isoY = originY + (col + row) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
 
         return new Point2D.Float(isoX, isoY);
     }

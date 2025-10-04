@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.*;
 
@@ -24,6 +26,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
 	List<IRenderable3D> sceneObjects = new ArrayList<>();
 	List<IRenderable3D> sceneCharacters = new ArrayList<>();
+	Map<Point, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
 	@SuppressWarnings("rawtypes")
 	private List<Character> characters;
@@ -244,6 +247,9 @@ public class BoardGame extends JPanel implements IBoardGame {
 						image.getOffsetY(), rank,
 						image.getRenderType(), alpha);
 				sceneObjects.add(imageRendarable3D);
+				pointToSceneObjectsMap
+						.computeIfAbsent(new Point(x, y, z), k -> new HashSet<>())
+						.add(code);
 			}
 		}
 	}
@@ -272,6 +278,9 @@ public class BoardGame extends JPanel implements IBoardGame {
 									image.getRenderType(), 1.0f);
 
 							sceneObjects.add(imageRendarable3D);
+							pointToSceneObjectsMap
+									.computeIfAbsent(new Point(x, y, z), k -> new HashSet<>())
+									.add(code);
 
 						}
 
@@ -333,6 +342,12 @@ public class BoardGame extends JPanel implements IBoardGame {
 	@Override
 	public void clearMap() {
 		sceneObjects.clear();
+		pointToSceneObjectsMap.clear();
+	}
+
+	@Override
+	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
+		return pointToSceneObjectsMap.get(new Point(x, y, z));
 	}
 
 }

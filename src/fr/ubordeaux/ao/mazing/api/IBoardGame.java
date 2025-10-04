@@ -1,5 +1,7 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.util.Set;
+
 public interface IBoardGame {
 
     void fillTilesBackground(int code, float alpha);
@@ -31,5 +33,7 @@ public interface IBoardGame {
     void addToSceneMap(int[][][] content);
 
     void clearMap();
+
+    Set<Integer> getSceneObjectsFromPoint(int x, int y, int z);
 
 }

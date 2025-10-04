@@ -2,8 +2,9 @@ package fr.ubordeaux.ao.mazing.project2;
 
 import fr.ubordeaux.ao.mazing.project2.controller.MazingController;
 import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project2.model.Point;
 import fr.ubordeaux.ao.mazing.project2.view.MazingView;
+import fr.ubordeaux.ao.mazing.project2.view.ViewEvent;
+import fr.ubordeaux.ao.mazing.project2.view.ViewListener;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,20 +16,25 @@ public class Main {
         view.addKeyListener(controller);
 
         // Vue notifie aussi le modèle
-        view.setViewListener(event -> {
-            switch (event.type) {
-                case PLAYER_POSITION -> {
-                    Point p = (Point) event.data;
-                    System.err.println(String.format("PLAYER_POSITION: %s", p));
-                    model.setPlayerPosition((float) p.getX(), (float) p.getY(), (float) p.getZ());
-                }
+        view.setViewListener(new ViewListener() {
+            @Override
+            public void onViewEvent(ViewEvent event) {
+                switch (event.type) {
 
-                case PLAYER_GOTHIT -> {
-                    System.err.println("GOTHIT");
-                }
+                    case PLAYER_GOTHIT -> {
+                        model.gothit();
+                    }
 
-                case OTHER_ACTION -> {
-                    // tu pourrais rajouter d'autres actions (tir, ramasser un objet, etc.)
+                    case PLAYER_ON_STEPS -> {
+                        Boolean b = (Boolean) event.data;
+                        model.setOnSteps(b);
+                    }
+
+                    case PLAYER_ON_TRAPDOOR -> {
+                        Boolean b = (Boolean) event.data;
+                        model.setOnTrapdoor(b);
+                    }
+
                 }
             }
         });
