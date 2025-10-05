@@ -28,7 +28,6 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     protected int offsetX;
     protected int offsetY;
 
-    private Runnable onTileTrigger;
     private Runnable loopAnimationTrigger;
     private Runnable beginLoopAnimationTrigger;
     private Runnable midLoopAnimationTrigger;
@@ -46,6 +45,7 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public Animation<T> getCurrentAnimation(int state) {
         return (Animation<T>) animations[state][currentDirection.ordinal()];
     }
@@ -99,6 +99,7 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     }
 
     // Déplace le personnage vers une case et ajuste la direction progressivement
+    @Override
     public void setPosition(float x, float y, float z) {
         this.x = x;
         this.y = y;
@@ -107,8 +108,8 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
 
     protected void turnPlayer(Direction targetDirection, int delayMs, Runnable onFinished) {
 
-        Direction currentDirection = getCurrentDirection();
-        int currentAngle = currentDirection.getAngle();
+        Direction direction = getCurrentDirection();
+        int currentAngle = direction.getAngle();
         int targetAngle = targetDirection.getAngle();
 
         int delta = ((targetAngle - currentAngle + 540) % 360) - 180;
@@ -116,7 +117,7 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         int stepSign = (delta >= 0) ? 1 : -1;
 
         if (steps == 0) {
-            if (onFinished != null)
+            if (null != onFinished)
                 onFinished.run();
             return;
         }
@@ -248,14 +249,19 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         this.z = z;
     }
 
+    @Override
     public abstract void changeMode(String mode);
 
+    @Override
     public abstract void changeMode(CharacterMode mode);
 
+    @Override
     public abstract RenderType getRenderType();
 
+    @Override
     public abstract void render(Graphics g);
 
+    @Override
     public abstract int getRank();
 
     @Override
@@ -267,7 +273,6 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         x += speedX;
         y += speedY;
         z += speedZ;
-        float epsilon = 0.05f; // tolérance pour dire "proche d'un entier"
 
         if (tickAnimationTrigger != null) {
             tickAnimationTrigger.run();

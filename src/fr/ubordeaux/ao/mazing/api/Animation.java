@@ -66,6 +66,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 *
 	 * @param owner personnage propriétaire de l'animation
 	 */
+	@Override
 	public void tick(AbstractCharacter<? extends CharacterMode> owner) {
 		owner.callTickTrigger(frameIndex);
 		if (!frozen) {
@@ -94,6 +95,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 *
 	 * @return image actuelle
 	 */
+	@Override
 	public BufferedImage getCurrentFrame() {
 		return images[frameIndex];
 	}
@@ -103,6 +105,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 *
 	 * @return image d'ombre actuelle
 	 */
+	@Override
 	public BufferedImage getCurrentShadow() {
 		return shadows[frameIndex];
 	}
@@ -110,6 +113,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	/**
 	 * Réinitialise l'animation au début et la dégelée si elle était gelée.
 	 */
+	@Override
 	public void reset() {
 		frameIndex = 0;
 		frozen = false;
@@ -118,6 +122,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	/**
 	 * Force l'animation à sa dernière frame et la gèle.
 	 */
+	@Override
 	public void lastFrame() {
 		frameIndex = images.length - 1;
 		frozen = true;

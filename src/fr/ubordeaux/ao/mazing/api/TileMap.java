@@ -2,7 +2,6 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
@@ -16,8 +15,8 @@ import java.awt.image.BufferedImage;
 public class TileMap {
     private final int tileWidth;
     private final int tileHeight;
-    private int originX;
-    private int originY;
+    private final int originX;
+    private final int originY;
     private static TileMap instance;
 
     private TileMap(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols, int rows) {
@@ -52,15 +51,15 @@ public class TileMap {
      */
     public Point2D gridToScreen(float col, float row, float step, boolean origin) {
 
-        int originX = origin ? this.originX : 0;
-        int originY = origin ? this.originY : 0;
+        int _originX = origin ? this.originX : 0;
+        int _originY = origin ? this.originY : 0;
 
         // Projection isométrique
         // float isoX = originX + (col - row) * tileWidth / 2;
         // float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight *
         // 0.60f;
-        float isoX = originX + (col - row) * (tileWidth / 2.0f);
-        float isoY = originY + (col + row) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
+        float isoX = _originX + (col - row) * (tileWidth / 2.0f);
+        float isoY = _originY + (col + row) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
 
         return new Point2D.Float(isoX, isoY);
     }
@@ -81,7 +80,7 @@ public class TileMap {
         Graphics2D g2d = (Graphics2D) g;
 
         // Sauvegarder l'ancien composite
-        Composite oldComposite = g2d.getComposite();
+        // Composite oldComposite = g2d.getComposite();
 
         // Définir l'alpha
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));

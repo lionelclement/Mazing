@@ -7,7 +7,7 @@ import fr.ubordeaux.ao.mazing.project1.model.MazingModel;
 import fr.ubordeaux.ao.mazing.project1.view.MazingView;
 
 public class MazingController extends KeyAdapter {
-    private MazingModel model;
+    private final MazingModel model;
 
     public MazingController(MazingModel model, MazingView view) {
         this.model = model;

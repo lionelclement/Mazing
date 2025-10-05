@@ -1,7 +1,8 @@
 package fr.ubordeaux.ao.mazing.project2.view;
 
-import fr.ubordeaux.ao.mazing.api.IBoardGame;
 import fr.ubordeaux.ao.mazing.api.Character;
+import fr.ubordeaux.ao.mazing.api.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.IRenderable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class CharacterView {
     }
 
     private void handleCollisions() {
-        Set<Integer> set = boardGame.getSceneObjectsFromPoint(
+        Set<Integer> set = (Set<Integer>) boardGame.getSceneObjectsFromPoint(
                 (int) character.getX(), (int) character.getY(), (int) character.getZ());
         if (set == null || set.isEmpty())
             return;
@@ -102,10 +103,12 @@ public class CharacterView {
         checkBarrier(set, westBarrier, -1, 0, 0.1f);
     }
 
-    private void checkBarrier(Set<Integer> set, Set<Integer> barrier, int dx, int dy, float pushBack) {
-        Set<Integer> copy = new HashSet<>(set);
-        copy.retainAll(barrier);
-        if (!copy.isEmpty()) {
+    private void checkBarrier(Set<Integer> renderables, Set<Integer> barrier, int dx, int dy, float pushBack) {
+        // Tester l'intersection entre les deux ensembles
+        Set<Integer> copy = new HashSet<>(renderables);
+        copy.retainAll(barrier); // garde uniquement les éléments communs
+
+        if (!copy.isEmpty()) { // collision détectée
             if ((dx != 0 && character.getSpeedX() * dx > 0 && character.getX() % 1 < 0.1f) ||
                     (dy != 0 && character.getSpeedY() * dy > 0 && character.getY() % 1 < 0.1f)) {
                 // on repousse légèrement le personnage

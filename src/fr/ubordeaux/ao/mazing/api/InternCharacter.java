@@ -6,7 +6,7 @@ package fr.ubordeaux.ao.mazing.api;
  *
  * @param <S> type de l'état du personnage, étendant CharacterMode
  */
-public interface InternCharacter<S extends CharacterMode> extends IRenderable3D {
+public interface InternCharacter<S extends CharacterMode> extends IRenderable {
 
     /**
      * Retourne l'animation courante pour un état donné.

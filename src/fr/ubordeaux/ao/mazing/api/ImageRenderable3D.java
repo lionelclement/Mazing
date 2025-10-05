@@ -6,20 +6,20 @@ import java.util.Objects;
 
 /**
  * Représente un objet 3D à afficher sur le plateau de jeu.
- * Implémente {@link IRenderable3D} pour être trié et rendu correctement selon
+ * Implémente {@link IRenderable} pour être trié et rendu correctement selon
  * sa profondeur et son rang.
  */
-public class ImageRenderable3D implements IRenderable3D {
+public class ImageRenderable3D implements IRenderable {
 
-    private BufferedImage bufferedImage;
-    private float x;
-    private float y;
-    private float z;
-    private RenderType renderType;
-    private int rank;
-    private int offsetX;
-    private int offsetY;
-    private float alpha;
+    private final BufferedImage bufferedImage;
+    private final float x;
+    private final float y;
+    private final float z;
+    private final RenderType renderType;
+    private final int rank;
+    private final int offsetX;
+    private final int offsetY;
+    private final float alpha;
 
     public ImageRenderable3D(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
             int rank,

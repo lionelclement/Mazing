@@ -115,13 +115,6 @@ public interface IBoardGame {
     void addToSceneMap(int[][][] content);
 
     /**
-     * Supprime un objet 3D de la scène.
-     *
-     * @param obj objet à retirer
-     */
-    public void removeMap(int x, int y, int z, IRenderable3D obj);
-
-    /**
      * Efface tous les éléments de la scène.
      */
     void clearMap();
@@ -134,5 +127,5 @@ public interface IBoardGame {
      * @param z Coordonnée Z.
      * @return Ensemble des codes d'objets présents à la position spécifiée.
      */
-    Set<IRenderable3D> getSceneObjectsFromPoint(int x, int y, int z);
+    Set<Integer> getSceneObjectsFromPoint(int x, int y, int z);
 }

@@ -6,7 +6,7 @@ import java.awt.Graphics;
  * Interface représentant un objet ou personnage pouvant être rendu en 3D
  * dans l'espace du jeu, avec position et priorité de rendu.
  */
-interface IRenderable3D {
+public interface IRenderable {
 
     /**
      * Retourne la position X du rendu.

@@ -54,14 +54,14 @@ public class BoardGame extends JPanel implements IBoardGame {
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
 
 	/** Liste des objets 3D présents dans la scène */
-	List<IRenderable3D> sceneObjects = new ArrayList<>();
+	List<IRenderable> sceneObjects = new ArrayList<>();
 
 	/** Liste des personnages présents dans la scène */
-	List<IRenderable3D> sceneCharacters = new ArrayList<>();
+	List<IRenderable> sceneCharacters = new ArrayList<>();
 
 	/** Mapping des coordonnées vers les codes d’objets de scène */
 	// Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
-	Map<DiscretePoint, Set<IRenderable3D>> pointToSceneObjectsMap = new HashMap<>();
+	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
 	/** Liste des personnages du plateau */
 	@SuppressWarnings("rawtypes")
@@ -193,18 +193,18 @@ public class BoardGame extends JPanel implements IBoardGame {
 		repaint();
 	}
 
-	private void renderScene(Graphics g, List<IRenderable3D> sceneObjects) {
+	private void renderScene(Graphics g, List<IRenderable> sceneObjects) {
 		// Trier les objets par z, puis x+y, puis par type
-		List<IRenderable3D> sorted = sceneObjects.stream()
+		List<IRenderable> sorted = sceneObjects.stream()
 				.sorted(Comparator
-						.comparingInt(o -> ((int) ((IRenderable3D) o).getZ()))
-						.thenComparingInt(o -> ((int) ((IRenderable3D) o).getIsoDepth()))
-						.thenComparingInt(o -> ((IRenderable3D) o).getRenderType().ordinal())
-						.thenComparingInt(o -> ((IRenderable3D) o).getRank())
-						.thenComparing(o -> ((IRenderable3D) o).getIsoDepth()))
+						.comparingInt(o -> ((int) ((IRenderable) o).getZ()))
+						.thenComparingInt(o -> ((int) ((IRenderable) o).getIsoDepth()))
+						.thenComparingInt(o -> ((IRenderable) o).getRenderType().ordinal())
+						.thenComparingInt(o -> ((IRenderable) o).getRank())
+						.thenComparing(o -> ((IRenderable) o).getIsoDepth()))
 				.toList();
 
-		for (IRenderable3D obj : sorted) {
+		for (IRenderable obj : sorted) {
 			obj.render(g);
 		}
 	}
@@ -221,7 +221,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 		// Centre de l'écran pour le rendu
 		g.translate(width / 2, TILE_HEIGHT);
 
-		List<IRenderable3D> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
+		List<IRenderable> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
 		renderableScene.addAll(sceneObjects);
 		renderableScene.addAll(sceneCharacters);
 		renderScene(g, renderableScene);
@@ -357,7 +357,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 				// .add(code);
 				pointToSceneObjectsMap
 						.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
-						.add(imageRendarable3D);
+						.add(code);
 			}
 		}
 	}
@@ -396,7 +396,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 							// .add(code);
 							pointToSceneObjectsMap
 									.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
-									.add(imageRendarable3D);
+									.add(code);
 
 						}
 
@@ -502,13 +502,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	 * @return ensemble de codes
 	 */
 	@Override
-	public Set<IRenderable3D> getSceneObjectsFromPoint(int x, int y, int z) {
+	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
 		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));
 	}
-
-	@Override
-	public void removeMap(int x, int y, int z, IRenderable3D obj) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
 }

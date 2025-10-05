@@ -45,10 +45,12 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             return name;
         }
 
+        @Override
         public int getNumFrames() {
             return numFrames;
         }
 
+        @Override
         public boolean isLoop() {
             return loop;
         }
@@ -61,11 +63,11 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     private Mode currentMode;
-    private Sound currentSound;
+    private final Sound currentSound;
     private SoundManager soundManager = new SoundManager();
     private Mode previousMode;
     private float previousSpeedX, previousSpeedY, previousSpeedZ;
-    private float previousX, previousY, previousZ;
+    private float previousZ;
 
     public Crusader() {
         super(Mode.values().length, OFFSET_X, OFFSET_Y);
@@ -78,56 +80,56 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     private void initSounds() {
-        String name = null;
+        String name;
         // String key = null;
         for (Sound footstepSound : Sound.values()) {
             switch (footstepSound) {
-                case Sound.CARPET:
+                case Sound.CARPET -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
                     soundManager.loadSound(Sound.CARPET.name(), name);
                     soundManager.setVolume(Sound.CARPET.name(), 0.8f);
-                    break;
-                case Sound.CARPET_SOFT:
+                }
+                case Sound.CARPET_SOFT -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
                     soundManager.loadSound(Sound.CARPET_SOFT.name(), name);
                     soundManager.setVolume(Sound.CARPET_SOFT.name(), 0.2f);
-                    break;
-                case Sound.WOOD:
+                }
+                case Sound.WOOD -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
                     soundManager.loadSound(Sound.WOOD.name(), name);
                     soundManager.setVolume(Sound.WOOD.name(), 0.8f);
-                    break;
-                case Sound.WOOD_SOFT:
+                }
+                case Sound.WOOD_SOFT -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
                     soundManager.loadSound(Sound.WOOD_SOFT.name(), name);
                     soundManager.setVolume(Sound.WOOD_SOFT.name(), 0.2f);
-                    break;
-                case Sound.JUMP:
+                }
+                case Sound.JUMP -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
                     soundManager.loadSound(Sound.JUMP.name(), name);
                     soundManager.setVolume(Sound.JUMP.name(), 0.8f);
-                    break;
+                }
 
-                case Sound.GOTHIT:
+                case Sound.GOTHIT -> {
                     name = String.format("/kenney_impact-sounds/Audio/impactTin_medium_000.wav");
                     soundManager.loadSound(Sound.GOTHIT.name(), name);
                     soundManager.setVolume(Sound.GOTHIT.name(), 0.8f);
-                    break;
+                }
 
-                case Sound.ATTACK:
+                case Sound.ATTACK -> {
                     name = String.format("/kenney_impact-sounds/Audio/impactPlate_heavy_000.wav");
                     soundManager.loadSound(Sound.ATTACK.name(), name);
                     soundManager.setVolume(Sound.ATTACK.name(), 0.8f);
-                    break;
+                }
 
-                case Sound.DEATH:
+                case Sound.DEATH -> {
                     name = String.format("/kenney_impact-sounds/Audio/impactWood_heavy_000.wav");
                     soundManager.loadSound(Sound.DEATH.name(), name);
                     soundManager.setVolume(Sound.DEATH.name(), 0.8f);
-                    break;
+                }
 
-                default:
-                    break;
+                default -> {
+                }
             }
 
         }
@@ -164,10 +166,12 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         }
     }
 
+    @Override
     public Mode getCurrentMode() {
         return currentMode;
     }
 
+    @Override
     public void stop() {
         super.setSpeed(0, 0, 0);
         changeMode(Mode.IDLE);
@@ -205,15 +209,14 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     @Override
     protected void callTickTrigger(int frameIndex) {
         switch (currentMode) {
-            case RUN:
-            case WALK:
+            case RUN, WALK -> {
                 if (frameIndex % 8 == 3) {
                     soundManager.stop(currentSound.name());
                     soundManager.play(currentSound.name());
                 }
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         super.callTickTrigger(frameIndex);
     }
@@ -321,6 +324,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         moveForward(RUN_SPEED);
     }
 
+    @Override
     public void changeDirection(Direction newDirection) {
         // On met à zéro les vitesses pendant la rotation
         speedX = speedY = speedZ = 0;

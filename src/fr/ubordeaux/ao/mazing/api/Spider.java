@@ -38,10 +38,12 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             return name;
         }
 
+        @Override
         public int getNumFrames() {
             return numFrames;
         }
 
+        @Override
         public boolean isLoop() {
             return loop;
         }
@@ -62,24 +64,24 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     private void initSounds() {
-        String name = null;
+        String name;
         // String key = null;
         for (Mode mode : Mode.values()) {
             switch (mode) {
-                case Mode.ATTACK:
+                case Mode.ATTACK -> {
                     name = String.format("/kenney_impact-sounds/Audio/footstep_snow_000.wav");
                     soundManager.loadSound(mode.getName(), name);
                     soundManager.setVolume(mode.getName(), 0.4f);
-                    break;
+                }
 
-                case Mode.DEATH:
+                case Mode.DEATH -> {
                     name = String.format("/kenney_impact-sounds/Audio/impactSoft_heavy_000.wav");
                     soundManager.loadSound(mode.getName(), name);
                     soundManager.setVolume(mode.getName(), 0.4f);
-                    break;
+                }
 
-                default:
-                    break;
+                default -> {
+                }
             }
 
         }
@@ -116,10 +118,12 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         }
     }
 
+    @Override
     public Mode getCurrentMode() {
         return currentMode;
     }
 
+    @Override
     public void stop() {
         super.setSpeed(0, 0, 0);
         changeMode(Mode.WALK);
@@ -173,20 +177,20 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     @Override
     public void callEndTrigger() {
         switch (currentMode) {
-            case ATTACK:
+            case ATTACK -> {
                 soundManager.play(currentMode.name());
                 currentMode = previousMode;
                 speedX = previousSpeedX;
                 speedY = previousSpeedY;
                 speedZ = previousSpeedZ;
-                break;
-            case FALL:
+            }
+            case FALL -> {
                 currentMode = Mode.DEATH;
                 soundManager.play(currentMode.name());
                 animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         super.callEndTrigger();
     }
@@ -241,6 +245,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         }
     }
 
+    @Override
     public void changeDirection(Direction newDirection) {
         // On met à zéro les vitesses pendant la rotation
         speedX = speedY = speedZ = 0;
