@@ -3,6 +3,18 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+/**
+ * Classe abstraite représentant un personnage dans le jeu.
+ * 
+ * Cette classe gère les informations de position, de vitesse,
+ * d'animations et de direction du personnage. Elle fournit
+ * également des méthodes de rendu et des hooks pour les triggers
+ * (début, fin, milieu, tick) lors de l'animation.
+ * 
+ *
+ * @param <T> le type d'état du personnage, qui doit implémenter
+ *            {@link CharacterMode}
+ */
 public abstract class AbstractCharacter<T extends CharacterMode> implements Character<T> {
 
     protected BufferedImage[][][] images; // [state][direction][frame]

@@ -1,5 +1,9 @@
 package fr.ubordeaux.ao.mazing.api;
 
+/**
+ * Représente un point discret dans l'espace 3D du plateau de jeu.
+ * Utilisé pour indexer et stocker des objets ou personnages sur une grille.
+ */
 public class DiscretePoint {
 
     private final int x;

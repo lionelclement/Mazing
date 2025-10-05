@@ -3,6 +3,13 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+/**
+ * Représente le personnage jouable "Crusader" avec ses animations,
+ * sons et comportements spécifiques (marcher, courir, sauter, attaquer, subir
+ * des dégâts, etc.).
+ * Étend {@link AbstractCharacter} et utilise {@link CharacterMode} pour gérer
+ * les différents états du personnage.
+ */
 public class Crusader extends AbstractCharacter<CharacterMode> {
 
     private static final int DELAY = 60;

@@ -8,6 +8,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+/**
+ * Gestionnaire des tuiles du plateau de jeu en affichage isométrique.
+ * Permet de dessiner des tuiles, des images 3D et de gérer la position et la
+ * profondeur iso du rendu.
+ */
 public class TileMap {
     private final int tileWidth;
     private final int tileHeight;

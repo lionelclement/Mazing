@@ -6,6 +6,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Classe utilitaire pour charger des ressources graphiques et animations depuis
+ * les fichiers du projet.
+ * Permet de charger des {@link BufferedImage} pour les personnages, objets et
+ * décor.
+ */
 public class Loader {
 
 	public static BufferedImage loadImage(String path) {

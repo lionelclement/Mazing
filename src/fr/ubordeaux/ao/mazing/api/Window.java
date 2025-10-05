@@ -2,6 +2,12 @@ package fr.ubordeaux.ao.mazing.api;
 
 import javax.swing.JFrame;
 
+/**
+ * Représente la fenêtre principale du jeu.
+ * Étend {@link JFrame} pour fournir une interface graphique et implémente
+ * {@link IWindow}
+ * pour exposer l'accès au plateau de jeu ({@link IBoardGame}).
+ */
 public class Window extends JFrame implements IWindow {
 
 	private BoardGame boardGame;

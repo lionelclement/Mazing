@@ -4,6 +4,11 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
+/**
+ * Représente un objet 3D à afficher sur le plateau de jeu.
+ * Implémente {@link IRenderable3D} pour être trié et rendu correctement selon
+ * sa profondeur et son rang.
+ */
 public class ImageRendarable3D implements IRenderable3D {
 
     private BufferedImage bufferedImage;

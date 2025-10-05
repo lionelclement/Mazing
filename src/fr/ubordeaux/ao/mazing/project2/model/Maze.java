@@ -17,8 +17,8 @@ public class Maze {
 
     public void clear() {
         for (int z = 0; z < depth; z++) {
-            for (int y = 0; y < width; y++) {
-                for (int x = 0; x < height; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
                     grid[z][y][x] = new Cell(x, y, z);
                     // On ajoute des murs à l'exterieur
                     for (Direction d : outerWalls(grid[z][y][x])) {

@@ -14,33 +14,83 @@ import java.util.Set;
 
 import javax.swing.*;
 
+/**
+ * Représente le plateau de jeu isométrique et gère le rendu des tuiles, murs et
+ * personnages.
+ * 
+ * Cette classe hérite de {@link JPanel} et implémente {@link IBoardGame}. Elle
+ * gère :
+ * 
+ * - Le rendu des objets 3D et des personnages.
+ * - Le fond du plateau et les textures des tuiles.
+ * - Les animations des personnages.
+ * - La gestion des positions et états du joueur.
+ * 
+ * 
+ */
 public class BoardGame extends JPanel implements IBoardGame {
 
 	private static final long serialVersionUID = 1L;
-	private final static int TILE_WIDTH = 128, TILE_HEIGHT = 100;
+	/** Largeur d’une tuile en pixels */
+	private final static int TILE_WIDTH = 128;
+	/** Hauteur d’une tuile en pixels */
+	private final static int TILE_HEIGHT = 100;
+	/** Largeur du plateau */
 	private final int width;
+
+	/** Hauteur du plateau */
 	private final int height;
-	private final static int CROP_WIDTH = 256, CROP_HEIGHT = 512;
+
+	/** Largeur d'une image à découper dans la spritesheet */
+	private final static int CROP_WIDTH = 256;
+
+	/** Hauteur d'une image à découper dans la spritesheet */
+	private final static int CROP_HEIGHT = 512;
+
+	/** Image de fond du plateau */
 	private BufferedImage background;
 
+	/** Mapping du code d’image vers son rang de rendu */
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
+
+	/** Liste des objets 3D présents dans la scène */
 	List<IRenderable3D> sceneObjects = new ArrayList<>();
+
+	/** Liste des personnages présents dans la scène */
 	List<IRenderable3D> sceneCharacters = new ArrayList<>();
+
+	/** Mapping des coordonnées vers les codes d’objets de scène */
 	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
+	/** Liste des personnages du plateau */
 	@SuppressWarnings("rawtypes")
 	private List<Character> characters;
+
+	/** Boucle de jeu pour mettre à jour les animations */
 	private Timer gameLoop;
+
+	/** Mapping du code d’image vers l’objet Image correspondant */
 	private Map<Integer, Image> codeToImageMap;
+
+	/** Référence vers le joueur */
 	private Character<CharacterMode> player;
 
+	/**
+	 * Constructeur principal.
+	 * 
+	 * @param width  largeur du plateau en pixels
+	 * @param height hauteur du plateau en pixels
+	 */
 	public BoardGame(int width, int height) {
 		this.width = width;
 		this.height = height;
+
+		// Initialisation du TileMap pour le rendu
 		TileMap.getInstance(TILE_WIDTH, TILE_HEIGHT, width, height, 8, 8);
 		characters = new ArrayList<>();
 		codeToImageMap = new HashMap<>();
 
+		// Chargement et découpe des spritesheets
 		BufferedImage imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR);
 
@@ -59,6 +109,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 0, RenderType.OBJECT);
 
+		// Initialisation des rangs de rendu des objets
 		codeToRankMap.put(138, 0);
 		codeToRankMap.put(136, 2);
 		codeToRankMap.put(139, 2);
@@ -72,16 +123,34 @@ public class BoardGame extends JPanel implements IBoardGame {
 		codeToRankMap.put(182, 2);
 		codeToRankMap.put(183, 2);
 
+		// Timer de mise à jour des animations (40 fps)
 		gameLoop = new Timer(1000 / 40, _ -> {
 			updateAnimations();
 		});
 		gameLoop.start();
 	}
 
+	/**
+	 * Constructeur par défaut avec taille 1024x800.
+	 */
 	public BoardGame() {
 		this(1024, 800);
 	}
 
+	/**
+	 * Découpe une spritesheet et enregistre les images dans codeToImageMap.
+	 * 
+	 * @param sheet      spritesheet source
+	 * @param width      largeur d’une tuile
+	 * @param height     hauteur d’une tuile
+	 * @param colsPerRow nombre de colonnes par ligne dans la spritesheet
+	 * @param maxSize    nombre maximum d’images à découper
+	 * @param offset     code de départ pour l’image
+	 * @param scale      facteur de mise à l’échelle
+	 * @param offsetX    décalage X appliqué à l’image
+	 * @param offsetY    décalage Y appliqué à l’image
+	 * @param renderType type de rendu de l’image
+	 */
 	private void crop(BufferedImage sheet, int width, int height, int colsPerRow,
 			int maxSize, int offset, double scale, int offsetX, int offsetY, RenderType renderType) {
 		int col = 0;
@@ -111,6 +180,9 @@ public class BoardGame extends JPanel implements IBoardGame {
 		}
 	}
 
+	/**
+	 * Met à jour toutes les animations des personnages.
+	 */
 	@SuppressWarnings("unchecked")
 	private void updateAnimations() {
 		for (Character<CharacterMode> c : characters) {
@@ -155,6 +227,11 @@ public class BoardGame extends JPanel implements IBoardGame {
 
 	}
 
+	/**
+	 * Remplit le plateau avec un fond en damier.
+	 * 
+	 * @param size taille du damier (nombre de tuiles par côté)
+	 */
 	@Override
 	public void fillCheckerboardBackground(int size) {
 
@@ -177,6 +254,12 @@ public class BoardGame extends JPanel implements IBoardGame {
 		g.dispose();
 	}
 
+	/**
+	 * Remplit le plateau avec une image de tuile spécifique.
+	 * 
+	 * @param code  code de la tuile
+	 * @param alpha transparence de la tuile
+	 */
 	@Override
 	public void fillTilesBackground(int code, float alpha) {
 
@@ -209,11 +292,23 @@ public class BoardGame extends JPanel implements IBoardGame {
 		g.dispose();
 	}
 
+	/**
+	 * Met à jour la position du joueur.
+	 * 
+	 * @param x coordonnée X
+	 * @param y coordonnée Y
+	 * @param z coordonnée Z
+	 */
 	@Override
 	public void updatePlayerPosition(float x, float y, float z) {
 		player.setPosition(x, y, z);
 	}
 
+	/**
+	 * Retourne le joueur actuel.
+	 * 
+	 * @return joueur
+	 */
 	public Character<?> getPlayer() {
 		return player;
 	}
@@ -236,6 +331,15 @@ public class BoardGame extends JPanel implements IBoardGame {
 		}
 	}
 
+	/**
+	 * Ajoute une tuile ou un objet à la scène.
+	 * 
+	 * @param code  code de l’objet
+	 * @param x     coordonnée X
+	 * @param y     coordonnée Y
+	 * @param z     coordonnée Z
+	 * @param alpha transparence
+	 */
 	@Override
 	public void addToSceneMap(int code, int x, int y, int z, float alpha) {
 		if (code != -1) {
@@ -254,6 +358,11 @@ public class BoardGame extends JPanel implements IBoardGame {
 		}
 	}
 
+	/**
+	 * Ajoute une matrice complète de tuiles à la scène.
+	 * 
+	 * @param matrix matrice 3D de codes de tuiles
+	 */
 	@Override
 	public void addToSceneMap(int[][][] matrix) {
 		for (int z = 0; z < matrix.length; z++) {
@@ -291,6 +400,11 @@ public class BoardGame extends JPanel implements IBoardGame {
 		}
 	}
 
+	/**
+	 * Ajoute un personnage à la scène.
+	 * 
+	 * @param character personnage à ajouter
+	 */
 	@Override
 	public void addToSceneMap(Character<?> character) {
 		characters.add(character);
@@ -298,53 +412,88 @@ public class BoardGame extends JPanel implements IBoardGame {
 	}
 
 	// getter pour position actuelle du joueur en grille
+	/**
+	 * Retourne la coordonnée X du joueur.
+	 */
 	@Override
 	public float getPlayerX() {
 		return player.getX();
 	}
 
+	/**
+	 * Retourne la coordonnée Y du joueur.
+	 */
 	@Override
 	public float getPlayerY() {
 		return player.getY();
 	}
 
+	/**
+	 * Retourne la coordonnée Z du joueur.
+	 */
 	@Override
 	public float getPlayerZ() {
 		return player.getZ();
 	}
 
+	/**
+	 * Met à jour la vitesse du joueur.
+	 */
 	@Override
 	public void updatePlayerSpeed(float vx, float vy, float vz) {
 		player.setSpeed(vx, vy, vz);
 	}
 
+	/**
+	 * Stoppe le joueur.
+	 */
 	@Override
 	public void stopPlayer() {
 		player.stop();
 	}
 
+	/**
+	 * Assigne le joueur.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void assignPlayer(Character<? extends CharacterMode> player) {
 		this.player = (Character<CharacterMode>) player;
 	}
 
+	/**
+	 * Change le mode du joueur.
+	 */
 	@Override
 	public void updatePlayerMode(String state) {
 		player.changeMode(state);
 	}
 
+	/**
+	 * Change la direction du joueur.
+	 */
 	@Override
 	public void updatePlayerDirection(String direction) {
 		player.changeDirection(direction);
 	}
 
+	/**
+	 * Vide la scène.
+	 */
 	@Override
 	public void clearMap() {
 		sceneObjects.clear();
 		pointToSceneObjectsMap.clear();
 	}
 
+	/**
+	 * Retourne les codes des objets présents à une position donnée.
+	 * 
+	 * @param x coordonnée X
+	 * @param y coordonnée Y
+	 * @param z coordonnée Z
+	 * @return ensemble de codes
+	 */
 	@Override
 	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
 		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));

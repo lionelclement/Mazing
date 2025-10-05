@@ -3,17 +3,48 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+/**
+ * Représente une animation pour un personnage.
+ * 
+ * 
+ * Gère les frames d'images et d'ombres, la progression de l'animation,
+ * les callbacks liés aux différentes étapes de l'animation, et le bouclage.
+ * 
+ *
+ * @param <S> Type du mode de personnage (CharacterMode)
+ */
 public class Animation<S extends CharacterMode> implements IAnimation<S> {
 
+	/** Tableau des images de l'animation */
 	private final BufferedImage[] images;
+
+	/** Tableau des ombres associées aux images */
 	private final BufferedImage[] shadows;
+
+	/** Nombre total de frames */
 	private final int frameNumber;
+
+	/** Index approximatif de la frame médiane (milieu de l'animation) */
 	private final int frameNumberMid;
+
+	/** Indique si l'animation doit boucler */
 	private final boolean loop;
+
+	/** Indique si l'animation est gelée (finie et non bouclée) */
 	private boolean frozen;
 
+	/** Index de la frame courante */
 	private int frameIndex;
 
+	/**
+	 * Constructeur d'une animation.
+	 *
+	 * @param frames       tableaux des images de l'animation
+	 * @param shadows      tableaux des images d'ombre correspondantes
+	 * @param frameDelayMs délai entre les frames (non utilisé directement ici)
+	 * @param loop         indique si l'animation doit boucler
+	 * @param owner        personnage propriétaire de l'animation
+	 */
 	public Animation(BufferedImage[] frames, BufferedImage[] shadows, int frameDelayMs, boolean loop,
 			AbstractCharacter<CharacterMode> owner) {
 		this.images = frames;
@@ -26,6 +57,15 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 		this.frameIndex = rand.nextInt(frames.length);
 	}
 
+	/**
+	 * Avance l'animation d'une frame et déclenche les callbacks associés.
+	 *
+	 * <p>
+	 * Les callbacks possibles : begin, mid, tick, loop, end.
+	 * </p>
+	 *
+	 * @param owner personnage propriétaire de l'animation
+	 */
 	public void tick(AbstractCharacter<? extends CharacterMode> owner) {
 		owner.callTickTrigger(frameIndex);
 		if (!frozen) {
@@ -49,21 +89,38 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 		}
 	}
 
+	/**
+	 * Retourne l'image courante de l'animation.
+	 *
+	 * @return image actuelle
+	 */
 	public BufferedImage getCurrentFrame() {
 		return images[frameIndex];
 	}
 
+	/**
+	 * Retourne l'image d'ombre courante de l'animation.
+	 *
+	 * @return image d'ombre actuelle
+	 */
 	public BufferedImage getCurrentShadow() {
 		return shadows[frameIndex];
 	}
 
+	/**
+	 * Réinitialise l'animation au début et la dégelée si elle était gelée.
+	 */
 	public void reset() {
 		frameIndex = 0;
 		frozen = false;
 	}
 
+	/**
+	 * Force l'animation à sa dernière frame et la gèle.
+	 */
 	public void lastFrame() {
 		frameIndex = images.length - 1;
+		frozen = true;
 	}
 
 }

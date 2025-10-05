@@ -3,6 +3,11 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+/**
+ * Représente une araignée avec ses animations et comportements spécifiques.
+ * Étend {@link AbstractCharacter} et utilise {@link CharacterMode} pour gérer
+ * les modes.
+ */
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final int DELAY = 60;

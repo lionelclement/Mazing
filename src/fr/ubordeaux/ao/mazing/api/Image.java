@@ -2,6 +2,11 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Représente une image du jeu avec ses informations de rendu.
+ * Contient un {@link BufferedImage}, des offsets et un {@link RenderType} pour
+ * la gestion de l'affichage.
+ */
 public class Image {
 
     private BufferedImage bufferedImage;

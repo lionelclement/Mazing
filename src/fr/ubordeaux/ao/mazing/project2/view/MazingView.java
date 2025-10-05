@@ -21,14 +21,33 @@ import java.util.Set;
 
 public class MazingView {
 
+	// Constantes de tuiles (Tile IDs)
+
+	private static final int TILE_DIRT = 12;
+	private static final int TILE_FLOOR = 72;
+
+	private static final int TILE_WALL_WEST = 108;
+	private static final int TILE_WALL_SOUTH = 109;
+	private static final int TILE_WALL_NORTH = 110;
+	private static final int TILE_WALL_EAST = 111;
+
+	private static final int TILE_HALF_WEST = 172;
+	private static final int TILE_HALF_SOUTH = 173;
+	private static final int TILE_HALF_NORTH = 174;
+	private static final int TILE_HALF_EAST = 175;
+
+	private static final int TILE_TRAPDOOR = 76;
+	private static final int TILE_STAIRS_UP = 308;
+	private static final int TILE_FLOOR_LEVEL = 24;
+
 	private final Window window;
 	private final IBoardGame boardGame;
 	private ViewListener viewListener;
 
-	private final Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(111, 175));
-	private final Set<Integer> southBarrier = new HashSet<>(Arrays.asList(109, 173));
-	private final Set<Integer> westBarrier = new HashSet<>(Arrays.asList(108, 172));
-	private final Set<Integer> northBarrier = new HashSet<>(Arrays.asList(110, 174));
+	private final Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(TILE_WALL_EAST, TILE_HALF_EAST));
+	private final Set<Integer> southBarrier = new HashSet<>(Arrays.asList(TILE_WALL_SOUTH, TILE_HALF_SOUTH));
+	private final Set<Integer> westBarrier = new HashSet<>(Arrays.asList(TILE_WALL_WEST, TILE_HALF_WEST));
+	private final Set<Integer> northBarrier = new HashSet<>(Arrays.asList(TILE_WALL_NORTH, TILE_HALF_NORTH));
 	private CharacterView crusader;
 	private final CharacterView[] spiders = new CharacterView[3];
 	private final Map<String, CharacterView> characters = new HashMap<>();
@@ -103,6 +122,7 @@ public class MazingView {
 
 	private void init() {
 
+		boardGame.fillTilesBackground(TILE_DIRT, 1.0f);
 		Character c = new Crusader();
 		c.setPosition(1, 1, 0);
 		boardGame.assignPlayer(c);
@@ -140,28 +160,28 @@ public class MazingView {
 		boardGame.addToSceneMap(tileId, baseX, baseY, baseZ, alpha);
 	}
 
-	private void addLineCell(int tileId, int baseX, int baseY, int baseZ, Direction dir, float alpha) {
+	private void addLineCell(int tileId, int size, int baseX, int baseY, int baseZ, Direction dir, float alpha) {
 		switch (dir) {
 			case WEST -> {
-				for (int k = 0; k < 3; k++) {
+				for (int k = 0; k < size; k++) {
 					boardGame.addToSceneMap(tileId, baseX, baseY + k, baseZ, alpha);
 				}
 			}
 
 			case EAST -> {
-				for (int k = 0; k < 3; k++) {
+				for (int k = 0; k < size; k++) {
 					boardGame.addToSceneMap(tileId, baseX + 2, baseY + k, baseZ, alpha);
 				}
 			}
 
 			case NORTH -> {
-				for (int k = 0; k < 3; k++) {
+				for (int k = 0; k < size; k++) {
 					boardGame.addToSceneMap(tileId, baseX + k, baseY, baseZ, alpha);
 				}
 			}
 
 			case SOUTH -> {
-				for (int k = 0; k < 3; k++) {
+				for (int k = 0; k < size; k++) {
 					boardGame.addToSceneMap(tileId, baseX + k, baseY + 2, baseZ, alpha);
 				}
 			}
@@ -179,9 +199,9 @@ public class MazingView {
 
 		boardGame.clearMap();
 
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 9; y++) {
-				boardGame.addToSceneMap(72, x, y, 0, 1.0f);
+		for (int x = 0; x < maze.getWidth() * 3; x++) {
+			for (int y = 0; y < maze.getHeight() * 3; y++) {
+				boardGame.addToSceneMap(TILE_FLOOR, x, y, 0, 1.0f);
 			}
 		}
 
@@ -192,53 +212,53 @@ public class MazingView {
 			} else {
 				alpha = 0f;
 			}
-			for (int y = 0; y < width; y++) {
-				for (int x = 0; x < height; x++) {
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
 					Cell cell = maze.getCell(x, y, z);
 					// On ajoute des murs à l'exterieur
 					for (Direction d : Direction.values()) {
 						if (cell.isWall(d)) {
 							if (d == Direction.WEST) {
-								addLineCell(108, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_WALL_WEST, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (d == Direction.EAST) {
-								addLineCell(111, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_WALL_EAST, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (d == Direction.NORTH) {
-								addLineCell(110, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_WALL_NORTH, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (d == Direction.SOUTH) {
-								addLineCell(109, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_WALL_SOUTH, 3, x * 3, y * 3, z, d, alpha);
 							}
 						}
 						if (!cell.isPath(d)) {
 							if (x > 0 && d == Direction.WEST) {
-								addLineCell(172, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_HALF_WEST, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (x < width - 1 && d == Direction.EAST) {
-								addLineCell(175, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_HALF_EAST, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (y > 0 && d == Direction.NORTH) {
-								addLineCell(174, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_HALF_NORTH, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (y < height - 1 && d == Direction.SOUTH) {
-								addLineCell(173, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_HALF_SOUTH, 3, x * 3, y * 3, z, d, alpha);
 							}
 							if (z > 0 && d == Direction.DOWN) {
-								addLineCell(24, x * 3, y * 3, z, Direction.NORTH, alpha);
-								addLineCell(24, x * 3, y * 3 + 1, z, Direction.NORTH, alpha);
-								addLineCell(24, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
+								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3, z, Direction.NORTH, alpha);
+								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 1, z, Direction.NORTH, alpha);
+								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
 							}
 						} else {
 							if (z > 0 && d == Direction.DOWN) {
-								addLineCell(24, x * 3, y * 3, z, Direction.NORTH, alpha);
-								addCell(24, x * 3, y * 3 + 1, z, alpha);
-								addCell(76, x * 3 + 1, y * 3 + 1, z, alpha);
-								addCell(24, x * 3 + 2, y * 3 + 1, z, alpha);
-								addLineCell(24, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
+								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3, z, Direction.NORTH, alpha);
+								addCell(TILE_FLOOR_LEVEL, x * 3, y * 3 + 1, z, alpha);
+								addCell(TILE_TRAPDOOR, x * 3 + 1, y * 3 + 1, z, alpha);
+								addCell(TILE_FLOOR_LEVEL, x * 3 + 2, y * 3 + 1, z, alpha);
+								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
 							}
 							if (z < depth && d == Direction.UP) {
-								addLineCell(308, x * 3, y * 3, z, d, alpha);
+								addLineCell(TILE_STAIRS_UP, 3, x * 3, y * 3, z, d, alpha);
 							}
 						}
 					}

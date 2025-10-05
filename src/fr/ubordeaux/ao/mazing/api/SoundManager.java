@@ -5,6 +5,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Gestionnaire des sons du jeu.
+ * Permet de charger, lire, arrêter et régler le volume des sons associés aux
+ * personnages et événements.
+ */
 public class SoundManager {
 
     private final Map<String, Clip> soundClips = new HashMap<>();
