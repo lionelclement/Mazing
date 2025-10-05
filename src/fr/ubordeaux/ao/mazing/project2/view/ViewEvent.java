@@ -1,15 +1,17 @@
-package fr.ubordeaux.ao.mazing.project2.view;
+package fr.ubordeaux.ao.mazing.project3.view;
 
 public class ViewEvent {
     public enum Type {
-        PLAYER_GOTHIT, PLAYER_ON_STEPS, PLAYER_ON_TRAPDOOR
+        GOTHIT, ON_STEPS, ON_TRAPDOOR
     }
 
     public final Type type;
-    public final Object data;
+    public final String attribute;
+    public final Object value;
 
-    public ViewEvent(Type type, Object data) {
+    public ViewEvent(Type type, String attribute, Object value) {
         this.type = type;
-        this.data = data;
+        this.attribute = attribute;
+        this.value = value;
     }
 }

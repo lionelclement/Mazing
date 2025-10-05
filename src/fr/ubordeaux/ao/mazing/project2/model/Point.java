@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.project2.model;
+package fr.ubordeaux.ao.mazing.project3.model;
 
 public class Point {
 
@@ -10,6 +10,12 @@ public class Point {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public Point() {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
     }
 
     public void translate(double x, double y, double z) {

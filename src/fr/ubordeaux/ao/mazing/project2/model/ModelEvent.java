@@ -1,22 +1,24 @@
-package fr.ubordeaux.ao.mazing.project2.model;
+package fr.ubordeaux.ao.mazing.project3.model;
 
 public class ModelEvent {
     public enum Type {
-        PLAYER_POSITIONZ, PLAYER_SPEED, PLAYER_MODE, WALLS, MAZE
+        PLAYER_POSITIONZ, PLAYER_SPEED, CHANGE_MODE, WALLS, MAZE, SPIDER_MODE
     }
 
     public final Type type;
-    public final Object data;
-    public Object addon = null;
+    public final String attribute;
+    public final Object value;
 
-    public ModelEvent(Type type, Object data) {
+    public ModelEvent(Type type, String attribute, Object value) {
         this.type = type;
-        this.data = data;
+        this.attribute = attribute;
+        this.value = value;
     }
 
-    public ModelEvent(Type type, Object data, Object addon) {
+    public ModelEvent(Type type, Object value) {
         this.type = type;
-        this.data = data;
-        this.addon = addon;
+        this.attribute = null;
+        this.value = value;
     }
+
 }

@@ -1,14 +1,15 @@
-package fr.ubordeaux.ao.mazing.project2.controller;
+package fr.ubordeaux.ao.mazing.project3.controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project2.view.MazingView;
+import fr.ubordeaux.ao.mazing.project3.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project3.model.Mode;
+import fr.ubordeaux.ao.mazing.project3.view.MazingView;
 
 public class MazingController extends KeyAdapter {
     private final MazingModel model;
-    private final static float SPEED_WALK = 0.05f;
+    private static final float SPEED_WALK = 0.05f;
 
     public MazingController(MazingModel model, MazingView view) {
         this.model = model;
@@ -16,66 +17,53 @@ public class MazingController extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        char c = e.getKeyChar();
 
-        if (e.getKeyChar() == 'a') {
-            model.setPlayerMode("ATTACK");
+        // --- Modes directs (touches simples)
+        switch (c) {
+            case 'a' -> model.changeMode("crusader", Mode.ATTACK);
+            case 'g' -> model.changeMode("crusader", Mode.GOTHIT);
+            case 'j' -> model.changeMode("crusader", Mode.JUMP);
+            case 'd' -> stopPlayer(Mode.DEATH);
+            case 's' -> stopPlayer(Mode.IDLE);
+            case 'm' -> model.mazeGenerate();
+            case 'D' -> model.changeMode("spider1", Mode.DEATH);
+            case 'h' -> moveVertical(1);
+            case 'H' -> moveVertical(-1);
         }
 
-        if (e.getKeyChar() == 'g') {
-            model.setPlayerMode("GOTHIT");
-        }
-
-        if (e.getKeyChar() == 'j') {
-            model.setPlayerMode("JUMP");
-        }
-
-        if (e.getKeyChar() == 'd') {
-            model.setPlayerMode("DEATH");
-            model.setPlayerSpeed(0, 0, 0);
-        }
-
-        if (e.getKeyChar() == 's') {
-            model.setPlayerMode("IDLE");
-            model.setPlayerSpeed(0, 0, 0);
-        }
-
-        if (e.getKeyChar() == 'm') {
-            model.mazeGenerate();
-        }
-
-        if (e.getKeyChar() == 'h') {
-            if (model.isOnSteps() && model.getPlayerPositionZ() < model.getMazeDepth() - 1) {
-                model.setPlayerPositionZ(model.getPlayerPositionZ() + 1);
-            }
-        }
-
-        if (e.getKeyChar() == 'H') {
-            if (model.isOnTrapdoor() && model.getPlayerPositionZ() > 0) {
-                model.setPlayerPositionZ(model.getPlayerPositionZ() - 1);
-            }
-        }
-
+        // --- Déplacements (touches directionnelles)
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP -> {
-                model.setPlayerMode("WALK");
-                model.setPlayerSpeed(0, -SPEED_WALK, 0);
-            }
-            case KeyEvent.VK_DOWN -> {
-                model.setPlayerMode("WALK");
-                model.setPlayerSpeed(0, SPEED_WALK, 0);
-            }
-            case KeyEvent.VK_LEFT -> {
-                model.setPlayerMode("WALK");
-                model.setPlayerSpeed(-SPEED_WALK, 0, 0);
-            }
-            case KeyEvent.VK_RIGHT -> {
-                model.setPlayerMode("WALK");
-                model.setPlayerSpeed(SPEED_WALK, 0, 0);
-            }
-            case KeyEvent.VK_Q -> {
-                System.exit(0);
-            }
+            case KeyEvent.VK_UP -> move(0, -SPEED_WALK, 0);
+            case KeyEvent.VK_DOWN -> move(0, SPEED_WALK, 0);
+            case KeyEvent.VK_LEFT -> move(-SPEED_WALK, 0, 0);
+            case KeyEvent.VK_RIGHT -> move(SPEED_WALK, 0, 0);
+            case KeyEvent.VK_Q -> System.exit(0);
         }
     }
 
+    /** Déplace le joueur dans le plan XY et active le mode WALK */
+    private void move(float dx, float dy, float dz) {
+        model.changePlayerMode(Mode.WALK);
+        model.setPlayerSpeed(dx, dy, dz);
+    }
+
+    /** Monte ou descend d’un étage si possible */
+    private void moveVertical(int direction) {
+        if (direction > 0 && model.isPlayerOnSteps() && model.getPlayerPositionZ() < model.getMazeDepth() - 1) {
+            model.setPlayerPositionZ((float) (model.getPlayerPositionZ() + 1));
+        } else if (direction < 0 && model.isPlayerOnTrapdoor() && model.getPlayerPositionZ() > 0) {
+            model.setPlayerPositionZ((float) (model.getPlayerPositionZ() - 1));
+        }
+    }
+
+    /** Met le joueur dans un mode et stoppe son déplacement */
+    private void stopPlayer(Mode mode) {
+        model.changeMode("crusader", mode);
+        model.setPlayerSpeed(0, 0, 0);
+    }
+
+    public void mazeGenerate() {
+        model.mazeGenerate();
+    }
 }

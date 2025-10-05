@@ -1,41 +1,43 @@
-package fr.ubordeaux.ao.mazing.project2.view;
+package fr.ubordeaux.ao.mazing.project3.view;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Character;
 import fr.ubordeaux.ao.mazing.api.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.mazing.api.Window;
-import fr.ubordeaux.ao.mazing.project2.controller.MazingController;
-import fr.ubordeaux.ao.mazing.project2.model.Cell;
-import fr.ubordeaux.ao.mazing.project2.model.Direction;
-import fr.ubordeaux.ao.mazing.project2.model.Maze;
-import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project2.model.Point;
+import fr.ubordeaux.ao.mazing.project3.controller.MazingController;
+import fr.ubordeaux.ao.mazing.project3.model.Cell;
+import fr.ubordeaux.ao.mazing.project3.model.Direction;
+import fr.ubordeaux.ao.mazing.project3.model.Maze;
+import fr.ubordeaux.ao.mazing.project3.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project3.model.Point;
+import fr.ubordeaux.ao.mazing.project3.model.Mode;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class MazingView {
 
 	private final Window window;
 	private final IBoardGame boardGame;
-
 	private ViewListener viewListener;
-	private boolean gothit;
 
-	Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(111, 175));
-	Set<Integer> southBarrier = new HashSet<>(Arrays.asList(109, 173));
+	private final Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(111, 175));
+	private final Set<Integer> southBarrier = new HashSet<>(Arrays.asList(109, 173));
+	private final Set<Integer> westBarrier = new HashSet<>(Arrays.asList(108, 172));
+	private final Set<Integer> northBarrier = new HashSet<>(Arrays.asList(110, 174));
+	private CharacterView crusader;
+	private final CharacterView[] spiders = new CharacterView[3];
+	private final Map<String, CharacterView> characters = new HashMap<>();
 
-	Set<Integer> westBarrier = new HashSet<>(Arrays.asList(108, 172));
-	Set<Integer> northBarrier = new HashSet<>(Arrays.asList(110, 174));
-
-	public MazingView() {
+	public MazingView(ViewListener viewListener) {
 		window = new Window();
 		boardGame = window.getBoardGame();
+		this.viewListener = viewListener;
 		init();
-	}
-
-	public void setViewListener(ViewListener listener) {
-		this.viewListener = listener;
 	}
 
 	public void addKeyListener(MazingController controller) {
@@ -51,166 +53,87 @@ public class MazingView {
 	}
 
 	public void bindToModel(MazingModel model) {
+
+		// Listener du model
 		model.setListener((event) -> {
+
+			System.err.printf("View receive notification: %s\n", event.type);
+
 			switch (event.type) {
+
 				case PLAYER_POSITIONZ -> {
-					Float pos = (Float) event.data;
+					Float pos = (Float) event.value;
 					boardGame.updatePlayerPosition(boardGame.getPlayerX(), boardGame.getPlayerY(), pos);
 				}
 
 				case PLAYER_SPEED -> {
-					Point speed = (Point) event.data;
+					Point speed = (Point) event.value;
 					boardGame.updatePlayerSpeed(
 							(float) speed.getX(),
 							(float) speed.getY(),
 							(float) speed.getZ());
 				}
 
-				case PLAYER_MODE -> {
-					String mode = (String) event.data;
-					boardGame.updatePlayerMode(mode);
+				case CHANGE_MODE -> {
+					String attribute = (String) event.attribute;
+					Mode value = (Mode) event.value;
+					CharacterView character = characters.get(attribute);
+					if (character != null) {
+						character.updateMode(value.name());
+					}
 				}
 
 				case WALLS -> {
-					int[][][] walls = (int[][][]) event.data;
+					int[][][] walls = (int[][][]) event.value;
 					boardGame.addToSceneMap(walls);
 				}
 
 				case MAZE -> {
-					Maze maze = (Maze) event.data;
+					Maze maze = (Maze) event.value;
 					boardGame.clearMap();
 					generateMazeViewFromMazeModel(maze, (int) boardGame.getPlayerZ());
 				}
 
 				default -> {
+					throw new UnsupportedOperationException("Not supported yet.");
 				}
 			}
 		});
 	}
 
 	private void init() {
-		Crusader crusader = new Crusader();
-		crusader.setPosition(1, 1, 0);
-		boardGame.assignPlayer(crusader);
-		crusader.setTickAnimationTrigger(() -> {
 
-			Set<Integer> set = new HashSet<>();
-
-			int cx = (int) crusader.getX();
-			int cy = (int) crusader.getY();
-			int cz = (int) crusader.getZ();
-
-			// boucle sur x-1 à x+1 et y-1 à y+1
-			for (int dx = -1; dx <= 1; dx++) {
-				for (int dy = -1; dy <= 1; dy++) {
-					Set<Integer> objects = boardGame.getSceneObjectsFromPoint(cx + dx, cy + dy, cz);
-					if (objects != null) {
-						set.addAll(objects);
-					}
-				}
-			}
-			if (set.contains(308)) {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_ON_STEPS, true));
-			} else {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_ON_STEPS, false));
-			}
-
-			if (set.contains(76)) {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_ON_TRAPDOOR, true));
-			} else {
-				viewListener.onViewEvent(
-						new ViewEvent(ViewEvent.Type.PLAYER_ON_TRAPDOOR, false));
-			}
-
-			set = boardGame.getSceneObjectsFromPoint((int) crusader.getX(),
-					(int) crusader.getY(),
-					(int) crusader.getZ());
-			if (set != null && !set.isEmpty()) {
-
-				// System.err.println(set);
-
-				Set<Integer> copy;
-
-				// South barrier
-				copy = new HashSet<>(set);
-				copy.retainAll(southBarrier);
-				if (!copy.isEmpty()) {
-					if (crusader.getSpeedY() > 0 && crusader.getY() % 1 < 0.1f) {
-						// replace
-						crusader.setPosition(crusader.getX(), crusader.getY() - 0.2f, crusader.getZ());
-						// send to Model
-						viewListener.onViewEvent(
-								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
-					}
-				}
-
-				// North barrier
-				copy = new HashSet<>(set);
-				copy.retainAll(northBarrier);
-				if (!copy.isEmpty()) {
-					if (crusader.getSpeedY() < 0 && crusader.getY() % 1 < 0.1f) {
-						// replace
-						crusader.setPosition(crusader.getX(), crusader.getY() + 0.1f, crusader.getZ());
-						// send to Model
-						viewListener.onViewEvent(
-								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
-					}
-				}
-
-				// East barrier
-				copy = new HashSet<>(set);
-				copy.retainAll(eastBarrier);
-				if (!copy.isEmpty()) {
-					if (crusader.getSpeedX() > 0 && crusader.getX() % 1 < 0.1f) {
-						// replace
-						crusader.setPosition(crusader.getX() - 0.2f, crusader.getY(), crusader.getZ());
-						// send to Model
-						viewListener.onViewEvent(
-								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
-					}
-				}
-
-				// West barrier
-				copy = new HashSet<>(set);
-				copy.retainAll(westBarrier);
-				if (!copy.isEmpty()) {
-					if (crusader.getSpeedX() < 0 && crusader.getX() % 1 < 0.1f) {
-						// replace
-						crusader.setPosition(crusader.getX() + 0.1f, crusader.getY(), crusader.getZ());
-						// send to Model
-						viewListener.onViewEvent(
-								new ViewEvent(ViewEvent.Type.PLAYER_GOTHIT, null));
-
-					}
-				}
-			}
-			// }
+		Character c = new Crusader();
+		c.setPosition(1, 1, 0);
+		boardGame.assignPlayer(c);
+		c.setTickAnimationTrigger(() -> {
+			System.err.println("tickAnimationTrigger");
+		});
+		c.setBeginAnimationTrigger(() -> {
+			System.err.println("beginAnimationTrigger");
+		});
+		c.setEndAnimationTrigger(() -> {
+			System.err.println("endAnimationTrigger");
+		});
+		c.setLoopAnimationTrigger(() -> {
+			System.err.println("loopAnimationTrigger");
 		});
 
-		crusader.setBeginAnimationTrigger(() ->
+		crusader = new CharacterView("crusader", c, boardGame, viewListener,
+				eastBarrier, westBarrier, northBarrier, southBarrier);
 
-		{
-			// Si on est GOTHIT, ons'arrète
-			if (crusader.getCurrentMode().name().equals("GOTHIT")) {
-				crusader.setSpeed(0, 0, 0);
-				gothit = true;
-			}
-		});
+		characters.put(crusader.toString(), crusader);
 
-		crusader.setEndAnimationTrigger(() -> {
-			// Si on est GOTHIT, ons'arrète
-			if (gothit) {
-				gothit = false;
-				crusader.setSpeed(0, 0, 0);
-				crusader.changeMode("IDLE");
-			}
-		});
+		for (int i = 0; i < 3; i++) {
+			Spider spider = new Spider();
+			spider.setPosition(i + 1, 0, 0);
+			spider.setSpeed(0.01f, 0, 0);
 
-		boardGame.addToSceneMap(crusader);
-		boardGame.fillTilesBackground(12, 1.0f);
+			spiders[i] = new CharacterView(String.format("spider%d", i), spider, boardGame, viewListener,
+					eastBarrier, westBarrier, northBarrier, southBarrier);
+			characters.put(spiders[i].toString(), spiders[i]);
+		}
+
 	}
 
 	private void addCell(int tileId, int baseX, int baseY, int baseZ, float alpha) {
@@ -249,7 +172,7 @@ public class MazingView {
 		}
 	}
 
-	private void generateMazeViewFromMazeModel(Maze maze, int level) {
+	public void generateMazeViewFromMazeModel(Maze maze, int level) {
 		int width = maze.getWidth();
 		int height = maze.getHeight();
 		int depth = maze.getDepth();
@@ -322,6 +245,10 @@ public class MazingView {
 				}
 			}
 		}
+	}
+
+	public CharacterView[] getSpiders() {
+		return spiders;
 	}
 
 }

@@ -1,13 +1,14 @@
-package fr.ubordeaux.ao.mazing.project2.model;
+package fr.ubordeaux.ao.mazing.project3.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Cell {
-    public final int x, y, z;
-    public boolean visited = false;
-    public final Map<Direction, Boolean> paths = new HashMap<>();
-    public final Map<Direction, Boolean> walls = new HashMap<>();
+    private final int x, y, z;
+    private boolean visited = false;
+    private final Map<Direction, Boolean> paths = new HashMap<>();
+    private final Map<Direction, Boolean> walls = new HashMap<>();
+    private boolean treasure;
 
     public Cell(int x, int y, int z) {
         this.x = x;
@@ -39,6 +40,42 @@ public class Cell {
         if (b != null)
             return b;
         return false;
+    }
+
+    public void putOnPaths(Direction dir, boolean b) {
+        paths.put(dir, b);
+    }
+
+    public void setVisited(boolean b) {
+        this.visited = b;
+    }
+
+    public void setTreasure(boolean b) {
+        this.treasure = b;
+    }
+
+    public void putOnWalls(Direction d, boolean b) {
+        this.walls.put(d, b);
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public boolean getPaths(Direction direction) {
+        return paths.get(direction);
     }
 
 }

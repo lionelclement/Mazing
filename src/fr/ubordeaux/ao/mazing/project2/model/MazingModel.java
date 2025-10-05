@@ -1,28 +1,22 @@
-package fr.ubordeaux.ao.mazing.project2.model;
+package fr.ubordeaux.ao.mazing.project3.model;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MazingModel {
 
-        private float playerSpeedX = 0;
-        private float playerSpeedY = 0;
-        private float playerSpeedZ = 0;
-        private String playerMode = "IDLE";
-        private float playerPositionZ;
         private Maze maze;
         private ModelListener listener;
-        private boolean onSteps;
-        private boolean onTrapdoor;
+        private CharacterModel player;
+        private Map<String, CharacterModel> characters = new HashMap<>();
 
-        public MazingModel(int width, int height, int depth) {
+        public MazingModel(int width, int height, int depth, CharacterModel player, CharacterModel[] spiders) {
                 maze = new Maze(width, height, depth);
-                onSteps = false;
-        }
-
-        public boolean isOnSteps() {
-                return onSteps;
-        }
-
-        public boolean isOnTrapdoor() {
-                return onTrapdoor;
+                this.player = player;
+                characters.put(player.toString(), player);
+                for (CharacterModel characterModel : spiders) {
+                        characters.put(characterModel.toString(), characterModel);
+                }
         }
 
         public void setListener(ModelListener listener) {
@@ -30,83 +24,108 @@ public class MazingModel {
         }
 
         public void setPlayerPositionZ(float z) {
-                float dz = playerPositionZ - z;
-                playerPositionZ = z;
-
-                if (listener != null) {
-                        if (dz * dz > 0) {
-                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_POSITIONZ, z));
-                                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE, maze));
-                        }
+                double dz = player.getPosition().getZ() - z;
+                player.getPosition().setZ(z);
+                if (dz * dz > 0) {
+                        notifyView(new ModelEvent(ModelEvent.Type.PLAYER_POSITIONZ, z));
+                        notifyView(new ModelEvent(ModelEvent.Type.MAZE, maze));
                 }
 
         }
 
         public void setPlayerSpeed(float playerSpeedX, float playerSpeedY, float playerSpeedZ) {
-                this.playerSpeedX = playerSpeedX;
-                this.playerSpeedY = playerSpeedY;
-                this.playerSpeedZ = playerSpeedZ;
-
-                if (listener != null) {
-                        Point speed = new Point(playerSpeedX, playerSpeedY, playerSpeedZ);
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_SPEED, speed));
-                }
+                Point speed = new Point(playerSpeedX, playerSpeedY, playerSpeedZ);
+                notifyView(new ModelEvent(ModelEvent.Type.PLAYER_SPEED, speed));
         }
 
-        public float getPlayerPositionZ() {
-                listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE,
+        public double getPlayerPositionZ() {
+                notifyView(new ModelEvent(ModelEvent.Type.MAZE,
                                 maze));
-                return playerPositionZ;
+                System.err.println(player.getPosition());
+                return player.getPosition().getZ();
         }
 
-        public float getPlayerSpeedX() {
-                return playerSpeedX;
+        public double getPlayerSpeedX() {
+                return player.getSpeed().getX();
         }
 
-        public float getPlayerSpeedY() {
-                return playerSpeedY;
+        public double getPlayerSpeedY() {
+                return player.getSpeed().getY();
         }
 
-        public float getPlayerSpeedZ() {
-                return playerSpeedZ;
+        public double getPlayerSpeedZ() {
+                return player.getSpeed().getZ();
         }
 
         public String getPlayerMode() {
-                return playerMode;
+                return player.getCurrentMode();
         }
 
         public void mazeGenerate() {
                 maze.clear();
                 maze.generate();
-                if (listener != null) {
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.MAZE,
-                                        maze));
-                }
+                notifyView(new ModelEvent(ModelEvent.Type.MAZE,
+                                maze));
+
         }
 
-        public void setPlayerMode(String playerMode) {
-                this.playerMode = playerMode;
-                if (listener != null) {
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_MODE,
-                                        playerMode));
+        public void setGothit(String character) {
+                CharacterModel characterModel = characters.get(character);
+                if (characterModel != null) {
+                        if (character.startsWith("spider")) {
+                                notifyView(new ModelEvent(ModelEvent.Type.CHANGE_MODE,
+                                                characterModel.toString(),
+                                                Mode.IDLE));
+                        } else {
+                                notifyView(new ModelEvent(ModelEvent.Type.CHANGE_MODE,
+                                                characterModel.toString(),
+                                                Mode.GOTHIT));
+                        }
                 }
-        }
-
-        public void gothit() {
-                setPlayerMode("GOTHIT");
-                setPlayerSpeed(0, 0, 0);
-
         }
 
         public float getMazeDepth() {
                 return maze.getDepth();
         }
 
-        public void setOnSteps(boolean b) {
-                onSteps = b;
+        public void setOnSteps(String character, Boolean b) {
+                CharacterModel characterModel = characters.get(character);
+                if (characterModel != null) {
+                        characterModel.setOnSteps(b);
+                }
         }
 
-        public void setOnTrapdoor(boolean b) {
-                onTrapdoor = b;
+        public void setOnTrapdoor(String character, Boolean b) {
+                CharacterModel characterModel = characters.get(character);
+                if (characterModel != null) {
+                        characterModel.setOnTrapdoor(b);
+                }
         }
+
+        public boolean isPlayerOnSteps() {
+                return player.getOnSteps();
+        }
+
+        public boolean isPlayerOnTrapdoor() {
+                return player.getOnTrapdoor();
+        }
+
+        public void changeMode(String characterId, Mode mode) {
+                CharacterModel c = characters.get(characterId);
+                if (c != null) {
+                        c.setCurrentMode(mode.toString());
+                        notifyView(new ModelEvent(ModelEvent.Type.CHANGE_MODE, characterId, mode));
+                }
+        }
+
+        private void notifyView(ModelEvent event) {
+                if (listener != null)
+                        listener.onModelUpdated(event);
+        }
+
+        public void changePlayerMode(Mode mode) {
+                player.setCurrentMode(mode.toString());
+                notifyView(new ModelEvent(ModelEvent.Type.CHANGE_MODE, "crusader", mode));
+        }
+
 }

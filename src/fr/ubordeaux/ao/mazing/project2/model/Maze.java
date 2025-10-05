@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.project2.model;
+package fr.ubordeaux.ao.mazing.project3.model;
 
 import java.util.*;
 
@@ -22,11 +22,11 @@ public class Maze {
                     grid[z][y][x] = new Cell(x, y, z);
                     // On ajoute des murs à l'exterieur
                     for (Direction d : outerWalls(grid[z][y][x])) {
-                        grid[z][y][x].walls.put(d, true);
+                        grid[z][y][x].putOnWalls(d, true);
                     }
                     // On ferme tous les chemins partout
                     for (Direction d : Direction.values()) {
-                        grid[z][y][x].paths.put(d, false);
+                        grid[z][y][x].putOnPaths(d, false);
                     }
                 }
             }
@@ -36,10 +36,8 @@ public class Maze {
     public void generate() {
         Stack<Cell> stack = new Stack<>();
         Cell start = grid[0][0][0];
-        // mettre une porte entre current et next
-        // grid[0][0][0].paths.put(Direction.WEST, true);
-
-        start.visited = true;
+        Cell lastCell = start;
+        start.setVisited(true);
         stack.push(start);
 
         while (!stack.isEmpty()) {
@@ -53,15 +51,16 @@ public class Maze {
                 Cell next = getNeighbor(current, dir);
 
                 // mettre une porte entre current et next
-                current.paths.put(dir, true);
-                next.paths.put(opposite(dir), true);
+                current.putOnPaths(dir, true);
+                next.putOnPaths(opposite(dir), true);
 
-                next.visited = true;
+                next.setVisited(true);
                 stack.push(next);
             } else {
                 stack.pop();
             }
         }
+        lastCell.setTreasure(true);
         System.err.println("Maze generated:");
         System.err.println(this);
     }
@@ -70,14 +69,14 @@ public class Maze {
         List<Direction> dirs = new ArrayList<>();
         for (Direction d : Direction.values()) {
             Cell n = getNeighbor(c, d);
-            if (n != null && !n.visited)
+            if (n != null && !n.isVisited())
                 dirs.add(d);
         }
         return dirs;
     }
 
     private Cell getNeighbor(Cell c, Direction d) {
-        int nx = c.x, ny = c.y, nz = c.z;
+        int nx = c.getX(), ny = c.getY(), nz = c.getZ();
         switch (d) {
             case NORTH -> ny--;
             case SOUTH -> ny++;
@@ -104,7 +103,7 @@ public class Maze {
 
     private List<Direction> outerWalls(Cell c) {
         List<Direction> result = new ArrayList<>();
-        int nx = c.x, ny = c.y, nz = c.z;
+        int nx = c.getX(), ny = c.getY(), nz = c.getZ();
         if (nx == 0) {
             result.add(Direction.WEST);
         }
@@ -137,7 +136,7 @@ public class Maze {
                 // Ligne du haut de chaque cellule (mur NORTH)
                 for (int x = 0; x < width; x++) {
                     Cell c = grid[z][y][x];
-                    result.append(c.paths.get(Direction.NORTH) ? "+   " : "+___");
+                    result.append(c.getPaths(Direction.NORTH) ? "+   " : "+___");
                 }
                 result.append("+\n");
 
@@ -145,11 +144,11 @@ public class Maze {
                 for (int x = 0; x < width; x++) {
                     Cell c = grid[z][y][x];
                     // mur OUEST à gauche, espace à l'intérieur
-                    result.append(c.paths.get(Direction.WEST) ? " " : "|");
+                    result.append(c.getPaths(Direction.WEST) ? " " : "|");
                     // symbole au centre de la cellule
                     String symbol = "   ";
-                    boolean up = c.paths.get(Direction.UP);
-                    boolean down = c.paths.get(Direction.DOWN);
+                    boolean up = c.getPaths(Direction.UP);
+                    boolean down = c.getPaths(Direction.DOWN);
                     if (up && down)
                         symbol = " x ";
                     else if (up)
@@ -160,14 +159,14 @@ public class Maze {
                 }
                 // Mur EST de la dernière cellule
                 Cell last = grid[z][y][width - 1];
-                result.append(last.paths.get(Direction.EAST) ? " " : "|");
+                result.append(last.getPaths(Direction.EAST) ? " " : "|");
                 result.append("\n");
             }
 
             // Ligne du bas de la dernière rangée (mur SOUTH)
             for (int x = 0; x < width; x++) {
                 Cell c = grid[z][height - 1][x];
-                result.append(c.paths.get(Direction.SOUTH) ? "+   " : "+___");
+                result.append(c.getPaths(Direction.SOUTH) ? "+   " : "+___");
             }
             result.append("+\n\n");
         }
