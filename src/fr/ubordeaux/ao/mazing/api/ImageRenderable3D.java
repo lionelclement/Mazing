@@ -9,7 +9,7 @@ import java.util.Objects;
  * Implémente {@link IRenderable3D} pour être trié et rendu correctement selon
  * sa profondeur et son rang.
  */
-public class ImageRendarable3D implements IRenderable3D {
+public class ImageRenderable3D implements IRenderable3D {
 
     private BufferedImage bufferedImage;
     private float x;
@@ -21,7 +21,7 @@ public class ImageRendarable3D implements IRenderable3D {
     private int offsetY;
     private float alpha;
 
-    public ImageRendarable3D(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
+    public ImageRenderable3D(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
             int rank,
             RenderType renderType, float alpha) {
         this.bufferedImage = bufferedImage;
@@ -72,6 +72,40 @@ public class ImageRendarable3D implements IRenderable3D {
     @Override
     public float getIsoDepth() {
         return getX() + getY();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 67 * hash + Objects.hashCode(this.bufferedImage);
+        hash = 67 * hash + Float.floatToIntBits(this.x);
+        hash = 67 * hash + Float.floatToIntBits(this.y);
+        hash = 67 * hash + Float.floatToIntBits(this.z);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ImageRenderable3D other = (ImageRenderable3D) obj;
+        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(other.y)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.z) != Float.floatToIntBits(other.z)) {
+            return false;
+        }
+        return Objects.equals(this.bufferedImage, other.bufferedImage);
     }
 
 }

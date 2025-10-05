@@ -60,7 +60,8 @@ public class BoardGame extends JPanel implements IBoardGame {
 	List<IRenderable3D> sceneCharacters = new ArrayList<>();
 
 	/** Mapping des coordonnées vers les codes d’objets de scène */
-	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
+	// Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
+	Map<DiscretePoint, Set<IRenderable3D>> pointToSceneObjectsMap = new HashMap<>();
 
 	/** Liste des personnages du plateau */
 	@SuppressWarnings("rawtypes")
@@ -107,7 +108,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.OBJECT);
 
 		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 0, RenderType.OBJECT);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.OBJECT);
 
 		// Initialisation des rangs de rendu des objets
 		codeToRankMap.put(138, 0);
@@ -346,14 +347,17 @@ public class BoardGame extends JPanel implements IBoardGame {
 			Image image = codeToImageMap.get(code);
 			int rank = codeToRank(code);
 			if (image != null) {
-				ImageRendarable3D imageRendarable3D = new ImageRendarable3D(
+				ImageRenderable3D imageRendarable3D = new ImageRenderable3D(
 						image.getBufferedImage(), x, y, z, image.getOffsetX(),
 						image.getOffsetY(), rank,
 						image.getRenderType(), alpha);
 				sceneObjects.add(imageRendarable3D);
+				// pointToSceneObjectsMap
+				// .computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
+				// .add(code);
 				pointToSceneObjectsMap
 						.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
-						.add(code);
+						.add(imageRendarable3D);
 			}
 		}
 	}
@@ -382,14 +386,17 @@ public class BoardGame extends JPanel implements IBoardGame {
 						Image image = codeToImageMap.get(code);
 						int rank = codeToRank(code);
 						if (image != null) {
-							ImageRendarable3D imageRendarable3D = new ImageRendarable3D(
+							ImageRenderable3D imageRendarable3D = new ImageRenderable3D(
 									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
 									image.getRenderType(), 1.0f);
 
 							sceneObjects.add(imageRendarable3D);
+							// pointToSceneObjectsMap
+							// .computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
+							// .add(code);
 							pointToSceneObjectsMap
 									.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
-									.add(code);
+									.add(imageRendarable3D);
 
 						}
 
@@ -495,8 +502,13 @@ public class BoardGame extends JPanel implements IBoardGame {
 	 * @return ensemble de codes
 	 */
 	@Override
-	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
+	public Set<IRenderable3D> getSceneObjectsFromPoint(int x, int y, int z) {
 		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));
+	}
+
+	@Override
+	public void removeMap(int x, int y, int z, IRenderable3D obj) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 }

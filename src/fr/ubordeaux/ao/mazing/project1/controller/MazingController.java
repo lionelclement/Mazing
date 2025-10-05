@@ -15,34 +15,24 @@ public class MazingController extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        char key = e.getKeyChar();
 
-        if (e.getKeyChar() == 'a') {
-            model.setPlayerMode("ATTACK");
-            return;
+        // Actions liées aux lettres
+        switch (key) {
+            case 'a' -> model.setPlayerMode("ATTACK");
+            case 'g' -> model.setPlayerMode("GOTHIT");
+            case 'j' -> model.setPlayerMode("JUMP");
+            case 'd' -> {
+                model.setPlayerMode("DEATH");
+                model.setPlayerSpeed(0, 0, 0);
+            }
+            case 's' -> {
+                model.setPlayerMode("IDLE");
+                model.setPlayerSpeed(0, 0, 0);
+            }
         }
 
-        if (e.getKeyChar() == 'g') {
-            model.setPlayerMode("GOTHIT");
-            return;
-        }
-
-        if (e.getKeyChar() == 'j') {
-            model.setPlayerMode("JUMP");
-            return;
-        }
-
-        if (e.getKeyChar() == 'd') {
-            model.setPlayerMode("DEATH");
-            model.setPlayerSpeed(0, 0, 0);
-            return;
-        }
-
-        if (e.getKeyChar() == 's') {
-            model.setPlayerMode("IDLE");
-            model.setPlayerSpeed(0, 0, 0);
-            return;
-        }
-
+        // Actions liées aux flèches et sortie
         switch (e.getKeyCode()) {
             case KeyEvent.VK_UP -> {
                 model.setPlayerMode("WALK");
@@ -60,9 +50,7 @@ public class MazingController extends KeyAdapter {
                 model.setPlayerMode("WALK");
                 model.setPlayerSpeed(0.05f, 0, 0);
             }
-            case KeyEvent.VK_Q -> {
-                System.exit(0);
-            }
+            case KeyEvent.VK_Q -> System.exit(0);
         }
     }
 
