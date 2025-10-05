@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.project3.model;
+package fr.ubordeaux.ao.mazing.project2.model;
 
 public class CharacterModel {
 

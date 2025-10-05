@@ -1,11 +1,11 @@
-package fr.ubordeaux.ao.mazing.project3.controller;
+package fr.ubordeaux.ao.mazing.project2.controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import fr.ubordeaux.ao.mazing.project3.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project3.model.Mode;
-import fr.ubordeaux.ao.mazing.project3.view.MazingView;
+import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project2.model.Mode;
+import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 
 public class MazingController extends KeyAdapter {
     private final MazingModel model;

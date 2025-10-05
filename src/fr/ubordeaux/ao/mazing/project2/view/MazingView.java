@@ -1,17 +1,17 @@
-package fr.ubordeaux.ao.mazing.project3.view;
+package fr.ubordeaux.ao.mazing.project2.view;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Character;
 import fr.ubordeaux.ao.mazing.api.IBoardGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.mazing.api.Window;
-import fr.ubordeaux.ao.mazing.project3.controller.MazingController;
-import fr.ubordeaux.ao.mazing.project3.model.Cell;
-import fr.ubordeaux.ao.mazing.project3.model.Direction;
-import fr.ubordeaux.ao.mazing.project3.model.Maze;
-import fr.ubordeaux.ao.mazing.project3.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project3.model.Point;
-import fr.ubordeaux.ao.mazing.project3.model.Mode;
+import fr.ubordeaux.ao.mazing.project2.controller.MazingController;
+import fr.ubordeaux.ao.mazing.project2.model.Cell;
+import fr.ubordeaux.ao.mazing.project2.model.Direction;
+import fr.ubordeaux.ao.mazing.project2.model.Maze;
+import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project2.model.Point;
+import fr.ubordeaux.ao.mazing.project2.model.Mode;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,12 +1,12 @@
-package fr.ubordeaux.ao.mazing.project3;
+package fr.ubordeaux.ao.mazing.project2;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.project3.controller.MazingController;
-import fr.ubordeaux.ao.mazing.project3.model.CharacterModel;
-import fr.ubordeaux.ao.mazing.project3.model.MazingModel;
-import fr.ubordeaux.ao.mazing.project3.view.MazingView;
-import fr.ubordeaux.ao.mazing.project3.view.ViewEvent;
-import fr.ubordeaux.ao.mazing.project3.view.ViewListener;
+import fr.ubordeaux.ao.mazing.project2.controller.MazingController;
+import fr.ubordeaux.ao.mazing.project2.model.CharacterModel;
+import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project2.view.MazingView;
+import fr.ubordeaux.ao.mazing.project2.view.ViewEvent;
+import fr.ubordeaux.ao.mazing.project2.view.ViewListener;
 
 public class Main {
 
