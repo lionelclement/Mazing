@@ -26,7 +26,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
 	List<IRenderable3D> sceneObjects = new ArrayList<>();
 	List<IRenderable3D> sceneCharacters = new ArrayList<>();
-	Map<Point, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
+	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
 	@SuppressWarnings("rawtypes")
 	private List<Character> characters;
@@ -248,7 +248,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 						image.getRenderType(), alpha);
 				sceneObjects.add(imageRendarable3D);
 				pointToSceneObjectsMap
-						.computeIfAbsent(new Point(x, y, z), k -> new HashSet<>())
+						.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
 						.add(code);
 			}
 		}
@@ -279,7 +279,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 
 							sceneObjects.add(imageRendarable3D);
 							pointToSceneObjectsMap
-									.computeIfAbsent(new Point(x, y, z), k -> new HashSet<>())
+									.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
 									.add(code);
 
 						}
@@ -347,7 +347,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 
 	@Override
 	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
-		return pointToSceneObjectsMap.get(new Point(x, y, z));
+		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));
 	}
 
 }

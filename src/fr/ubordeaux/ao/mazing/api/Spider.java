@@ -12,8 +12,8 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private static final int OFFSET_Y = 0;
 
     public enum Mode implements CharacterMode {
-        IDLE("idle", 1, true),
         WALK("walk", 25, true),
+        IDLE("walk", 2, true),
         ATTACK("attack", 8, false),
         FALL("death", 8, false),
         DEATH("death", 8, false);
@@ -42,14 +42,14 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         }
     }
 
-    private Mode currentState;
+    private Mode currentMode;
     SoundManager soundManager = new SoundManager();
-    private Mode previousState;
+    private Mode previousMode;
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
 
     public Spider() {
         super(Mode.values().length, OFFSET_X, OFFSET_Y);
-        currentState = Mode.WALK;
+        currentMode = Mode.WALK;
         currentDirection = Direction.EAST;
         soundManager = new SoundManager();
         initSounds();
@@ -59,18 +59,18 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private void initSounds() {
         String name = null;
         // String key = null;
-        for (Mode state : Mode.values()) {
-            switch (state) {
+        for (Mode mode : Mode.values()) {
+            switch (mode) {
                 case Mode.ATTACK:
                     name = String.format("/kenney_impact-sounds/Audio/footstep_snow_000.wav");
-                    soundManager.loadSound(state.name(), name);
-                    soundManager.setVolume(state.name(), 0.4f);
+                    soundManager.loadSound(mode.getName(), name);
+                    soundManager.setVolume(mode.getName(), 0.4f);
                     break;
 
                 case Mode.DEATH:
                     name = String.format("/kenney_impact-sounds/Audio/impactSoft_heavy_000.wav");
-                    soundManager.loadSound(state.name(), name);
-                    soundManager.setVolume(state.name(), 0.4f);
+                    soundManager.loadSound(mode.getName(), name);
+                    soundManager.setVolume(mode.getName(), 0.4f);
                     break;
 
                 default:
@@ -82,39 +82,37 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void initAnimations() {
-        Mode[] states = Mode.values();
+        Mode[] modes = Mode.values();
         Direction[] directions = Direction.values();
 
-        for (Mode state : states) {
-            int numFrames = state.getNumFrames();
+        for (Mode mode : modes) {
+            int numFrames = mode.getNumFrames();
             for (Direction direction : directions) {
-                images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
-                        numFrames,
+                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
                         (direction.ordinal() + 6) % 8,
                         String.format("/bw_spider/%s/%s-BW_Spider_",
-                                state.getName(),
-                                state.getName()),
+                                mode.getName(),
+                                mode.getName()),
                         SCALE);
 
-                shadow_images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
-                        numFrames,
+                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
                         (direction.ordinal() + 6) % 8,
                         String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
-                                state.getName(),
-                                state.getName()),
+                                mode.getName(),
+                                mode.getName()),
                         SCALE);
 
-                animations[state.ordinal()][direction.ordinal()] = new Animation(
-                        images[state.ordinal()][direction.ordinal()],
-                        shadow_images[state.ordinal()][direction.ordinal()],
-                        DELAY, state.isLoop(), this);
+                animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                        images[mode.ordinal()][direction.ordinal()],
+                        shadow_images[mode.ordinal()][direction.ordinal()],
+                        DELAY, mode.isLoop(), this);
 
             }
         }
     }
 
     public Mode getCurrentMode() {
-        return currentState;
+        return currentMode;
     }
 
     public void stop() {
@@ -125,14 +123,14 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     @Override
     public void changeMode(CharacterMode state) {
         Mode s = (Mode) state;
-        System.out.println("changeState: " + currentState + " -> " + s);
-        previousState = currentState;
+        System.out.println("changeMode: " + currentMode + " -> " + s);
+        previousMode = currentMode;
         previousSpeedX = speedX;
         previousSpeedY = speedY;
         previousSpeedZ = speedZ;
         speedX = speedY = speedZ = 0;
-        currentState = s;
-        animations[currentState.ordinal()][currentDirection.ordinal()].reset();
+        currentMode = s;
+        animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
 
     @Override
@@ -142,13 +140,13 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void render(Graphics g) {
-        Animation<CharacterMode> anim = getCurrentAnimation(currentState.ordinal());
+        Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
         TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
         TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
 
-        super.render(g, currentState.ordinal());
+        super.render(g, currentMode.ordinal());
     }
 
     @Override
@@ -158,7 +156,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public String toString() {
-        return "Crusader [x=" + x + ", y=" + y + ", z=" + z + ", getRenderType()=" + getRenderType() + ", getRank()="
+        return "Spider [x=" + x + ", y=" + y + ", z=" + z + ", getRenderType()=" + getRenderType() + ", getRank()="
                 + getRank() + "]";
     }
 
@@ -169,18 +167,18 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void callEndTrigger() {
-        switch (currentState) {
+        switch (currentMode) {
             case ATTACK:
-                soundManager.play(currentState.name());
-                currentState = previousState;
+                soundManager.play(currentMode.name());
+                currentMode = previousMode;
                 speedX = previousSpeedX;
                 speedY = previousSpeedY;
                 speedZ = previousSpeedZ;
                 break;
             case FALL:
-                currentState = Mode.DEATH;
-                soundManager.play(currentState.name());
-                animations[currentState.ordinal()][currentDirection.ordinal()].lastFrame();
+                currentMode = Mode.DEATH;
+                soundManager.play(currentMode.name());
+                animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
                 break;
             default:
                 break;
@@ -291,7 +289,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             }
 
             // Obtenir la vitesse scalaire selon l'état actuel
-            float speed = switch (currentState) {
+            float speed = switch (currentMode) {
                 case WALK -> WALK_SPEED;
                 default -> 0;
             };
@@ -320,11 +318,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     protected void callTickTrigger(int frameIndex) {
-        float speed = (float) Math.sqrt((speedX * speedX + speedY * speedY + speedZ * speedZ));
-        if (speed < 0.02f)
-            changeMode(Spider.Mode.IDLE);
-        else
-            changeMode(Spider.Mode.WALK);
+        super.callTickTrigger(frameIndex);
     }
 
 }

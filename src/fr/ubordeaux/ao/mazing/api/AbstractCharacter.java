@@ -33,18 +33,6 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         currentDirection = Direction.SOUTH;
     }
 
-    public float getSpeedX() {
-        return speedX;
-    }
-
-    public float getSpeedY() {
-        return speedY;
-    }
-
-    public float getSpeedZ() {
-        return speedZ;
-    }
-
     @SuppressWarnings("unchecked")
     public Animation<T> getCurrentAnimation(int state) {
         return (Animation<T>) animations[state][currentDirection.ordinal()];
@@ -233,6 +221,21 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         return z;
     }
 
+    @Override
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    @Override
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    @Override
+    public void setZ(float z) {
+        this.z = z;
+    }
+
     public abstract void changeMode(String mode);
 
     public abstract void changeMode(CharacterMode mode);
@@ -306,6 +309,21 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     @Override
     public void setLoopAnimationTrigger(Runnable callback) {
         loopAnimationTrigger = callback;
+    }
+
+    @Override
+    public float getSpeedX() {
+        return speedX;
+    }
+
+    @Override
+    public float getSpeedY() {
+        return speedY;
+    }
+
+    @Override
+    public float getSpeedZ() {
+        return speedZ;
     }
 
 }

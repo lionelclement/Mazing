@@ -128,32 +128,30 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void initAnimations() {
-        Mode[] states = Mode.values();
+        Mode[] modes = Mode.values();
         Direction[] directions = Direction.values();
 
-        for (Mode state : states) {
-            int numFrames = state.getNumFrames();
+        for (Mode mode : modes) {
+            int numFrames = mode.getNumFrames();
             for (Direction direction : directions) {
-                images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
-                        numFrames,
+                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
                         direction.ordinal(),
                         String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
-                                state.getName(),
-                                state.getName()),
+                                mode.getName(),
+                                mode.getName()),
                         SCALE);
 
-                shadow_images[state.ordinal()][direction.ordinal()] = Loader.loadAnimations(
-                        numFrames,
+                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
                         direction.ordinal(),
                         String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
-                                state.getName(),
-                                state.getName()),
+                                mode.getName(),
+                                mode.getName()),
                         SCALE);
 
-                animations[state.ordinal()][direction.ordinal()] = new Animation(
-                        images[state.ordinal()][direction.ordinal()],
-                        shadow_images[state.ordinal()][direction.ordinal()],
-                        DELAY, state.isLoop(), this);
+                animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                        images[mode.ordinal()][direction.ordinal()],
+                        shadow_images[mode.ordinal()][direction.ordinal()],
+                        DELAY, mode.isLoop(), this);
 
             }
         }
@@ -389,6 +387,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void changeMode(String mode) {
+        // System.err.println("Crusader@changeMode");
         try {
             changeMode(Mode.valueOf(mode));
         } catch (IllegalArgumentException e) {

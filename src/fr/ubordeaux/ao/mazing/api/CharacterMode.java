@@ -7,4 +7,5 @@ public interface CharacterMode {
     boolean isLoop();
 
     int ordinal();
+
 }

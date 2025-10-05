@@ -1,12 +1,12 @@
 package fr.ubordeaux.ao.mazing.api;
 
-public class Point {
+public class DiscretePoint {
 
     private final int x;
     private final int y;
     private final int z;
 
-    public Point(int x, int y, int z) {
+    public DiscretePoint(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -32,7 +32,7 @@ public class Point {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Point other = (Point) obj;
+        final DiscretePoint other = (DiscretePoint) obj;
         if (this.x != other.x) {
             return false;
         }

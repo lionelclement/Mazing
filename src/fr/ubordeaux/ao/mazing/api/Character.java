@@ -4,6 +4,12 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
 
     void setPosition(float x, float y, float z);
 
+    void setX(float x);
+
+    void setY(float y);
+
+    void setZ(float z);
+
     void setSpeed(float xSpeed, float ySpeed, float zSpeed);
 
     void walk();
