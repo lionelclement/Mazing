@@ -3,15 +3,15 @@ package fr.ubordeaux.ao.mazing.project2.controller;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import fr.ubordeaux.ao.mazing.project2.model.MazingModel;
+import fr.ubordeaux.ao.mazing.project2.model.IMazingModel;
 import fr.ubordeaux.ao.mazing.project2.model.Mode;
 import fr.ubordeaux.ao.mazing.project2.view.MazingView;
 
 public class MazingController extends KeyAdapter {
-    private final MazingModel model;
-    private static final float SPEED_WALK = 0.05f;
+    private final IMazingModel model;
+    private static final double SPEED_WALK = 0.05;
 
-    public MazingController(MazingModel model, MazingView view) {
+    public MazingController(IMazingModel model, MazingView view) {
         this.model = model;
     }
 
@@ -43,7 +43,7 @@ public class MazingController extends KeyAdapter {
     }
 
     /** Déplace le joueur dans le plan XY et active le mode WALK */
-    private void move(float dx, float dy, float dz) {
+    private void move(double dx, double dy, double dz) {
         model.changePlayerMode(Mode.WALK);
         model.setPlayerSpeed(dx, dy, dz);
     }
@@ -51,9 +51,9 @@ public class MazingController extends KeyAdapter {
     /** Monte ou descend d’un étage si possible */
     private void moveVertical(int direction) {
         if (direction > 0 && model.isPlayerOnSteps() && model.getPlayerPositionZ() < model.getMazeDepth() - 1) {
-            model.setPlayerPositionZ((float) (model.getPlayerPositionZ() + 1));
+            model.setPlayerPositionZ((double) (model.getPlayerPositionZ() + 1));
         } else if (direction < 0 && model.isPlayerOnTrapdoor() && model.getPlayerPositionZ() > 0) {
-            model.setPlayerPositionZ((float) (model.getPlayerPositionZ() - 1));
+            model.setPlayerPositionZ((double) (model.getPlayerPositionZ() - 1));
         }
     }
 

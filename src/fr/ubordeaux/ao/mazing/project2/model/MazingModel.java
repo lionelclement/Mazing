@@ -3,7 +3,7 @@ package fr.ubordeaux.ao.mazing.project2.model;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MazingModel {
+public class MazingModel implements IMazingModel {
 
         private Maze maze;
         private ModelListener listener;
@@ -23,7 +23,8 @@ public class MazingModel {
                 this.listener = listener;
         }
 
-        public void setPlayerPositionZ(float z) {
+        @Override
+        public void setPlayerPositionZ(double z) {
                 double dz = player.getPosition().getZ() - z;
                 player.getPosition().setZ(z);
                 if (dz * dz > 0) {
@@ -33,11 +34,13 @@ public class MazingModel {
 
         }
 
-        public void setPlayerSpeed(float playerSpeedX, float playerSpeedY, float playerSpeedZ) {
+        @Override
+        public void setPlayerSpeed(double playerSpeedX, double playerSpeedY, double playerSpeedZ) {
                 Point speed = new Point(playerSpeedX, playerSpeedY, playerSpeedZ);
                 notifyView(new ModelEvent(ModelEvent.Type.PLAYER_SPEED, speed));
         }
 
+        @Override
         public double getPlayerPositionZ() {
                 notifyView(new ModelEvent(ModelEvent.Type.MAZE,
                                 maze));
@@ -61,6 +64,7 @@ public class MazingModel {
                 return player.getCurrentMode();
         }
 
+        @Override
         public void mazeGenerate() {
                 maze.clear();
                 maze.generate();
@@ -84,7 +88,8 @@ public class MazingModel {
                 }
         }
 
-        public float getMazeDepth() {
+        @Override
+        public int getMazeDepth() {
                 return maze.getDepth();
         }
 
@@ -102,14 +107,17 @@ public class MazingModel {
                 }
         }
 
+        @Override
         public boolean isPlayerOnSteps() {
                 return player.getOnSteps();
         }
 
+        @Override
         public boolean isPlayerOnTrapdoor() {
                 return player.getOnTrapdoor();
         }
 
+        @Override
         public void changeMode(String characterId, Mode mode) {
                 CharacterModel c = characters.get(characterId);
                 if (c != null) {
@@ -123,6 +131,7 @@ public class MazingModel {
                         listener.onModelUpdated(event);
         }
 
+        @Override
         public void changePlayerMode(Mode mode) {
                 player.setCurrentMode(mode.toString());
                 notifyView(new ModelEvent(ModelEvent.Type.CHANGE_MODE, "crusader", mode));
