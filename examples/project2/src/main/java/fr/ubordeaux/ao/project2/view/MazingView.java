@@ -1,11 +1,15 @@
 package fr.ubordeaux.ao.project2.view;
 
-import fr.ubordeaux.ao.mazing.api.board.BoardGame;
 import fr.ubordeaux.ao.mazing.api.view.GameWindow;
-import fr.ubordeaux.ao.mazing.api.entity.Crusader;
-import fr.ubordeaux.ao.mazing.api.entity.Entity;
-import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
-import fr.ubordeaux.ao.mazing.api.entity.Spider;
+import fr.ubordeaux.ao.mazing.api.view.board.BoardGameComponent;
+import fr.ubordeaux.ao.mazing.api.view.entity.EntityRenderer;
+import fr.ubordeaux.ao.mazing.impl.model.board.BoardGame;
+import fr.ubordeaux.ao.mazing.impl.model.entity.Crusader;
+import fr.ubordeaux.ao.mazing.api.model.entity.Entity;
+import fr.ubordeaux.ao.mazing.api.model.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.impl.model.entity.Spider;
+import fr.ubordeaux.ao.mazing.impl.view.entity.CrusaderRenderer;
+import fr.ubordeaux.ao.mazing.impl.view.entity.SpiderRenderer;
 import fr.ubordeaux.ao.project2.controller.MazingController;
 import fr.ubordeaux.ao.project2.model.Cell;
 import fr.ubordeaux.ao.project2.model.Direction;
@@ -43,6 +47,7 @@ public class MazingView {
 
 	private final GameWindow window;
 	private final IBoardGame boardGame;
+	private final BoardGameComponent boardGameComponent;
 	private ViewListener viewListener;
 
 	private final Set<Integer> eastBarrier = new HashSet<>(Arrays.asList(TILE_WALL_EAST, TILE_HALF_EAST));
@@ -54,8 +59,9 @@ public class MazingView {
 	private final Map<String, CharacterView> characters = new HashMap<>();
 
 	public MazingView(ViewListener viewListener) {
-		window = new GameWindow(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT));
-		boardGame = window.getBoardGame();
+		boardGame = new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT);
+		boardGameComponent = new BoardGameComponent(boardGame);
+		window = new GameWindow(boardGameComponent);
 		this.viewListener = viewListener;
 		init();
 	}
@@ -68,7 +74,7 @@ public class MazingView {
 		window.setVisible(b);
 	}
 
-	public IBoardGame getBoardGame() {
+	public BoardGameComponent getBoardGame() {
 		return window.getBoardGame();
 	}
 
@@ -105,12 +111,12 @@ public class MazingView {
 
 				case WALLS -> {
 					int[][][] walls = (int[][][]) event.value;
-					boardGame.addToSceneMap(walls);
+					boardGameComponent.addToSceneMap(walls);
 				}
 
 				case MAZE -> {
 					Maze maze = (Maze) event.value;
-					boardGame.clearMap();
+					boardGameComponent.clearMap();
 					generateMazeViewFromMazeModel(maze, (int) boardGame.getPlayerZ());
 				}
 
@@ -123,24 +129,25 @@ public class MazingView {
 
 	private void init() {
 
-		boardGame.fillTilesBackground(TILE_DIRT, 1.0f);
-		Entity c = new Crusader();
-		c.setPosition(1, 1, 0);
-		boardGame.assignPlayer(c);
-		c.setTickAnimationCallback(() -> {
+		boardGameComponent.fillTilesBackground(TILE_DIRT, 1.0f);
+		Entity e = new Crusader();
+		e.setPosition(1, 1, 0);
+		boardGame.assignPlayer(e);
+		EntityRenderer r = new CrusaderRenderer(e);
+		r.setTickAnimationCallback(() -> {
 			System.err.println("tickAnimationTrigger");
 		});
-		c.setBeginAnimationCallback(() -> {
+		r.setBeginAnimationCallback(() -> {
 			System.err.println("beginAnimationTrigger");
 		});
-		c.setEndAnimationCallback(() -> {
+		r.setEndAnimationCallback(() -> {
 			System.err.println("endAnimationTrigger");
 		});
-		c.setLoopAnimationCallback(() -> {
+		r.setLoopAnimationCallback(() -> {
 			System.err.println("loopAnimationTrigger");
 		});
 
-		crusader = new CharacterView("crusader", c, boardGame, viewListener,
+		crusader = new CharacterView("crusader", r, boardGameComponent, viewListener,
 				eastBarrier, westBarrier, northBarrier, southBarrier);
 
 		characters.put(crusader.toString(), crusader);
@@ -149,8 +156,9 @@ public class MazingView {
 			Spider spider = new Spider();
 			spider.setPosition(i + 1, 0, 0);
 			spider.setSpeed(0.01f, 0, 0);
+			SpiderRenderer spiderRenderer = new SpiderRenderer(spider);
 
-			spiders[i] = new CharacterView(String.format("spider%d", i), spider, boardGame, viewListener,
+			spiders[i] = new CharacterView(String.format("spider%d", i), spiderRenderer, boardGameComponent, viewListener,
 					eastBarrier, westBarrier, northBarrier, southBarrier);
 			characters.put(spiders[i].toString(), spiders[i]);
 		}
@@ -158,38 +166,38 @@ public class MazingView {
 	}
 
 	private void addCell(int tileId, int baseX, int baseY, int baseZ, float alpha) {
-		boardGame.addToSceneMap(tileId, baseX, baseY, baseZ, alpha);
+		boardGameComponent.addToSceneMap(tileId, baseX, baseY, baseZ, alpha);
 	}
 
 	private void addLineCell(int tileId, int size, int baseX, int baseY, int baseZ, Direction dir, float alpha) {
 		switch (dir) {
 			case WEST -> {
 				for (int k = 0; k < size; k++) {
-					boardGame.addToSceneMap(tileId, baseX, baseY + k, baseZ, alpha);
+					boardGameComponent.addToSceneMap(tileId, baseX, baseY + k, baseZ, alpha);
 				}
 			}
 
 			case EAST -> {
 				for (int k = 0; k < size; k++) {
-					boardGame.addToSceneMap(tileId, baseX + 2, baseY + k, baseZ, alpha);
+					boardGameComponent.addToSceneMap(tileId, baseX + 2, baseY + k, baseZ, alpha);
 				}
 			}
 
 			case NORTH -> {
 				for (int k = 0; k < size; k++) {
-					boardGame.addToSceneMap(tileId, baseX + k, baseY, baseZ, alpha);
+					boardGameComponent.addToSceneMap(tileId, baseX + k, baseY, baseZ, alpha);
 				}
 			}
 
 			case SOUTH -> {
 				for (int k = 0; k < size; k++) {
-					boardGame.addToSceneMap(tileId, baseX + k, baseY + 2, baseZ, alpha);
+					boardGameComponent.addToSceneMap(tileId, baseX + k, baseY + 2, baseZ, alpha);
 				}
 			}
 
-			case UP -> boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
+			case UP -> boardGameComponent.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
 
-			case DOWN -> boardGame.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
+			case DOWN -> boardGameComponent.addToSceneMap(tileId, baseX + 1, baseY + 1, baseZ, alpha);
 		}
 	}
 
@@ -198,11 +206,11 @@ public class MazingView {
 		int height = maze.getHeight();
 		int depth = maze.getDepth();
 
-		boardGame.clearMap();
+		boardGameComponent.clearMap();
 
 		for (int x = 0; x < maze.getWidth() * 3; x++) {
 			for (int y = 0; y < maze.getHeight() * 3; y++) {
-				boardGame.addToSceneMap(TILE_FLOOR, x, y, 0, 1.0f);
+				boardGameComponent.addToSceneMap(TILE_FLOOR, x, y, 0, 1.0f);
 			}
 		}
 

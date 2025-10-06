@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.api.view.entity;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -62,25 +62,25 @@ public class Animation {
 	 *
 	 * @param owner personnage propriétaire de l'animation
 	 */
-	public void tick(IAnimationCallback owner) {
-		owner.runTickCallback(frameIndex);
+	public void tick(EntityRenderer owner) {
+		owner.onTick(frameIndex);
 		if (!frozen) {
 			if (frameIndex == 0) {
-				owner.runBeginCallback();
+				owner.onBeginAnimation();
 			}
 			if (frameIndex == frameNumberMid) {
-				owner.runMidCallback();
+				owner.onMiddleAnimation();
 			}
 			frameIndex++;
 		}
 		if (frameIndex >= frameNumber) {
 			if (loop) {
 				frameIndex = 0;
-				owner.runLoopCallback();
+				owner.onLoopAnimation();
 			} else {
 				frameIndex--;
 				frozen = true;
-				owner.runEndCallback();
+				owner.onEndAnimation();
 			}
 		}
 	}

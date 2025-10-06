@@ -39,17 +39,17 @@ public class ImageRenderable3D implements IRenderable {
     }
 
     @Override
-    public float getX() {
+    public float getRenderX() {
         return x;
     }
 
     @Override
-    public float getY() {
+    public float getRenderY() {
         return y;
     }
 
     @Override
-    public float getZ() {
+    public float getRenderZ() {
         return z;
     }
 
@@ -74,7 +74,7 @@ public class ImageRenderable3D implements IRenderable {
 
     @Override
     public float getIsoDepth() {
-        return getX() + getY();
+        return getRenderX() + getRenderY();
     }
 
     @Override

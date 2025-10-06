@@ -1,13 +1,8 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.impl.model.entity;
 
 import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.Loader;
-import fr.ubordeaux.ao.mazing.api.RenderType;
 import fr.ubordeaux.ao.mazing.api.SoundManager;
-import fr.ubordeaux.ao.mazing.api.TileMap;
-
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import fr.ubordeaux.ao.mazing.api.model.entity.EntityMode;
 
 /**
  * Représente le personnage jouable "Crusader" avec ses animations,
@@ -18,13 +13,9 @@ import java.awt.image.BufferedImage;
  */
 public class Crusader extends AbstractEntity {
 
-    private static final int DELAY = 60;
     private static final float WALK_SPEED = 0.03f;
     private static final float RUN_SPEED = 0.08f;
     private static final float JUMP_SPEED = 1.5f;
-    private static final float SCALE = 2.5f;
-    private static final int OFFSET_X = 0;
-    private static final int OFFSET_Y = 8;
 
     public enum Mode implements EntityMode {
         WALK("walk", 15, true),
@@ -76,7 +67,7 @@ public class Crusader extends AbstractEntity {
     private float previousZ;
 
     public Crusader() {
-        super(Mode.values().length, OFFSET_X, OFFSET_Y);
+        super();
         previousMode = currentMode = Mode.IDLE;
         currentSound = Sound.CARPET_SOFT;
         currentDirection = Direction.EAST;
@@ -141,37 +132,6 @@ public class Crusader extends AbstractEntity {
     }
 
     @Override
-    protected void loadAnimations() {
-        Mode[] modes = Mode.values();
-        Direction[] directions = Direction.values();
-
-        for (Mode mode : modes) {
-            int numFrames = mode.getNumFrames();
-            for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
-                                mode.getName(),
-                                mode.getName()),
-                        SCALE);
-
-                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
-                                mode.getName(),
-                                mode.getName()),
-                        SCALE);
-
-                animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                        images[mode.ordinal()][direction.ordinal()],
-                        shadow_images[mode.ordinal()][direction.ordinal()],
-                        DELAY, mode.isLoop());
-
-            }
-        }
-    }
-
-    @Override
     public Mode getCurrentMode() {
         return currentMode;
     }
@@ -186,32 +146,10 @@ public class Crusader extends AbstractEntity {
     public void changeMode(EntityMode mode) {
         previousMode = currentMode;
         currentMode = (Mode) mode;
-        animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
 
     @Override
-    public RenderType getRenderType() {
-        return RenderType.OBJECT;
-    }
-
-    @Override
-    public void render(Graphics g) {
-        Animation anim = getCurrentAnimation();
-        BufferedImage image = anim.getCurrentFrame();
-        BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-
-        super.render(g);
-    }
-
-    @Override
-    public int getRank() {
-        return 1;
-    }
-
-    @Override
-    public void runTickCallback(int frameIndex) {
+    public void onTick(int frameIndex) {
         switch (currentMode) {
             case RUN, WALK -> {
                 if (frameIndex % 8 == 3) {
@@ -222,11 +160,11 @@ public class Crusader extends AbstractEntity {
             default -> {
             }
         }
-        super.runTickCallback(frameIndex);
+        super.onTick(frameIndex);
     }
 
     @Override
-    public void runBeginCallback() {
+    public void onBeginAnimation() {
         switch (currentMode) {
             case ATTACK:
                 previousSpeedX = speedX;
@@ -246,22 +184,22 @@ public class Crusader extends AbstractEntity {
             default:
                 break;
         }
-        super.runBeginCallback();
+        super.onBeginAnimation();
     }
 
     @Override
-    public void runMidCallback() {
+    public void onMiddleAnimation() {
         switch (currentMode) {
             case JUMP:
                 speedZ = -speedZ;
             default:
                 break;
         }
-        super.runMidCallback();
+        super.onMiddleAnimation();
     }
 
     @Override
-    public void runEndCallback() {
+    public void onEndAnimation() {
         switch (currentMode) {
             case ATTACK:
             case GOTHIT:
@@ -275,7 +213,6 @@ public class Crusader extends AbstractEntity {
                 currentMode = Mode.IDLE;
                 currentMode = Mode.DEATH;
                 soundManager.play(currentMode.name());
-                animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
                 break;
             case JUMP:
                 z = previousZ;
@@ -284,7 +221,7 @@ public class Crusader extends AbstractEntity {
             default:
                 break;
         }
-        super.runEndCallback();
+        super.onEndAnimation();
     }
 
     private void moveForward(float speed) {
@@ -393,11 +330,6 @@ public class Crusader extends AbstractEntity {
             speedY = dirY * speed;
             speedZ = 0; // ou conserver speedZ si besoin
         });
-    }
-
-    @Override
-    public float getIsoDepth() {
-        return getX() + getY() + 0.9f;
     }
 
     @Override

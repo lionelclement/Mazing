@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.api.board;
+package fr.ubordeaux.ao.mazing.api.view.board;
 
 /**
  * Représente un point discret dans l'espace 3D du plateau de jeu.

@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.api.model.entity;
 
 /**
  * Représente un mode ou un état d'un personnage dans le jeu.

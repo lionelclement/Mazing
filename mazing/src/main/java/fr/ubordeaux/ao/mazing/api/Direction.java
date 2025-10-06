@@ -41,7 +41,7 @@ public enum Direction {
      * @param value Index ordinal.
      * @param angle Angle en degrés.
      */
-    private Direction(int value, int angle) {
+    Direction(int value, int angle) {
         this.value = value;
         this.angle = angle;
     }

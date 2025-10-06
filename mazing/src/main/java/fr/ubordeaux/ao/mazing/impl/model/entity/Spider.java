@@ -1,13 +1,8 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.impl.model.entity;
 
 import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.Loader;
-import fr.ubordeaux.ao.mazing.api.RenderType;
 import fr.ubordeaux.ao.mazing.api.SoundManager;
-import fr.ubordeaux.ao.mazing.api.TileMap;
-
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import fr.ubordeaux.ao.mazing.api.model.entity.EntityMode;
 
 /**
  * Représente une araignée avec ses animations et comportements spécifiques.
@@ -16,11 +11,7 @@ import java.awt.image.BufferedImage;
  */
 public class Spider extends AbstractEntity {
 
-    private static final int DELAY = 60;
     private static final float WALK_SPEED = 0.03f;
-    private static final float SCALE = 2.5f;
-    private static final int OFFSET_X = 0;
-    private static final int OFFSET_Y = 0;
 
     public enum Mode implements EntityMode {
         WALK("walk", 25, true),
@@ -56,12 +47,12 @@ public class Spider extends AbstractEntity {
     }
 
     private Mode currentMode;
-    SoundManager soundManager = new SoundManager();
+    SoundManager soundManager;
     private Mode previousMode;
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
 
     public Spider() {
-        super(Mode.values().length, OFFSET_X, OFFSET_Y);
+        super();
         currentMode = Mode.WALK;
         currentDirection = Direction.EAST;
         soundManager = new SoundManager();
@@ -92,36 +83,6 @@ public class Spider extends AbstractEntity {
         }
     }
 
-    @Override
-    protected void loadAnimations() {
-        Mode[] modes = Mode.values();
-        Direction[] directions = Direction.values();
-
-        for (Mode mode : modes) {
-            int numFrames = mode.getNumFrames();
-            for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
-                        (direction.ordinal() + 6) % 8,
-                        String.format("/bw_spider/%s/%s-BW_Spider_",
-                                mode.getName(),
-                                mode.getName()),
-                        SCALE);
-
-                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
-                        (direction.ordinal() + 6) % 8,
-                        String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
-                                mode.getName(),
-                                mode.getName()),
-                        SCALE);
-
-                animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                        images[mode.ordinal()][direction.ordinal()],
-                        shadow_images[mode.ordinal()][direction.ordinal()],
-                        DELAY, mode.isLoop());
-
-            }
-        }
-    }
 
     @Override
     public Mode getCurrentMode() {
@@ -144,43 +105,15 @@ public class Spider extends AbstractEntity {
         previousSpeedZ = speedZ;
         speedX = speedY = speedZ = 0;
         currentMode = s;
-        animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
 
     @Override
-    public RenderType getRenderType() {
-        return RenderType.OBJECT;
+    public void onBeginAnimation() {
+        super.onEndAnimation();
     }
 
     @Override
-    public void render(Graphics g) {
-        Animation anim = getCurrentAnimation();
-        BufferedImage image = anim.getCurrentFrame();
-        BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-
-        super.render(g);
-    }
-
-    @Override
-    public int getRank() {
-        return 1;
-    }
-
-    @Override
-    public String toString() {
-        return "Spider [x=" + x + ", y=" + y + ", z=" + z + ", getRenderType()=" + getRenderType() + ", getRank()="
-                + getRank() + "]";
-    }
-
-    @Override
-    public void runBeginCallback() {
-        super.runEndCallback();
-    }
-
-    @Override
-    public void runEndCallback() {
+    public void onEndAnimation() {
         switch (currentMode) {
             case ATTACK -> {
                 soundManager.play(currentMode.name());
@@ -192,12 +125,11 @@ public class Spider extends AbstractEntity {
             case FALL -> {
                 currentMode = Mode.DEATH;
                 soundManager.play(currentMode.name());
-                animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
             }
             default -> {
             }
         }
-        super.runEndCallback();
+        super.onEndAnimation();
     }
 
     private void moveForward(float speed) {
@@ -317,11 +249,6 @@ public class Spider extends AbstractEntity {
     }
 
     @Override
-    public float getIsoDepth() {
-        return getX() + getY() + 0.6f;
-    }
-
-    @Override
     public void changeMode(String mode) {
         try {
             changeMode(Mode.valueOf(mode));
@@ -329,11 +256,6 @@ public class Spider extends AbstractEntity {
             // Gérer le cas où la direction est inconnue
             System.err.println("Mode invalide : " + mode);
         }
-    }
-
-    @Override
-    public void runTickCallback(int frameIndex) {
-        super.runTickCallback(frameIndex);
     }
 
 }

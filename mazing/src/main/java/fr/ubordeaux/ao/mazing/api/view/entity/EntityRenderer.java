@@ -1,6 +1,20 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.api.view.entity;
 
-public interface IAnimationCallback {
+import fr.ubordeaux.ao.mazing.api.model.entity.Entity;
+import fr.ubordeaux.ao.mazing.api.model.entity.EntityMode;
+import fr.ubordeaux.ao.mazing.api.view.IRenderable;
+
+public interface EntityRenderer extends IRenderable {
+
+    Entity getEntity();
+
+    /**
+     * Retourne l'animation courante selon l'état de l'entité.
+     * Cet état est récupéré grâce à {@link Entity#getCurrentMode()}.
+     *
+     * @return l'animation correspondant à l'état spécifié
+     */
+    Animation getCurrentAnimation();
 
     /**
      * Définit une action à exécuter à chaque boucle d'animation.
@@ -37,30 +51,42 @@ public interface IAnimationCallback {
      */
     void setTickAnimationCallback(Runnable callback);
 
+    void changeMode(EntityMode mode);
+    /**
+     * Change le mode du personnage en utilisant une chaîne de caractères.
+     *
+     * @param mode Nom du mode à appliquer (ex. "IDLE", "WALK", etc).
+     */
+    void changeMode(String mode);
     /**
      * Exécute le callback de tick d'animation
      *
      * @param frameIndex the current animation frame
      */
-    void runTickCallback(int frameIndex);
+    default void onTick(int frameIndex) {
+    }
 
     /**
      * Exécute le callback de début d'animation
      */
-    void runBeginCallback();
+    default void onBeginAnimation() {
+    }
 
     /**
      * Exécute le callback de milieu d'animation
      */
-    void runMidCallback();
+    default void onMiddleAnimation() {
+    }
 
     /**
      * Exécute le callback de fin d'animation
      */
-    void runEndCallback();
+    default void onEndAnimation() {
+    }
 
     /**
      * Exécute le callback de boucle d'animation
      */
-    void runLoopCallback();
+    default void onLoopAnimation() {
+    }
 }

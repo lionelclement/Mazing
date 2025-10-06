@@ -1,7 +1,9 @@
 package fr.ubordeaux.ao.project2.view;
 
-import fr.ubordeaux.ao.mazing.api.entity.Entity;
-import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.model.entity.Entity;
+import fr.ubordeaux.ao.mazing.api.model.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.view.board.BoardGameComponent;
+import fr.ubordeaux.ao.mazing.api.view.entity.EntityRenderer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,8 +11,8 @@ import java.util.Set;
 public class CharacterView {
 
     private final String name;
-    private final Entity character;
-    private final IBoardGame boardGame;
+    private final EntityRenderer character;
+    private final BoardGameComponent boardGame;
     private final ViewListener viewListener;
     private boolean gothit;
 
@@ -19,7 +21,7 @@ public class CharacterView {
     private final Set<Integer> northBarrier;
     private final Set<Integer> southBarrier;
 
-    public CharacterView(String name, Entity character, IBoardGame boardGame, ViewListener listener,
+    public CharacterView(String name, EntityRenderer character, BoardGameComponent boardGame, ViewListener listener,
                          Set<Integer> east, Set<Integer> west, Set<Integer> north, Set<Integer> south) {
         this.name = name;
         this.character = character;
@@ -42,9 +44,9 @@ public class CharacterView {
 
         // Begin trigger : stop si GOTHIT
         character.setBeginAnimationCallback(() -> {
-            if (character.getCurrentMode().toString().equals("GOTHIT")) {
+            if (character.getEntity().getCurrentMode().toString().equals("GOTHIT")) {
                 // character.changeMode("GOTHIT");
-                character.setSpeed(0, 0, 0);
+                character.getEntity().setSpeed(0, 0, 0);
                 gothit = true;
             }
         });
@@ -53,7 +55,7 @@ public class CharacterView {
         character.setEndAnimationCallback(() -> {
             if (gothit) {
                 gothit = false;
-                character.setSpeed(0, 0, 0);
+                character.getEntity().setSpeed(0, 0, 0);
                 character.changeMode("IDLE");
             }
         });
@@ -70,9 +72,9 @@ public class CharacterView {
 
     private void handleSpecialTiles() {
         Set<Integer> set = new HashSet<>();
-        int cx = (int) character.getX();
-        int cy = (int) character.getY();
-        int cz = (int) character.getZ();
+        int cx = (int) character.getRenderX();
+        int cy = (int) character.getRenderY();
+        int cz = (int) character.getRenderZ();
 
         // On regarde autour de (-1, 0, +1)
         for (int dx = -1; dx <= 1; dx++) {
@@ -91,7 +93,7 @@ public class CharacterView {
 
     private void handleCollisions() {
         Set<Integer> set = (Set<Integer>) boardGame.getSceneObjectsFromPoint(
-                (int) character.getX(), (int) character.getY(), (int) character.getZ());
+                (int) character.getRenderX(), (int) character.getRenderY(), (int) character.getRenderZ());
         if (set == null || set.isEmpty())
             return;
 
@@ -108,12 +110,12 @@ public class CharacterView {
         copy.retainAll(barrier); // garde uniquement les éléments communs
 
         if (!copy.isEmpty()) { // collision détectée
-            if ((dx != 0 && character.getSpeedX() * dx > 0 && character.getX() % 1 < 0.1f) ||
-                    (dy != 0 && character.getSpeedY() * dy > 0 && character.getY() % 1 < 0.1f)) {
+            if ((dx != 0 && character.getEntity().getSpeedX() * dx > 0 && character.getRenderX() % 1 < 0.1f) ||
+                    (dy != 0 && character.getEntity().getSpeedY() * dy > 0 && character.getRenderY() % 1 < 0.1f)) {
                 // on repousse légèrement le personnage
-                character.setPosition(character.getX() - dx * pushBack, character.getY() - dy * pushBack,
-                        character.getZ());
-                character.setSpeed(0, 0, 0);
+                character.getEntity().setPosition(character.getRenderX() - dx * pushBack, character.getRenderY() - dy * pushBack,
+                        character.getRenderZ());
+                character.getEntity().setSpeed(0, 0, 0);
                 viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.GOTHIT, name, null));
             }
         }

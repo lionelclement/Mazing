@@ -15,21 +15,21 @@ public interface IRenderable {
      *
      * @return coordonnée X
      */
-    float getX();
+    float getRenderX();
 
     /**
      * Retourne la position Y du rendu.
      *
      * @return coordonnée Y
      */
-    float getY();
+    float getRenderY();
 
     /**
      * Retourne la position Z du rendu.
      *
      * @return coordonnée Z
      */
-    float getZ();
+    float getRenderZ();
 
     /**
      * Retourne le type de rendu (sol, objet, personnage, etc.).

@@ -1,12 +1,11 @@
-package fr.ubordeaux.ao.mazing.api.entity;
+package fr.ubordeaux.ao.mazing.api.model.entity;
 
 import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.view.IRenderable;
 
 /**
  * Interface représentant un personnage dans le jeu.
  */
-public interface Entity extends IRenderable, IAnimationCallback {
+public interface Entity {
 
     /**
      * Définit la position du personnage.
@@ -37,6 +36,12 @@ public interface Entity extends IRenderable, IAnimationCallback {
      * @param z Nouvelle coordonnée Z.
      */
     void setZ(float z);
+
+    float getX();
+
+    float getY();
+
+    float getZ();
 
     /**
      * Définit la vitesse du personnage selon chaque axe.
@@ -134,10 +139,30 @@ public interface Entity extends IRenderable, IAnimationCallback {
     void changeMode(String mode);
 
     /**
-     * Retourne l'animation courante selon l'état de l'entité.
-     * Cet état est récupéré grâce à {@link Entity#getCurrentMode()}.
+     * Exécute le callback de tick d'animation
      *
-     * @return l'animation correspondant à l'état spécifié
+     * @param frameIndex the current animation frame
      */
-    Animation getCurrentAnimation();
+    default void onTick(int frameIndex){}
+
+    /**
+     * Exécute le callback de début d'animation
+     */
+    default void onBeginAnimation(){}
+
+    /**
+     * Exécute le callback de milieu d'animation
+     */
+    default void onMiddleAnimation(){}
+
+    /**
+     * Exécute le callback de fin d'animation
+     */
+    default void onEndAnimation(){}
+
+    /**
+     * Exécute le callback de boucle d'animation
+     */
+    default void onLoopAnimation(){}
+
 }

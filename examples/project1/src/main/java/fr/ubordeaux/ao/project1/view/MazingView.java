@@ -1,9 +1,11 @@
 package fr.ubordeaux.ao.project1.view;
 
-import fr.ubordeaux.ao.mazing.api.board.BoardGame;
+import fr.ubordeaux.ao.mazing.api.view.board.BoardGameComponent;
 import fr.ubordeaux.ao.mazing.api.view.GameWindow;
-import fr.ubordeaux.ao.mazing.api.entity.Crusader;
-import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.impl.model.board.BoardGame;
+import fr.ubordeaux.ao.mazing.impl.model.entity.Crusader;
+import fr.ubordeaux.ao.mazing.api.model.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.impl.view.entity.CrusaderRenderer;
 import fr.ubordeaux.ao.project1.controller.MazingController;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.model.Point;
@@ -14,17 +16,18 @@ import java.util.Set;
 public class MazingView {
 
 	private GameWindow window;
-	private IBoardGame boardGame;
+	private BoardGameComponent boardGame;
 	private boolean flag;
 
 	public MazingView() {
-		window = new GameWindow(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT));
+		window = new GameWindow(new BoardGameComponent(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT)));
 		boardGame = window.getBoardGame();
 		boardGame.fillTilesBackground(72, 1.0f);
 		boardGame.addToSceneMap(540, 2, 2, 0, 1.0f);
 
 		Crusader crusader = new Crusader();
-		crusader.setEndAnimationCallback(() -> {
+		CrusaderRenderer crusaderRenderer = new CrusaderRenderer(crusader);
+		crusaderRenderer.setEndAnimationCallback(() -> {
 			boardGame.clearMap();
 			crusader.setSpeed(0, 0, 0);
 			Random rand = new Random();
@@ -34,11 +37,11 @@ public class MazingView {
 			crusader.changeMode("IDLE");
 		});
 
-		crusader.setTickAnimationCallback(() -> {
+		crusaderRenderer.setTickAnimationCallback(() -> {
 			if (!flag) {
-				int x = Math.round(crusader.getX());
-				int y = Math.round(crusader.getY());
-				int z = Math.round(crusader.getZ());
+				int x = Math.round(crusaderRenderer.getRenderX());
+				int y = Math.round(crusaderRenderer.getRenderY());
+				int z = Math.round(crusaderRenderer.getRenderZ());
 
 				Set<Integer> set = boardGame.getSceneObjectsFromPoint(x, y, z);
 				if (set == null || set.isEmpty())
@@ -51,8 +54,8 @@ public class MazingView {
 			}
 		});
 
-		boardGame.assignPlayer(crusader);
-		boardGame.addToSceneMap(crusader);
+		boardGame.getBoardGame().assignPlayer(crusader);
+		boardGame.addToSceneMap(crusaderRenderer);
 	}
 
 	public void addKeyListener(MazingController controller) {
@@ -63,7 +66,7 @@ public class MazingView {
 		window.setVisible(b);
 	}
 
-	public IBoardGame getBoardGame() {
+	public BoardGameComponent getBoardGame() {
 		return window.getBoardGame();
 	}
 
@@ -72,7 +75,7 @@ public class MazingView {
 			switch (event.type) {
 				case PLAYER_POS -> {
 					Point pos = (Point) event.data;
-					boardGame.updatePlayerPosition(
+					boardGame.getBoardGame().updatePlayerPosition(
 							(float) pos.getX(),
 							(float) pos.getY(),
 							(float) pos.getZ());
@@ -80,7 +83,7 @@ public class MazingView {
 
 				case PLAYER_SPEED -> {
 					Point speed = (Point) event.data;
-					boardGame.updatePlayerSpeed(
+					boardGame.getBoardGame().updatePlayerSpeed(
 							(float) speed.getX(),
 							(float) speed.getY(),
 							(float) speed.getZ());
@@ -88,7 +91,7 @@ public class MazingView {
 
 				case PLAYER_MODE -> {
 					String mode = (String) event.data;
-					boardGame.updatePlayerMode(mode);
+					boardGame.getBoardGame().updatePlayerMode(mode);
 				}
 			}
 		});

@@ -1,6 +1,7 @@
 package fr.ubordeaux.ao.mazing.api.view;
 
-import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.model.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.view.board.BoardGameComponent;
 
 import javax.swing.JFrame;
 
@@ -11,18 +12,18 @@ import javax.swing.JFrame;
  */
 public class GameWindow extends JFrame {
 
-	private IBoardGame boardGame;
+	private BoardGameComponent boardGame;
 	public static final int WIDTH = 1366;
 	public static final int HEIGHT = 738;
 
-	public GameWindow(IBoardGame boardGame) {
+	public GameWindow(BoardGameComponent boardGame) {
 		super("Isometric 3D Game");
 		setSize(WIDTH, HEIGHT);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setResizable(false);
 		this.boardGame = boardGame;
-		add(new BoardGameComponent(boardGame));
+		add(this.boardGame);
 		setVisible(true);
 		setFocusable(true);
 		requestFocusInWindow();
@@ -31,9 +32,9 @@ public class GameWindow extends JFrame {
 	/**
 	 * Retourne le plateau de jeu associé à cette fenêtre.
 	 *
-	 * @return l'instance d'IBoardGame affichée dans cette fenêtre.
+	 * @return l'instance de BoardGameComponent affichée dans cette fenêtre.
 	 */
-	public IBoardGame getBoardGame() {
+	public BoardGameComponent getBoardGame() {
 		return boardGame;
 	}
 
