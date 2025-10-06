@@ -356,7 +356,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 				// .computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
 				// .add(code);
 				pointToSceneObjectsMap
-						.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
+						.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
 						.add(code);
 			}
 		}
@@ -395,7 +395,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 							// .computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
 							// .add(code);
 							pointToSceneObjectsMap
-									.computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
+									.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
 									.add(code);
 
 						}
