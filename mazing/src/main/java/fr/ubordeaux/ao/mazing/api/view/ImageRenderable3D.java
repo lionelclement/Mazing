@@ -1,4 +1,7 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.view;
+
+import fr.ubordeaux.ao.mazing.api.RenderType;
+import fr.ubordeaux.ao.mazing.api.TileMap;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;

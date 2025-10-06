@@ -1,12 +1,18 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.board;
+
+import fr.ubordeaux.ao.mazing.api.view.IRenderable;
+import fr.ubordeaux.ao.mazing.api.Image;
+import fr.ubordeaux.ao.mazing.api.view.ImageRenderable3D;
+import fr.ubordeaux.ao.mazing.api.Loader;
+import fr.ubordeaux.ao.mazing.api.RenderType;
+import fr.ubordeaux.ao.mazing.api.TileMap;
+import fr.ubordeaux.ao.mazing.api.entity.Entity;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,9 +34,9 @@ import javax.swing.*;
  * 
  * 
  */
-public class BoardGame extends JPanel implements IBoardGame {
+public class BoardGame implements IBoardGame {
 
-	private static final long serialVersionUID = 1L;
+	// private static final long serialVersionUID = 1L;
 	/** Largeur d’une tuile en pixels */
 	private final static int TILE_WIDTH = 128;
 	/** Hauteur d’une tuile en pixels */
@@ -57,24 +63,20 @@ public class BoardGame extends JPanel implements IBoardGame {
 	List<IRenderable> sceneObjects = new ArrayList<>();
 
 	/** Liste des personnages présents dans la scène */
-	List<IRenderable> sceneCharacters = new ArrayList<>();
+	List<IRenderable> sceneEntities = new ArrayList<>();
 
 	/** Mapping des coordonnées vers les codes d’objets de scène */
 	// Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
 	/** Liste des personnages du plateau */
-	@SuppressWarnings("rawtypes")
-	private List<Character> characters;
-
-	/** Boucle de jeu pour mettre à jour les animations */
-	private Timer gameLoop;
+	private List<Entity> entities;
 
 	/** Mapping du code d’image vers l’objet Image correspondant */
 	private Map<Integer, Image> codeToImageMap;
 
 	/** Référence vers le joueur */
-	private Character<CharacterMode> player;
+	private Entity player;
 
 	/**
 	 * Constructeur principal.
@@ -88,7 +90,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 
 		// Initialisation du TileMap pour le rendu
 		TileMap.getInstance(TILE_WIDTH, TILE_HEIGHT, width, height, 8, 8);
-		characters = new ArrayList<>();
+		entities = new ArrayList<>();
 		codeToImageMap = new HashMap<>();
 
 		// Chargement et découpe des spritesheets
@@ -124,11 +126,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 		codeToRankMap.put(182, 2);
 		codeToRankMap.put(183, 2);
 
-		// Timer de mise à jour des animations (40 fps)
-		gameLoop = new Timer(1000 / 40, _ -> {
-			updateAnimations();
-		});
-		gameLoop.start();
+
 	}
 
 	/**
@@ -181,52 +179,6 @@ public class BoardGame extends JPanel implements IBoardGame {
 		}
 	}
 
-	/**
-	 * Met à jour toutes les animations des personnages.
-	 */
-	@SuppressWarnings("unchecked")
-	private void updateAnimations() {
-		for (Character<CharacterMode> c : characters) {
-			Animation<CharacterMode> animation = c.getCurrentAnimation(c.getCurrentMode().ordinal());
-			animation.tick((AbstractCharacter<? extends CharacterMode>) c);
-		}
-		repaint();
-	}
-
-	private void renderScene(Graphics g, List<IRenderable> sceneObjects) {
-		// Trier les objets par z, puis x+y, puis par type
-		List<IRenderable> sorted = sceneObjects.stream()
-				.sorted(Comparator
-						.comparingInt(o -> ((int) ((IRenderable) o).getZ()))
-						.thenComparingInt(o -> ((int) ((IRenderable) o).getIsoDepth()))
-						.thenComparingInt(o -> ((IRenderable) o).getRenderType().ordinal())
-						.thenComparingInt(o -> ((IRenderable) o).getRank())
-						.thenComparing(o -> ((IRenderable) o).getIsoDepth()))
-				.toList();
-
-		for (IRenderable obj : sorted) {
-			obj.render(g);
-		}
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		// Dessine le fond pré-généré
-		if (background != null) {
-			g.drawImage(background, 0, 0, null);
-		}
-
-		// Centre de l'écran pour le rendu
-		g.translate(width / 2, TILE_HEIGHT);
-
-		List<IRenderable> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
-		renderableScene.addAll(sceneObjects);
-		renderableScene.addAll(sceneCharacters);
-		renderScene(g, renderableScene);
-
-	}
 
 	/**
 	 * Remplit le plateau avec un fond en damier.
@@ -310,7 +262,7 @@ public class BoardGame extends JPanel implements IBoardGame {
 	 * 
 	 * @return joueur
 	 */
-	public Character<?> getPlayer() {
+	public Entity getPlayer() {
 		return player;
 	}
 
@@ -410,12 +362,12 @@ public class BoardGame extends JPanel implements IBoardGame {
 	/**
 	 * Ajoute un personnage à la scène.
 	 * 
-	 * @param character personnage à ajouter
+	 * @param entity personnage à ajouter
 	 */
 	@Override
-	public void addToSceneMap(Character<?> character) {
-		characters.add(character);
-		sceneCharacters.add(character);
+	public void addToSceneMap(Entity entity) {
+		entities.add(entity);
+		sceneEntities.add(entity);
 	}
 
 	// getter pour position actuelle du joueur en grille
@@ -462,10 +414,9 @@ public class BoardGame extends JPanel implements IBoardGame {
 	/**
 	 * Assigne le joueur.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public void assignPlayer(Character<? extends CharacterMode> player) {
-		this.player = (Character<CharacterMode>) player;
+	public void assignPlayer(Entity player) {
+		this.player = player;
 	}
 
 	/**
@@ -504,5 +455,35 @@ public class BoardGame extends JPanel implements IBoardGame {
 	@Override
 	public Set<Integer> getSceneObjectsFromPoint(int x, int y, int z) {
 		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));
+	}
+
+	@Override
+	public List<IRenderable> getSceneObjects() {
+		return this.sceneObjects;
+	}
+
+	@Override
+	public List<IRenderable> getSceneEntities() {
+		return this.sceneEntities;
+	}
+
+	@Override
+	public List<Entity> getEntities() {
+		return this.entities;
+	}
+
+	@Override
+	public java.awt.Image getBackgroundImage() {
+		return this.background;
+	}
+
+	@Override
+	public int getWidth() {
+		return width;
+	}
+
+	@Override
+	public int getTileHeight() {
+		return TILE_HEIGHT;
 	}
 }

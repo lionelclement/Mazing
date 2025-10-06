@@ -1,11 +1,12 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.entity;
+
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.view.IRenderable;
 
 /**
  * Interface représentant un personnage dans le jeu.
- * 
- * @param <S> Type représentant le mode du personnage.
  */
-public interface Character<S extends CharacterMode> extends InternCharacter<S> {
+public interface Entity extends IRenderable, IAnimationCallback {
 
     /**
      * Définit la position du personnage.
@@ -46,6 +47,28 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
      */
     void setSpeed(float xSpeed, float ySpeed, float zSpeed);
 
+
+    /**
+     * Retourne la vitesse du personnage sur l'axe X.
+     *
+     * @return vitesse actuelle sur X
+     */
+    float getSpeedX();
+
+    /**
+     * Retourne la vitesse du personnage sur l'axe Y.
+     *
+     * @return vitesse actuelle sur Y
+     */
+    float getSpeedY();
+
+    /**
+     * Retourne la vitesse du personnage sur l'axe Z.
+     *
+     * @return vitesse actuelle sur Z
+     */
+    float getSpeedZ();
+
     /**
      * Fait marcher le personnage.
      */
@@ -80,7 +103,7 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
      * 
      * @return Le mode actuel.
      */
-    S getCurrentMode();
+    EntityMode getCurrentMode();
 
     /**
      * Change la direction du personnage vers une direction cible.
@@ -101,7 +124,7 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
      * 
      * @param mode Nouveau mode du personnage.
      */
-    void changeMode(S mode);
+    void changeMode(EntityMode mode);
 
     /**
      * Change le mode du personnage en utilisant une chaîne de caractères.
@@ -111,37 +134,10 @@ public interface Character<S extends CharacterMode> extends InternCharacter<S> {
     void changeMode(String mode);
 
     /**
-     * Définit une action à exécuter à chaque boucle d'animation.
-     * 
-     * @param callback Fonction à exécuter.
+     * Retourne l'animation courante selon l'état de l'entité.
+     * Cet état est récupéré grâce à {@link Entity#getCurrentMode()}.
+     *
+     * @return l'animation correspondant à l'état spécifié
      */
-    void setLoopAnimationTrigger(Runnable callback);
-
-    /**
-     * Définit une action à exécuter au début de l'animation.
-     * 
-     * @param callback Fonction à exécuter.
-     */
-    void setBeginAnimationTrigger(Runnable callback);
-
-    /**
-     * Définit une action à exécuter au milieu de l'animation.
-     * 
-     * @param callback Fonction à exécuter.
-     */
-    void setMidAnimationTrigger(Runnable callback);
-
-    /**
-     * Définit une action à exécuter à la fin de l'animation.
-     * 
-     * @param callback Fonction à exécuter.
-     */
-    void setEndAnimationTrigger(Runnable callback);
-
-    /**
-     * Définit une action à exécuter à chaque tick de l'animation.
-     * 
-     * @param callback Fonction à exécuter.
-     */
-    void setTickAnimationTrigger(Runnable callback);
+    Animation getCurrentAnimation();
 }

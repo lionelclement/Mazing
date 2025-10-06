@@ -80,13 +80,13 @@ loadScripts(document, 'script');</script>
 <li><a href="#getPlayer()" tabindex="0">getPlayer()</a></li>
 <li><a href="#addToSceneMap(int,int,int,int,float)" tabindex="0">addToSceneMap(int, int, int, int, float)</a></li>
 <li><a href="#addToSceneMap(int%5B%5D%5B%5D%5B%5D)" tabindex="0">addToSceneMap(int[][][])</a></li>
-<li><a href="#addToSceneMap(fr.ubordeaux.ao.mazing.api.Character)" tabindex="0">addToSceneMap(Character)</a></li>
+<li><a href="#addToSceneMap(fr.ubordeaux.ao.mazing.api.character.Entitytabindex="0">addToSceneMap(Character)</a></li>
 <li><a href="#getPlayerX()" tabindex="0">getPlayerX()</a></li>
 <li><a href="#getPlayerY()" tabindex="0">getPlayerY()</a></li>
 <li><a href="#getPlayerZ()" tabindex="0">getPlayerZ()</a></li>
 <li><a href="#updatePlayerSpeed(float,float,float)" tabindex="0">updatePlayerSpeed(float, float, float)</a></li>
 <li><a href="#stopPlayer()" tabindex="0">stopPlayer()</a></li>
-<li><a href="#assignPlayer(fr.ubordeaux.ao.mazing.api.Character)" tabindex="0">assignPlayer(Character)</a></li>
+<li><a href="#assignPlayer(fr.ubordeaux.ao.mazing.api.character.Entitytabindex="0">assignPlayer(Character)</a></li>
 <li><a href="#updatePlayerMode(java.lang.String)" tabindex="0">updatePlayerMode(String)</a></li>
 <li><a href="#updatePlayerDirection(java.lang.String)" tabindex="0">updatePlayerDirection(String)</a></li>
 <li><a href="#clearMap()" tabindex="0">clearMap()</a></li>
@@ -105,7 +105,7 @@ loadScripts(document, 'script');</script>
 <div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/java/awt/Container.html" title="class or interface in java.awt" class="external-link">java.awt.Container</a>
 <div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/javax/swing/JComponent.html" title="class or interface in javax.swing" class="external-link">javax.swing.JComponent</a>
 <div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/javax/swing/JPanel.html" title="class or interface in javax.swing" class="external-link">javax.swing.JPanel</a>
-<div class="inheritance">fr.ubordeaux.ao.mazing.api.BoardGame</div>
+<div class="inheritance">fr.ubordeaux.ao.mazing.api.board.BoardGame</div>
 </div>
 </div>
 </div>
@@ -135,7 +135,7 @@ implements <a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="../../../../../serialized-form.html#fr.ubordeaux.ao.mazing.api.BoardGame">Serialized Form</a></li>
+<li><a href="../../../../../serialized-form.html#fr.ubordeaux.ao.mazing.api.board.BoardGame">Serialized Form</a></li>
 </ul>
 </dd>
 </dl>
@@ -222,12 +222,12 @@ implements <a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.
 <div class="block">Ajoute une tuile ou un objet à la scène.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addToSceneMap(fr.ubordeaux.ao.mazing.api.Character)" class="member-name-link">addToSceneMap</a><wbr>(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;?&gt;&nbsp;character)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addToSceneMap(fr.ubordeaux.ao.mazing.api.character.Entityclass="member-name-link">addToSceneMap</a><wbr>(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;?&gt;&nbsp;entity)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Ajoute un personnage à la scène.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#assignPlayer(fr.ubordeaux.ao.mazing.api.Character)" class="member-name-link">assignPlayer</a><wbr>(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;? extends <a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;&nbsp;player)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#assignPlayer(fr.ubordeaux.ao.mazing.api.character.Entityclass="member-name-link">assignPlayer</a><wbr>(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;? extends <a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;&nbsp;player)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Assigne le joueur.</div>
 </div>
@@ -482,16 +482,16 @@ implements <a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.
 </section>
 </li>
 <li>
-<section class="detail" id="addToSceneMap(fr.ubordeaux.ao.mazing.api.Character)">
+<section class="detail" id="addToSceneMap(fr.ubordeaux.ao.mazing.api.character.Entity
 <h3>addToSceneMap</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addToSceneMap</span><wbr><span class="parameters">(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;?&gt;&nbsp;character)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addToSceneMap</span><wbr><span class="parameters">(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;?&gt;&nbsp;entity)</span></div>
 <div class="block">Ajoute un personnage à la scène.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBoardGame.html#addToSceneMap(fr.ubordeaux.ao.mazing.api.Character)">addToSceneMap</a></code>&nbsp;in interface&nbsp;<code><a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.api">IBoardGame</a></code></dd>
+<dd><code><a href="IBoardGame.html#addToSceneMap(fr.ubordeaux.ao.mazing.api.character.EntityaddToSceneMap</a></code>&nbsp;in interface&nbsp;<code><a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.api">IBoardGame</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>character</code> - personnage à ajouter</dd>
+<dd><code>entity</code> - personnage à ajouter</dd>
 </dl>
 </div>
 </section>
@@ -574,14 +574,14 @@ implements <a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.
 </section>
 </li>
 <li>
-<section class="detail" id="assignPlayer(fr.ubordeaux.ao.mazing.api.Character)">
+<section class="detail" id="assignPlayer(fr.ubordeaux.ao.mazing.api.character.Entity
 <h3>assignPlayer</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">assignPlayer</span><wbr><span class="parameters">(<a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;? extends <a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;&nbsp;player)</span></div>
 <div class="block">Assigne le joueur.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBoardGame.html#assignPlayer(fr.ubordeaux.ao.mazing.api.Character)">assignPlayer</a></code>&nbsp;in interface&nbsp;<code><a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.api">IBoardGame</a></code></dd>
+<dd><code><a href="IBoardGame.html#assignPlayer(fr.ubordeaux.ao.mazing.api.character.EntityassignPlayer</a></code>&nbsp;in interface&nbsp;<code><a href="IBoardGame.html" title="interface in fr.ubordeaux.ao.mazing.api">IBoardGame</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>player</code> - Le personnage à associer au joueur.</dd>
 </dl>

@@ -1,7 +1,7 @@
 package fr.ubordeaux.ao.project2.view;
 
-import fr.ubordeaux.ao.mazing.api.Character;
-import fr.ubordeaux.ao.mazing.api.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.entity.Entity;
+import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +9,7 @@ import java.util.Set;
 public class CharacterView {
 
     private final String name;
-    private final Character character;
+    private final Entity character;
     private final IBoardGame boardGame;
     private final ViewListener viewListener;
     private boolean gothit;
@@ -19,8 +19,8 @@ public class CharacterView {
     private final Set<Integer> northBarrier;
     private final Set<Integer> southBarrier;
 
-    public CharacterView(String name, Character character, IBoardGame boardGame, ViewListener listener,
-            Set<Integer> east, Set<Integer> west, Set<Integer> north, Set<Integer> south) {
+    public CharacterView(String name, Entity character, IBoardGame boardGame, ViewListener listener,
+                         Set<Integer> east, Set<Integer> west, Set<Integer> north, Set<Integer> south) {
         this.name = name;
         this.character = character;
         this.boardGame = boardGame;
@@ -35,13 +35,13 @@ public class CharacterView {
 
     private void init() {
         // Tick trigger : collision et objets spéciaux autour
-        character.setTickAnimationTrigger(() -> {
+        character.setTickAnimationCallback(() -> {
             handleSpecialTiles();
             handleCollisions();
         });
 
         // Begin trigger : stop si GOTHIT
-        character.setBeginAnimationTrigger(() -> {
+        character.setBeginAnimationCallback(() -> {
             if (character.getCurrentMode().toString().equals("GOTHIT")) {
                 // character.changeMode("GOTHIT");
                 character.setSpeed(0, 0, 0);
@@ -50,7 +50,7 @@ public class CharacterView {
         });
 
         // End trigger : remettre à IDLE
-        character.setEndAnimationTrigger(() -> {
+        character.setEndAnimationCallback(() -> {
             if (gothit) {
                 gothit = false;
                 character.setSpeed(0, 0, 0);
@@ -59,10 +59,10 @@ public class CharacterView {
         });
 
         // Mid & Loop triggers peuvent être définis si nécessaire
-        character.setMidAnimationTrigger(() -> {
+        character.setMidAnimationCallback(() -> {
         });
 
-        character.setLoopAnimationTrigger(() -> {
+        character.setLoopAnimationCallback(() -> {
         });
 
         boardGame.addToSceneMap(character);

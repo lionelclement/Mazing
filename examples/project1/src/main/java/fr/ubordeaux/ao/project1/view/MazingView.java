@@ -1,8 +1,9 @@
 package fr.ubordeaux.ao.project1.view;
 
-import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.IBoardGame;
-import fr.ubordeaux.ao.mazing.api.Window;
+import fr.ubordeaux.ao.mazing.api.board.BoardGame;
+import fr.ubordeaux.ao.mazing.api.view.GameWindow;
+import fr.ubordeaux.ao.mazing.api.entity.Crusader;
+import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
 import fr.ubordeaux.ao.project1.controller.MazingController;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.model.Point;
@@ -12,18 +13,18 @@ import java.util.Set;
 
 public class MazingView {
 
-	private Window window;
+	private GameWindow window;
 	private IBoardGame boardGame;
 	private boolean flag;
 
 	public MazingView() {
-		window = new Window();
+		window = new GameWindow(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT));
 		boardGame = window.getBoardGame();
 		boardGame.fillTilesBackground(72, 1.0f);
 		boardGame.addToSceneMap(540, 2, 2, 0, 1.0f);
 
 		Crusader crusader = new Crusader();
-		crusader.setEndAnimationTrigger(() -> {
+		crusader.setEndAnimationCallback(() -> {
 			boardGame.clearMap();
 			crusader.setSpeed(0, 0, 0);
 			Random rand = new Random();
@@ -33,7 +34,7 @@ public class MazingView {
 			crusader.changeMode("IDLE");
 		});
 
-		crusader.setTickAnimationTrigger(() -> {
+		crusader.setTickAnimationCallback(() -> {
 			if (!flag) {
 				int x = Math.round(crusader.getX());
 				int y = Math.round(crusader.getY());

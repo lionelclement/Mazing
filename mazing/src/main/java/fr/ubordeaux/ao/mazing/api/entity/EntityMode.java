@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.entity;
 
 /**
  * Représente un mode ou un état d'un personnage dans le jeu.
@@ -9,7 +9,7 @@ package fr.ubordeaux.ao.mazing.api;
  * boucle.
  * 
  */
-public interface CharacterMode {
+public interface EntityMode {
 
     /**
      * Retourne le nombre de frames dans l'animation de ce mode.

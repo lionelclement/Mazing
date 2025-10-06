@@ -74,7 +74,7 @@ loadScripts(document, 'script');</script>
 <ol class="toc-list">
 <li><a href="#getCurrentMode()" tabindex="0">getCurrentMode()</a></li>
 <li><a href="#stop()" tabindex="0">stop()</a></li>
-<li><a href="#changeMode(fr.ubordeaux.ao.mazing.api.CharacterMode)" tabindex="0">changeMode(CharacterMode)</a></li>
+<li><a href="#changeMode(fr.ubordeaux.ao.mazing.api.entity.EntityMode)" tabindex="0">changeMode(CharacterMode)</a></li>
 <li><a href="#getRenderType()" tabindex="0">getRenderType()</a></li>
 <li><a href="#render(java.awt.Graphics)" tabindex="0">render(Graphics)</a></li>
 <li><a href="#getRank()" tabindex="0">getRank()</a></li>
@@ -99,8 +99,8 @@ loadScripts(document, 'script');</script>
 <h1 title="Class Crusader" class="title">Class Crusader</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">fr.ubordeaux.ao.mazing.api.AbstractCharacter</a>&lt;<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;
-<div class="inheritance">fr.ubordeaux.ao.mazing.api.Crusader</div>
+<div class="inheritance"><a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">fr.ubordeaux.ao.mazing.api.entity.AbstractEntity>&lt;<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;
+<div class="inheritance">fr.ubordeaux.ao.mazing.api.entity.Crusader</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
@@ -144,7 +144,7 @@ loadScripts(document, 'script');</script>
 <section class="field-summary" id="field-summary">
 <h2>Field Summary</h2>
 <div class="inherited-list">
-<h3 id="fields-inherited-from-class-fr.ubordeaux.ao.mazing.api.AbstractCharacter">Fields inherited from class&nbsp;fr.ubordeaux.ao.mazing.api.<a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a></h3>
+<h3 id="fields-inherited-from-class-fr.ubordeaux.ao.mazing.api.character.AbstractEntityields inherited from class&nbsp;fr.ubordeaux.ao.mazing.api.<a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a></h3>
 <code><a href="AbstractCharacter.html#animations">animations</a>, <a href="AbstractCharacter.html#currentDirection">currentDirection</a>, <a href="AbstractCharacter.html#images">images</a>, <a href="AbstractCharacter.html#offsetX">offsetX</a>, <a href="AbstractCharacter.html#offsetY">offsetY</a>, <a href="AbstractCharacter.html#shadow_images">shadow_images</a>, <a href="AbstractCharacter.html#speedX">speedX</a>, <a href="AbstractCharacter.html#speedY">speedY</a>, <a href="AbstractCharacter.html#speedZ">speedZ</a>, <a href="AbstractCharacter.html#targetX">targetX</a>, <a href="AbstractCharacter.html#targetY">targetY</a>, <a href="AbstractCharacter.html#targetZ">targetZ</a>, <a href="AbstractCharacter.html#x">x</a>, <a href="AbstractCharacter.html#y">y</a>, <a href="AbstractCharacter.html#z">z</a></code></div>
 </section>
 </li>
@@ -195,7 +195,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Change la direction du personnage en utilisant une chaîne de caractères.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#changeMode(fr.ubordeaux.ao.mazing.api.CharacterMode)" class="member-name-link">changeMode</a><wbr>(<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&nbsp;mode)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#changeMode(fr.ubordeaux.ao.mazing.api.entity.EntityMode)" class="member-name-link">changeMode</a><wbr>(<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&nbsp;mode)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Change le mode du personnage.</div>
 </div>
@@ -252,7 +252,7 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-fr.ubordeaux.ao.mazing.api.AbstractCharacter">Methods inherited from class&nbsp;fr.ubordeaux.ao.mazing.api.<a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a></h3>
+<h3 id="methods-inherited-from-class-fr.ubordeaux.ao.mazing.api.character.AbstractEntityethods inherited from class&nbsp;fr.ubordeaux.ao.mazing.api.<a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a></h3>
 <code><a href="AbstractCharacter.html#callLoopTrigger()">callLoopTrigger</a>, <a href="AbstractCharacter.html#getCurrentAnimation(int)">getCurrentAnimation</a>, <a href="AbstractCharacter.html#getCurrentDirection()">getCurrentDirection</a>, <a href="AbstractCharacter.html#getSpeedX()">getSpeedX</a>, <a href="AbstractCharacter.html#getSpeedY()">getSpeedY</a>, <a href="AbstractCharacter.html#getSpeedZ()">getSpeedZ</a>, <a href="AbstractCharacter.html#getX()">getX</a>, <a href="AbstractCharacter.html#getY()">getY</a>, <a href="AbstractCharacter.html#getZ()">getZ</a>, <a href="AbstractCharacter.html#render(java.awt.Graphics,int)">render</a>, <a href="AbstractCharacter.html#setBeginAnimationTrigger(java.lang.Runnable)">setBeginAnimationTrigger</a>, <a href="AbstractCharacter.html#setDirection(fr.ubordeaux.ao.mazing.api.Direction)">setDirection</a>, <a href="AbstractCharacter.html#setEndAnimationTrigger(java.lang.Runnable)">setEndAnimationTrigger</a>, <a href="AbstractCharacter.html#setLoopAnimationTrigger(java.lang.Runnable)">setLoopAnimationTrigger</a>, <a href="AbstractCharacter.html#setMidAnimationTrigger(java.lang.Runnable)">setMidAnimationTrigger</a>, <a href="AbstractCharacter.html#setPosition(float,float,float)">setPosition</a>, <a href="AbstractCharacter.html#setSpeed(float,float,float)">setSpeed</a>, <a href="AbstractCharacter.html#setTickAnimationTrigger(java.lang.Runnable)">setTickAnimationTrigger</a>, <a href="AbstractCharacter.html#setX(float)">setX</a>, <a href="AbstractCharacter.html#setY(float)">setY</a>, <a href="AbstractCharacter.html#setZ(float)">setZ</a>, <a href="AbstractCharacter.html#turnPlayer(fr.ubordeaux.ao.mazing.api.Direction,int,java.lang.Runnable)">turnPlayer</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
@@ -315,7 +315,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="changeMode(fr.ubordeaux.ao.mazing.api.CharacterMode)">
+<section class="detail" id="changeMode(fr.ubordeaux.ao.mazing.api.entity.EntityMode)">
 <h3>changeMode</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">changeMode</span><wbr><span class="parameters">(<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&nbsp;mode)</span></div>
@@ -325,7 +325,7 @@ loadScripts(document, 'script');</script>
 <dt>Specified by:</dt>
 <dd><code><a href="Character.html#changeMode(S)">changeMode</a></code>&nbsp;in interface&nbsp;<code><a href="Character.html" title="interface in fr.ubordeaux.ao.mazing.api">Character</a>&lt;<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;</code></dd>
 <dt>Specified by:</dt>
-<dd><code><a href="AbstractCharacter.html#changeMode(fr.ubordeaux.ao.mazing.api.CharacterMode)">changeMode</a></code>&nbsp;in class&nbsp;<code><a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a>&lt;<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;</code></dd>
+<dd><code><a href="AbstractCharacter.html#changeMode(fr.ubordeaux.ao.mazing.api.entity.EntityMode)">changeMode</a></code>&nbsp;in class&nbsp;<code><a href="AbstractCharacter.html" title="class in fr.ubordeaux.ao.mazing.api">AbstractCharacter</a>&lt;<a href="CharacterMode.html" title="interface in fr.ubordeaux.ao.mazing.api">CharacterMode</a>&gt;</code></dd>
 <dt>Parameters:</dt>
 <dd><code>mode</code> - Nouveau mode du personnage.</dd>
 </dl>

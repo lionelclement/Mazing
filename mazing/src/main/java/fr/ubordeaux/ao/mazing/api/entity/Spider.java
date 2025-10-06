@@ -1,14 +1,20 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.entity;
+
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.Loader;
+import fr.ubordeaux.ao.mazing.api.RenderType;
+import fr.ubordeaux.ao.mazing.api.SoundManager;
+import fr.ubordeaux.ao.mazing.api.TileMap;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 /**
  * Représente une araignée avec ses animations et comportements spécifiques.
- * Étend {@link AbstractCharacter} et utilise {@link CharacterMode} pour gérer
+ * Étend {@link AbstractEntity} et utilise {@link EntityMode} pour gérer
  * les modes.
  */
-public class Spider extends AbstractCharacter<CharacterMode> {
+public class Spider extends AbstractEntity {
 
     private static final int DELAY = 60;
     private static final float WALK_SPEED = 0.03f;
@@ -16,7 +22,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private static final int OFFSET_X = 0;
     private static final int OFFSET_Y = 0;
 
-    public enum Mode implements CharacterMode {
+    public enum Mode implements EntityMode {
         WALK("walk", 25, true),
         IDLE("walk", 2, true),
         ATTACK("attack", 8, false),
@@ -60,7 +66,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         currentDirection = Direction.EAST;
         soundManager = new SoundManager();
         initSounds();
-        initAnimations();
     }
 
     private void initSounds() {
@@ -87,8 +92,8 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void initAnimations() {
+    @Override
+    protected void loadAnimations() {
         Mode[] modes = Mode.values();
         Direction[] directions = Direction.values();
 
@@ -112,7 +117,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
                 animations[mode.ordinal()][direction.ordinal()] = new Animation(
                         images[mode.ordinal()][direction.ordinal()],
                         shadow_images[mode.ordinal()][direction.ordinal()],
-                        DELAY, mode.isLoop(), this);
+                        DELAY, mode.isLoop());
 
             }
         }
@@ -130,7 +135,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void changeMode(CharacterMode state) {
+    public void changeMode(EntityMode state) {
         Mode s = (Mode) state;
         System.out.println("changeMode: " + currentMode + " -> " + s);
         previousMode = currentMode;
@@ -149,13 +154,13 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void render(Graphics g) {
-        Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
+        Animation anim = getCurrentAnimation();
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
         TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
         TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
 
-        super.render(g, currentMode.ordinal());
+        super.render(g);
     }
 
     @Override
@@ -170,12 +175,12 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void callBeginTrigger() {
-        super.callEndTrigger();
+    public void runBeginCallback() {
+        super.runEndCallback();
     }
 
     @Override
-    public void callEndTrigger() {
+    public void runEndCallback() {
         switch (currentMode) {
             case ATTACK -> {
                 soundManager.play(currentMode.name());
@@ -192,7 +197,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             default -> {
             }
         }
-        super.callEndTrigger();
+        super.runEndCallback();
     }
 
     private void moveForward(float speed) {
@@ -327,8 +332,8 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    protected void callTickTrigger(int frameIndex) {
-        super.callTickTrigger(frameIndex);
+    public void runTickCallback(int frameIndex) {
+        super.runTickCallback(frameIndex);
     }
 
 }

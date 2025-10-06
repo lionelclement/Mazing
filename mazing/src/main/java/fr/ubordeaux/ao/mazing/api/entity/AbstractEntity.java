@@ -1,4 +1,8 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.entity;
+
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.RenderType;
+import fr.ubordeaux.ao.mazing.api.TileMap;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -11,15 +15,12 @@ import java.awt.image.BufferedImage;
  * également des méthodes de rendu et des hooks pour les triggers
  * (début, fin, milieu, tick) lors de l'animation.
  * 
- *
- * @param <T> le type d'état du personnage, qui doit implémenter
- *            {@link CharacterMode}
  */
-public abstract class AbstractCharacter<T extends CharacterMode> implements Character<T> {
+public abstract class AbstractEntity implements Entity {
 
     protected BufferedImage[][][] images; // [state][direction][frame]
     protected BufferedImage[][][] shadow_images; // [state][direction][frame]
-    protected Animation<? extends CharacterMode>[][] animations; // [state][direction]
+    protected Animation[][] animations; // [state][direction]
 
     protected float x, y, z;
     protected float targetX, targetY, targetZ;
@@ -34,27 +35,33 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     private Runnable endLoopAnimationTrigger;
     private Runnable tickAnimationTrigger;
 
-    @SuppressWarnings("unchecked")
-    public AbstractCharacter(int numberStates, int offsetX, int offsetY) {
+    public AbstractEntity(int numberStates, int offsetX, int offsetY) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         images = new BufferedImage[numberStates][Direction.values().length][];
         shadow_images = new BufferedImage[numberStates][Direction.values().length][];
-        animations = (Animation<CharacterMode>[][]) new Animation[numberStates][Direction.values().length];
+        animations = new Animation[numberStates][Direction.values().length];
+        this.loadAnimations();
         currentDirection = Direction.SOUTH;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Charge les animations de cette entité dans l'attribut {@link AbstractEntity#images}, {@link AbstractEntity#shadow_images}, et {@link AbstractEntity#animations}.
+     * Ces attributs ont déjà été correctement initialisé avant l'appel de cette méthode.
+     */
+    protected abstract void loadAnimations();
+
     @Override
-    public Animation<T> getCurrentAnimation(int state) {
-        return (Animation<T>) animations[state][currentDirection.ordinal()];
+    public Animation getCurrentAnimation() {
+        return animations[this.getCurrentMode().ordinal()][currentDirection.ordinal()];
     }
 
-    public void render(Graphics g, int state) {
-        Animation<T> anim = getCurrentAnimation(state);
+    public void render(Graphics g) {
+        Animation anim = getCurrentAnimation();
         BufferedImage image = anim.getCurrentFrame();
         TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, getRenderType(), 1.0f);
     }
+
 
     @Override
     public Direction getCurrentDirection() {
@@ -253,13 +260,10 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
     public abstract void changeMode(String mode);
 
     @Override
-    public abstract void changeMode(CharacterMode mode);
+    public abstract void changeMode(EntityMode mode);
 
     @Override
     public abstract RenderType getRenderType();
-
-    @Override
-    public abstract void render(Graphics g);
 
     @Override
     public abstract int getRank();
@@ -269,7 +273,7 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         return getX() + getY() + 0.5f;
     }
 
-    protected void callTickTrigger(int frameIndex) {
+    public void runTickCallback(int frameIndex) {
         x += speedX;
         y += speedY;
         z += speedZ;
@@ -279,52 +283,52 @@ public abstract class AbstractCharacter<T extends CharacterMode> implements Char
         }
     }
 
-    public void callBeginTrigger() {
+    public void runBeginCallback() {
         if (beginLoopAnimationTrigger != null) {
             beginLoopAnimationTrigger.run();
         }
     }
 
-    public void callMidTrigger() {
+    public void runMidCallback() {
         if (midLoopAnimationTrigger != null) {
             midLoopAnimationTrigger.run();
         }
     }
 
-    public void callEndTrigger() {
+    public void runEndCallback() {
         if (endLoopAnimationTrigger != null) {
             endLoopAnimationTrigger.run();
         }
     }
 
-    public void callLoopTrigger() {
+    public void runLoopCallback() {
         if (loopAnimationTrigger != null) {
             loopAnimationTrigger.run();
         }
     }
 
     @Override
-    public void setTickAnimationTrigger(Runnable callback) {
+    public void setTickAnimationCallback(Runnable callback) {
         tickAnimationTrigger = callback;
     }
 
     @Override
-    public void setBeginAnimationTrigger(Runnable callback) {
+    public void setBeginAnimationCallback(Runnable callback) {
         beginLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setMidAnimationTrigger(Runnable callback) {
+    public void setMidAnimationCallback(Runnable callback) {
         midLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setEndAnimationTrigger(Runnable callback) {
+    public void setEndAnimationCallback(Runnable callback) {
         endLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setLoopAnimationTrigger(Runnable callback) {
+    public void setLoopAnimationCallback(Runnable callback) {
         loopAnimationTrigger = callback;
     }
 

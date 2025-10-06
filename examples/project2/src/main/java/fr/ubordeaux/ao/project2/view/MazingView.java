@@ -1,10 +1,11 @@
 package fr.ubordeaux.ao.project2.view;
 
-import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Character;
-import fr.ubordeaux.ao.mazing.api.IBoardGame;
-import fr.ubordeaux.ao.mazing.api.Spider;
-import fr.ubordeaux.ao.mazing.api.Window;
+import fr.ubordeaux.ao.mazing.api.board.BoardGame;
+import fr.ubordeaux.ao.mazing.api.view.GameWindow;
+import fr.ubordeaux.ao.mazing.api.entity.Crusader;
+import fr.ubordeaux.ao.mazing.api.entity.Entity;
+import fr.ubordeaux.ao.mazing.api.board.IBoardGame;
+import fr.ubordeaux.ao.mazing.api.entity.Spider;
 import fr.ubordeaux.ao.project2.controller.MazingController;
 import fr.ubordeaux.ao.project2.model.Cell;
 import fr.ubordeaux.ao.project2.model.Direction;
@@ -40,7 +41,7 @@ public class MazingView {
 	private static final int TILE_STAIRS_UP = 308;
 	private static final int TILE_FLOOR_LEVEL = 24;
 
-	private final Window window;
+	private final GameWindow window;
 	private final IBoardGame boardGame;
 	private ViewListener viewListener;
 
@@ -53,7 +54,7 @@ public class MazingView {
 	private final Map<String, CharacterView> characters = new HashMap<>();
 
 	public MazingView(ViewListener viewListener) {
-		window = new Window();
+		window = new GameWindow(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT));
 		boardGame = window.getBoardGame();
 		this.viewListener = viewListener;
 		init();
@@ -123,19 +124,19 @@ public class MazingView {
 	private void init() {
 
 		boardGame.fillTilesBackground(TILE_DIRT, 1.0f);
-		Character c = new Crusader();
+		Entity c = new Crusader();
 		c.setPosition(1, 1, 0);
 		boardGame.assignPlayer(c);
-		c.setTickAnimationTrigger(() -> {
+		c.setTickAnimationCallback(() -> {
 			System.err.println("tickAnimationTrigger");
 		});
-		c.setBeginAnimationTrigger(() -> {
+		c.setBeginAnimationCallback(() -> {
 			System.err.println("beginAnimationTrigger");
 		});
-		c.setEndAnimationTrigger(() -> {
+		c.setEndAnimationCallback(() -> {
 			System.err.println("endAnimationTrigger");
 		});
-		c.setLoopAnimationTrigger(() -> {
+		c.setLoopAnimationCallback(() -> {
 			System.err.println("loopAnimationTrigger");
 		});
 

@@ -1,5 +1,10 @@
-package fr.ubordeaux.ao.mazing.api;
+package fr.ubordeaux.ao.mazing.api.board;
 
+import fr.ubordeaux.ao.mazing.api.view.IRenderable;
+import fr.ubordeaux.ao.mazing.api.entity.Entity;
+
+import java.awt.*;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -55,7 +60,7 @@ public interface IBoardGame {
      *
      * @param character Le personnage à associer au joueur.
      */
-    void assignPlayer(Character<? extends CharacterMode> character);
+    void assignPlayer(Entity character);
 
     /**
      * Met à jour la position du joueur sur le plateau.
@@ -94,7 +99,7 @@ public interface IBoardGame {
      *
      * @param character Le personnage à ajouter.
      */
-    void addToSceneMap(Character<?> character);
+    void addToSceneMap(Entity character);
 
     /**
      * Ajoute un tile à la scène à une position donnée.
@@ -128,4 +133,16 @@ public interface IBoardGame {
      * @return Ensemble des codes d'objets présents à la position spécifiée.
      */
     Set<Integer> getSceneObjectsFromPoint(int x, int y, int z);
+
+    List<IRenderable> getSceneObjects();
+
+    List<IRenderable> getSceneEntities();
+
+    List<Entity> getEntities();
+
+    Image getBackgroundImage();
+
+    int getWidth();
+
+    int getTileHeight();
 }
