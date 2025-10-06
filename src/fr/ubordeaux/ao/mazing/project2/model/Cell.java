@@ -8,6 +8,7 @@ public class Cell {
     private boolean visited = false;
     private final Map<Direction, Boolean> paths = new HashMap<>();
     private final Map<Direction, Boolean> walls = new HashMap<>();
+    private final Map<Direction, Boolean> doors = new HashMap<>();
     private boolean treasure;
 
     public Cell(int x, int y, int z) {
@@ -42,6 +43,13 @@ public class Cell {
         return false;
     }
 
+    public boolean isDoor(Direction d) {
+        Boolean b = doors.get(d);
+        if (b != null)
+            return b;
+        return false;
+    }
+
     public void putOnPaths(Direction dir, boolean b) {
         paths.put(dir, b);
     }
@@ -58,6 +66,10 @@ public class Cell {
         this.walls.put(d, b);
     }
 
+    public void putOnDoors(Direction d, boolean b) {
+        this.doors.put(d, b);
+    }
+
     public boolean isVisited() {
         return visited;
     }
@@ -72,10 +84,6 @@ public class Cell {
 
     public int getZ() {
         return z;
-    }
-
-    public boolean getPaths(Direction direction) {
-        return paths.get(direction);
     }
 
 }

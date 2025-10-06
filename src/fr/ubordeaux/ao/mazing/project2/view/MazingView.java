@@ -26,15 +26,41 @@ public class MazingView {
 	private static final int TILE_DIRT = 12;
 	private static final int TILE_FLOOR = 72;
 
-	private static final int TILE_WALL_WEST = 108;
-	private static final int TILE_WALL_SOUTH = 109;
 	private static final int TILE_WALL_NORTH = 110;
+	private static final int TILE_WALL_SOUTH = 109;
 	private static final int TILE_WALL_EAST = 111;
+	private static final int TILE_WALL_WEST = 108;
+
+	private static final int[] TILE_WALL = {
+			TILE_WALL_NORTH,
+			TILE_WALL_SOUTH,
+			TILE_WALL_EAST,
+			TILE_WALL_WEST
+	};
 
 	private static final int TILE_HALF_WEST = 172;
 	private static final int TILE_HALF_SOUTH = 173;
 	private static final int TILE_HALF_NORTH = 174;
 	private static final int TILE_HALF_EAST = 175;
+
+	private static final int[] TILE_HALF = {
+			TILE_HALF_NORTH,
+			TILE_HALF_SOUTH,
+			TILE_HALF_EAST,
+			TILE_HALF_WEST
+	};
+
+	private static final int TILE_DOOR_WEST = 156;
+	private static final int TILE_DOOR_SOUTH = 157;
+	private static final int TILE_DOOR_NORTH = 158;
+	private static final int TILE_DOOR_EAST = 159;
+
+	private static final int[] TILE_DOOR = {
+			TILE_DOOR_NORTH,
+			TILE_DOOR_SOUTH,
+			TILE_DOOR_EAST,
+			TILE_DOOR_WEST
+	};
 
 	private static final int TILE_TRAPDOOR = 76;
 	private static final int TILE_STAIRS_UP = 308;
@@ -192,6 +218,36 @@ public class MazingView {
 		}
 	}
 
+	private void addLineCell(int tileId, int tileMidId, int size, int baseX, int baseY, int baseZ, Direction dir,
+			float alpha) {
+		switch (dir) {
+			case WEST -> {
+				boardGame.addToSceneMap(tileId, baseX, baseY + 0, baseZ, alpha);
+				boardGame.addToSceneMap(tileMidId, baseX, baseY + 1, baseZ, alpha);
+				boardGame.addToSceneMap(tileId, baseX, baseY + 2, baseZ, alpha);
+			}
+
+			case EAST -> {
+				boardGame.addToSceneMap(tileId, baseX + 2, baseY + 0, baseZ, alpha);
+				boardGame.addToSceneMap(tileMidId, baseX + 2, baseY + 1, baseZ, alpha);
+				boardGame.addToSceneMap(tileId, baseX + 2, baseY + 2, baseZ, alpha);
+			}
+
+			case NORTH -> {
+				boardGame.addToSceneMap(tileId, baseX + 0, baseY, baseZ, alpha);
+				boardGame.addToSceneMap(tileMidId, baseX + 1, baseY, baseZ, alpha);
+				boardGame.addToSceneMap(tileId, baseX + 2, baseY, baseZ, alpha);
+			}
+
+			case SOUTH -> {
+				boardGame.addToSceneMap(tileId, baseX + 0, baseY + 2, baseZ, alpha);
+				boardGame.addToSceneMap(tileMidId, baseX + 1, baseY + 2, baseZ, alpha);
+				boardGame.addToSceneMap(tileId, baseX + 2, baseY + 2, baseZ, alpha);
+			}
+
+		}
+	}
+
 	public void generateMazeViewFromMazeModel(Maze maze, int level) {
 		int width = maze.getWidth();
 		int height = maze.getHeight();
@@ -199,11 +255,13 @@ public class MazingView {
 
 		boardGame.clearMap();
 
-		for (int x = 0; x < maze.getWidth() * 3; x++) {
-			for (int y = 0; y < maze.getHeight() * 3; y++) {
-				boardGame.addToSceneMap(TILE_FLOOR, x, y, 0, 1.0f);
-			}
-		}
+		/*
+		 * for (int x = 0; x < maze.getWidth() * 3; x++) {
+		 * for (int y = 0; y < maze.getHeight() * 3; y++) {
+		 * boardGame.addToSceneMap(TILE_FLOOR, x, y, 0, 1.0f);
+		 * }
+		 * }
+		 */
 
 		for (int z = 0; z <= level + 1 && z < depth; z++) {
 			float alpha;
@@ -217,58 +275,63 @@ public class MazingView {
 					Cell cell = maze.getCell(x, y, z);
 					// On ajoute des murs à l'exterieur
 					for (Direction d : Direction.values()) {
+						// if (cell.isDoor(d) && d.ordinal() < 4) {
+						// addLineCell(TILE_WALL[d.ordinal()], TILE_DOOR[d.ordinal()], 3, x * 3, y * 3,
+						// z, d, alpha);
+						// }
 						if (cell.isWall(d)) {
-							if (d == Direction.WEST) {
-								addLineCell(TILE_WALL_WEST, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (d == Direction.EAST) {
-								addLineCell(TILE_WALL_EAST, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (d == Direction.NORTH) {
-								addLineCell(TILE_WALL_NORTH, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (d == Direction.SOUTH) {
-								addLineCell(TILE_WALL_SOUTH, 3, x * 3, y * 3, z, d, alpha);
-							}
+							addCell(TILE_TRAPDOOR, x * 3, y * 3, z, alpha);
+							// addLineCell(TILE_WALL[d.ordinal()], 3, x * 3, y * 3, z, d, alpha);
 						}
-						if (!cell.isPath(d)) {
-							if (x > 0 && d == Direction.WEST) {
-								addLineCell(TILE_HALF_WEST, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (x < width - 1 && d == Direction.EAST) {
-								addLineCell(TILE_HALF_EAST, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (y > 0 && d == Direction.NORTH) {
-								addLineCell(TILE_HALF_NORTH, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (y < height - 1 && d == Direction.SOUTH) {
-								addLineCell(TILE_HALF_SOUTH, 3, x * 3, y * 3, z, d, alpha);
-							}
-							if (z > 0 && d == Direction.DOWN) {
-								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3, z, Direction.NORTH, alpha);
-								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 1, z, Direction.NORTH, alpha);
-								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
-							}
-						} else {
-							if (z > 0 && d == Direction.DOWN) {
-								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3, z, Direction.NORTH, alpha);
-								addCell(TILE_FLOOR_LEVEL, x * 3, y * 3 + 1, z, alpha);
-								addCell(TILE_TRAPDOOR, x * 3 + 1, y * 3 + 1, z, alpha);
-								addCell(TILE_FLOOR_LEVEL, x * 3 + 2, y * 3 + 1, z, alpha);
-								addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 2, z, Direction.NORTH, alpha);
-							}
-							if (z < depth && d == Direction.UP) {
-								addLineCell(TILE_STAIRS_UP, 3, x * 3, y * 3, z, d, alpha);
-							}
-						}
+						// if (!cell.isPath(d) /* && (d.ordinal() == 0) || (d.ordinal() == 3) */) {
+						// addLineCell(TILE_HALF[d.ordinal()], 3, x * 3, y * 3, z, d, alpha);
+						// for (int i = 0; i < 3; i++)
+						// for (int j = 0; j < 3; j++)
+						// addCell(40, x * 3 + i, y * 3 + j, z, alpha);
+						// }
+						// } else {
+						// if (z > 0 && d == Direction.DOWN) {
+						// addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3, z, Direction.NORTH, alpha);
+						// addCell(TILE_FLOOR_LEVEL, x * 3, y * 3 + 1, z, alpha);
+						// addCell(TILE_TRAPDOOR, x * 3 + 1, y * 3 + 1, z, alpha);
+						// addCell(TILE_FLOOR_LEVEL, x * 3 + 2, y * 3 + 1, z, alpha);
+						// addLineCell(TILE_FLOOR_LEVEL, 3, x * 3, y * 3 + 2, z, Direction.NORTH,
+						// alpha);
+						// }
+						// if (z < depth && d == Direction.UP) {
+						// addLineCell(TILE_STAIRS_UP, 3, x * 3, y * 3, z, d, alpha);
+						// }
+						// }
+
 					}
 				}
 			}
 		}
+
 	}
 
 	public CharacterView[] getSpiders() {
 		return spiders;
+	}
+
+	public int getOriginY() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getOriginY'");
+	}
+
+	public void setOriginY(int i) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setOriginY'");
+	}
+
+	public int getOriginX() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getOriginX'");
+	}
+
+	public void setOriginX(int i) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setOriginX'");
 	}
 
 }

@@ -39,9 +39,12 @@ public class MazingView {
 				int y = Math.round(crusader.getY());
 				int z = Math.round(crusader.getZ());
 
+				// On récupère les objets proches
 				Set<Integer> set = boardGame.getSceneObjectsFromPoint(x, y, z);
 				if (set == null || set.isEmpty())
 					return;
+
+				// Si objet présent
 				if (!set.isEmpty()) {
 					flag = true;
 					crusader.setSpeed(0, 0, 0);
@@ -68,14 +71,8 @@ public class MazingView {
 
 	public void bindToModel(MazingModel model) {
 		model.setListener(event -> {
+			System.err.println("MODEL -> VIEW event");
 			switch (event.type) {
-				case PLAYER_POS -> {
-					Point pos = (Point) event.data;
-					boardGame.updatePlayerPosition(
-							(float) pos.getX(),
-							(float) pos.getY(),
-							(float) pos.getZ());
-				}
 
 				case PLAYER_SPEED -> {
 					Point speed = (Point) event.data;

@@ -17,7 +17,7 @@ public class Main {
         spiders[1] = new CharacterModel("spider2");
         spiders[2] = new CharacterModel("spider3");
 
-        MazingModel model = new MazingModel(3, 3, 2, player, spiders);
+        MazingModel model = new MazingModel(3, 3, 1, player, spiders);
         model.mazeGenerate();
 
         // View -> Model Listener

@@ -17,6 +17,7 @@ public class MazingController extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         char key = e.getKeyChar();
 
+        System.err.println("KEYPRESSED: CONTROLLER -> MODEL");
         // Actions liées aux lettres
         switch (key) {
             case 'a' -> model.setPlayerMode("ATTACK");

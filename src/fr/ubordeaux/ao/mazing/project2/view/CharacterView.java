@@ -2,7 +2,6 @@ package fr.ubordeaux.ao.mazing.project2.view;
 
 import fr.ubordeaux.ao.mazing.api.Character;
 import fr.ubordeaux.ao.mazing.api.IBoardGame;
-import fr.ubordeaux.ao.mazing.api.IRenderable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +43,6 @@ public class CharacterView {
         // Begin trigger : stop si GOTHIT
         character.setBeginAnimationTrigger(() -> {
             if (character.getCurrentMode().toString().equals("GOTHIT")) {
-                // character.changeMode("GOTHIT");
                 character.setSpeed(0, 0, 0);
                 gothit = true;
             }
