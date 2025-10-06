@@ -43,7 +43,6 @@ public class CharacterView {
         // Begin trigger : stop si GOTHIT
         character.setBeginAnimationTrigger(() -> {
             if (character.getCurrentMode().toString().equals("GOTHIT")) {
-                // character.changeMode("GOTHIT");
                 character.setSpeed(0, 0, 0);
                 gothit = true;
             }

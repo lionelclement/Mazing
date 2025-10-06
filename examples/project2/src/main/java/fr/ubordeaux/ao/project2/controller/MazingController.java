@@ -9,15 +9,18 @@ import fr.ubordeaux.ao.project2.view.MazingView;
 
 public class MazingController extends KeyAdapter {
     private final IMazingModel model;
+    private MazingView view;
     private static final double SPEED_WALK = 0.05;
 
     public MazingController(IMazingModel model, MazingView view) {
         this.model = model;
+        this.view = view;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         char c = e.getKeyChar();
+        boolean shift = e.isShiftDown();
 
         // --- Modes directs (touches simples)
         switch (c) {
@@ -34,10 +37,30 @@ public class MazingController extends KeyAdapter {
 
         // --- Déplacements (touches directionnelles)
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP -> move(0, -SPEED_WALK, 0);
-            case KeyEvent.VK_DOWN -> move(0, SPEED_WALK, 0);
-            case KeyEvent.VK_LEFT -> move(-SPEED_WALK, 0, 0);
-            case KeyEvent.VK_RIGHT -> move(SPEED_WALK, 0, 0);
+            case KeyEvent.VK_UP -> {
+                if (shift)
+                    view.setOriginY(view.getOriginY() - 10);
+                else
+                    move(0, -SPEED_WALK, 0);
+            }
+            case KeyEvent.VK_DOWN -> {
+                if (shift)
+                    view.setOriginY(view.getOriginY() + 10);
+                else
+                    move(0, SPEED_WALK, 0);
+            }
+            case KeyEvent.VK_LEFT -> {
+                if (shift)
+                    view.setOriginX(view.getOriginX() - 10);
+                else
+                    move(-SPEED_WALK, 0, 0);
+            }
+            case KeyEvent.VK_RIGHT -> {
+                if (shift)
+                    view.setOriginX(view.getOriginX() + 10);
+                else
+                    move(SPEED_WALK, 0, 0);
+            }
             case KeyEvent.VK_Q -> System.exit(0);
         }
     }
