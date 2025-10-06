@@ -1,11 +1,10 @@
-## Pour compiler:
+# Avec Gradle
 
+Pour exécuter :
+```shell
+./gradlew project1:run
 ```
-javac -d bin $(find src/fr -name '*.java') 
-```
-
-## Pour executer:
-
-```
-java -cp bin:res fr.ubordeaux.ao.mazing.project2.Main 
+ou
+```shell
+./gradlew project2:run
 ```
