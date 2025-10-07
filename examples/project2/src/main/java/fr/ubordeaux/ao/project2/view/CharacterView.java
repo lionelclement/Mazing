@@ -67,56 +67,63 @@ public class CharacterView {
         boardGame.addToSceneMap(character);
     }
 
-    private void handleSpecialTiles() {
-        Set<Integer> set = new HashSet<>();
-        int cx = (int) character.getX();
-        int cy = (int) character.getY();
-        int cz = (int) character.getZ();
+    // A mettre dans le modèle
+    // private void handleSpecialTiles() {
+    // Set<Integer> set = new HashSet<>();
+    // int cx = (int) character.getX();
+    // int cy = (int) character.getY();
+    // int cz = (int) character.getZ();
 
-        // On regarde autour de (-1, 0, +1)
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                Set<Integer> objects = boardGame.getSceneObjectsFromPoint(cx + dx, cy + dy, cz);
-                if (objects != null)
-                    set.addAll(objects);
-            }
-        }
+    // // On regarde autour de (-1, 0, +1)
+    // for (int dx = -1; dx <= 1; dx++) {
+    // for (int dy = -1; dy <= 1; dy++) {
+    // Set<Integer> objects = boardGame.getSceneObjectsFromPoint(cx + dx, cy + dy,
+    // cz);
+    // if (objects != null)
+    // set.addAll(objects);
+    // }
+    // }
 
-        viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.ON_STEPS, name,
-                set.contains(308)));
-        viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.ON_TRAPDOOR, name,
-                set.contains(76)));
-    }
+    // viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.ON_STEPS, name,
+    // set.contains(308)));
+    // viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.ON_TRAPDOOR, name,
+    // set.contains(76)));
+    // }
 
-    private void handleCollisions() {
-        Set<Integer> set = (Set<Integer>) boardGame.getSceneObjectsFromPoint(
-                (int) character.getX(), (int) character.getY(), (int) character.getZ());
-        if (set == null || set.isEmpty())
-            return;
+    // A mettre dans le modèle
+    // private void handleCollisions() {
+    // Set<Integer> set = (Set<Integer>) boardGame.getSceneObjectsFromPoint(
+    // (int) character.getX(), (int) character.getY(), (int) character.getZ());
+    // if (set == null || set.isEmpty())
+    // return;
 
-        // Pour chaque direction, copie et intersection avec les barrières
-        checkBarrier(set, southBarrier, 0, 1, 0.2f);
-        checkBarrier(set, northBarrier, 0, -1, 0.1f);
-        checkBarrier(set, eastBarrier, 1, 0, 0.2f);
-        checkBarrier(set, westBarrier, -1, 0, 0.1f);
-    }
+    // // Pour chaque direction, copie et intersection avec les barrières
+    // checkBarrier(set, southBarrier, 0, 1, 0.2f);
+    // checkBarrier(set, northBarrier, 0, -1, 0.1f);
+    // checkBarrier(set, eastBarrier, 1, 0, 0.2f);
+    // checkBarrier(set, westBarrier, -1, 0, 0.1f);
+    // }
 
-    private void checkBarrier(Set<Integer> renderables, Set<Integer> barrier, int dx, int dy, float pushBack) {
-        // Tester l'intersection entre les deux ensembles
-        Set<Integer> copy = new HashSet<>(renderables);
-        copy.retainAll(barrier); // garde uniquement les éléments communs
+    // A mettre dans le modèle
+    // private void checkBarrier(Set<Integer> renderables, Set<Integer> barrier, int
+    // dx, int dy, float pushBack) {
+    // // Tester l'intersection entre les deux ensembles
+    // Set<Integer> copy = new HashSet<>(renderables);
+    // copy.retainAll(barrier); // garde uniquement les éléments communs
 
-        if (!copy.isEmpty()) { // collision détectée
-            if ((dx != 0 && character.getSpeedX() * dx > 0 && character.getX() % 1 < 0.1f) ||
-                    (dy != 0 && character.getSpeedY() * dy > 0 && character.getY() % 1 < 0.1f)) {
-                // on repousse légèrement le personnage
-                character.setPosition(character.getX() - dx * pushBack, character.getY() - dy * pushBack,
-                        character.getZ());
-                character.setSpeed(0, 0, 0);
-                viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.GOTHIT, name, null));
-            }
-        }
-    }
+    // if (!copy.isEmpty()) { // collision détectée
+    // if ((dx != 0 && character.getSpeedX() * dx > 0 && character.getX() % 1 <
+    // 0.1f) ||
+    // (dy != 0 && character.getSpeedY() * dy > 0 && character.getY() % 1 < 0.1f)) {
+    // // on repousse légèrement le personnage
+    // character.setPosition(character.getX() - dx * pushBack, character.getY() - dy
+    // * pushBack,
+    // character.getZ());
+    // character.setSpeed(0, 0, 0);
+    // viewListener.onViewEvent(new ViewEvent(ViewEvent.Type.GOTHIT, name, null));
+    // }
+    // }
+    // }
 
     void updateMode(String value) {
         character.changeMode(value);
