@@ -4,6 +4,8 @@ import javax.sound.sampled.*;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 
 /**
  * Gestionnaire des sons du jeu.
@@ -23,13 +25,15 @@ public class SoundManager {
      *                     "/kenney_impact-sounds/Audio/footstep_carpet_000.wav"
      */
     public void loadSound(String name, String resourcePath) {
-        try {
-            InputStream is = getClass().getResourceAsStream(resourcePath);
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) {
                 throw new RuntimeException("Resource not found: " + resourcePath);
             }
 
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(is);
+            // BufferedInputStream pour supporter mark/reset dans un JAR
+            BufferedInputStream bis = new BufferedInputStream(is);
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(bis);
             Clip clip = AudioSystem.getClip();
             clip.open(audioStream);
 
@@ -41,8 +45,12 @@ public class SoundManager {
                 volumeControls.put(name, gainControl);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException("Unsupported audio file: " + resourcePath, e);
+        } catch (IOException e) {
+            throw new RuntimeException("IO error while loading sound: " + resourcePath, e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException("Audio line unavailable for: " + resourcePath, e);
         }
     }
 
