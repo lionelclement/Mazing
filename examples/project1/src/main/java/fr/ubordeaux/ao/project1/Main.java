@@ -1,8 +1,8 @@
 package fr.ubordeaux.ao.project1;
 
-import fr.ubordeaux.ao.project1.controller.MazingController;
-import fr.ubordeaux.ao.project1.model.MazingModel;
-import fr.ubordeaux.ao.project1.view.MazingView;
+import fr.ubordeaux.ao.project0.controller.MazingController;
+import fr.ubordeaux.ao.project0.model.MazingModel;
+import fr.ubordeaux.ao.project0.view.MazingView;
 
 public class Main {
     public static void main(String[] args) {

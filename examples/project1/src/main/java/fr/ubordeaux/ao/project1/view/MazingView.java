@@ -3,8 +3,8 @@ package fr.ubordeaux.ao.project1.view;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IBoardGame;
 import fr.ubordeaux.ao.mazing.api.Window;
-import fr.ubordeaux.ao.project1.controller.MazingController;
-import fr.ubordeaux.ao.project1.model.MazingModel;
+import fr.ubordeaux.ao.project0.controller.MazingController;
+import fr.ubordeaux.ao.project0.model.MazingModel;
 import fr.ubordeaux.ao.project1.model.Point;
 
 import java.util.Random;
