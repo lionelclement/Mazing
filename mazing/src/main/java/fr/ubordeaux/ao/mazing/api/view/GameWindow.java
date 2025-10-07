@@ -2,6 +2,7 @@ package fr.ubordeaux.ao.mazing.api.view;
 
 import fr.ubordeaux.ao.mazing.api.model.board.IBoardGame;
 import fr.ubordeaux.ao.mazing.api.view.board.BoardGameComponent;
+import fr.ubordeaux.ao.mazing.impl.model.board.BoardGame;
 
 import javax.swing.JFrame;
 
@@ -29,6 +30,11 @@ public class GameWindow extends JFrame {
 		requestFocusInWindow();
 	}
 
+	public GameWindow() {
+		this(new BoardGameComponent(new BoardGame(GameWindow.WIDTH, GameWindow.HEIGHT), GameWindow.WIDTH, GameWindow.HEIGHT));
+	}
+
+	
 	/**
 	 * Retourne le plateau de jeu associé à cette fenêtre.
 	 *

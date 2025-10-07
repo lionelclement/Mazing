@@ -22,6 +22,9 @@ import java.util.List;
  */
 public class BoardGame implements IBoardGame {
 
+	public static final int WIDTH = 1366;
+	public static final int HEIGHT = 738;
+
 	/** Largeur du plateau */
 	private final int width;
 
@@ -52,7 +55,7 @@ public class BoardGame implements IBoardGame {
 	 * Constructeur par défaut avec taille 1024x800.
 	 */
 	public BoardGame() {
-		this(1024, 800);
+		this(WIDTH, HEIGHT);
 	}
 
 	/**

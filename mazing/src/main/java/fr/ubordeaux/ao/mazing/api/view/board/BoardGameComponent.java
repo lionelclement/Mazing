@@ -63,9 +63,9 @@ public class BoardGameComponent extends JPanel {
     /** Boucle de jeu pour mettre à jour les animations */
     private Timer gameLoop;
 
-    public BoardGameComponent(IBoardGame boardGame) {
-        this(boardGame, 1024, 800);
-    }
+    //public BoardGameComponent(IBoardGame boardGame) {
+    //    this(boardGame, 1024, 800);
+    //}
 
     public BoardGameComponent(IBoardGame boardGame, int width, int height) {
         super();

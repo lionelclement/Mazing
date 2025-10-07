@@ -1,0 +1,10 @@
+{
+    "java.project.sourcePaths": ["src/main/java"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "../../mazing/lib/**/*.jar"
+    ],
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": false,
+    "java.configuration.updateBuildConfiguration": "disabled"
+}
