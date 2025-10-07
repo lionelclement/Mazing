@@ -19,9 +19,11 @@ jar cf lib/mazing.jar -C build/classes .
 ```
  
 ## Compiler et exécuter le projet project0 (faire pareil avec project1, project2, etc.)
+```
 javac -cp lib/mazing.jar -d build/classes $(find examples/project0/src -name "*.java")
 java -cp lib/mazing.jar:build/classes/ fr.ubordeaux.ao.project0.Main
 ```
+
 
 
 
