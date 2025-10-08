@@ -6,6 +6,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="lib" path="/Users/clement/Workspace/mazing-20250929/mazing/lib/mazing.jar"/>
+	<classpathentry kind="lib" path="/Users/clement/Workspace/mazing-20250929/mazing/version-20251008/lib/mazing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
