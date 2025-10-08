@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
-class ImageRenderable3D extends AbstractRenderable {
+class ImageRenderable extends AbstractRenderable {
 
     private final BufferedImage bufferedImage;
     private final float x;
@@ -16,7 +16,7 @@ class ImageRenderable3D extends AbstractRenderable {
     private final int offsetY;
     private final float alpha;
 
-    public ImageRenderable3D(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
+    public ImageRenderable(BufferedImage bufferedImage, float x, float y, float z, int offsetX, int offsetY,
             int rank,
             RenderType renderType, float alpha) {
         this.bufferedImage = bufferedImage;
@@ -30,7 +30,7 @@ class ImageRenderable3D extends AbstractRenderable {
         this.alpha = alpha;
     }
 
-    public ImageRenderable3D(BufferedImage bufferedImage, int offsetX, int offsetY, RenderType renderType) {
+    public ImageRenderable(BufferedImage bufferedImage, int offsetX, int offsetY, RenderType renderType) {
 		this(bufferedImage, 0, 0, 0, offsetX, offsetY, 0, renderType, 0);
 	}
 
@@ -90,7 +90,7 @@ class ImageRenderable3D extends AbstractRenderable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ImageRenderable3D other = (ImageRenderable3D) obj;
+        final ImageRenderable other = (ImageRenderable) obj;
         if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
             return false;
         }

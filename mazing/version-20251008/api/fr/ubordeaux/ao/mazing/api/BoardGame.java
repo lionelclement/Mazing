@@ -75,7 +75,7 @@ public class BoardGame extends JPanel implements IWindowGame {
 	private Timer gameLoop;
 
 	/** Mapping du code d’image vers l’objet Image correspondant */
-	private Map<Integer, ImageRenderable3D> codeToImageMap;
+	private Map<Integer, ImageRenderable> codeToImageMap;
 
 	/** Référence vers le joueur */
 	/**
@@ -173,7 +173,7 @@ public class BoardGame extends JPanel implements IWindowGame {
 			g2d.drawImage(sub, 0, 0, scaledWidth, scaledHeight, null);
 			g2d.dispose();
 
-			codeToImageMap.put(i + offset, new ImageRenderable3D(scaled, offsetX, offsetY, renderType));
+			codeToImageMap.put(i + offset, new ImageRenderable(scaled, offsetX, offsetY, renderType));
 
 			col++;
 			if (col == colsPerRow) {
@@ -282,7 +282,7 @@ public class BoardGame extends JPanel implements IWindowGame {
 		int YMINBG = -15;
 		int YMAXBG = 15;
 
-		ImageRenderable3D tileImg = codeToImageMap.get(code);
+		ImageRenderable tileImg = codeToImageMap.get(code);
 		if (tileImg != null) {
 			for (int y = YMINBG; y < YMAXBG; y++) {
 				for (int x = XMINBG; x < XMAXBG; x++) {
@@ -326,10 +326,10 @@ public class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void add(int code, int x, int y, int z, float alpha) {
 		if (code != -1) {
-			ImageRenderable3D image = codeToImageMap.get(code);
+			ImageRenderable image = codeToImageMap.get(code);
 			int rank = codeToRank(code);
 			if (image != null) {
-				ImageRenderable3D imageRendarable3D = new ImageRenderable3D(
+				ImageRenderable imageRendarable3D = new ImageRenderable(
 						image.getBufferedImage(), x, y, z, image.getOffsetX(),
 						image.getOffsetY(), rank,
 						image.getRenderType(), alpha);
@@ -362,10 +362,10 @@ public class BoardGame extends JPanel implements IWindowGame {
 						// : (code <= 200) ? 1
 						// : 2;
 						// int newCode = imageMatrix[z][y][x] % 100;
-						ImageRenderable3D image = codeToImageMap.get(code);
+						ImageRenderable image = codeToImageMap.get(code);
 						int rank = codeToRank(code);
 						if (image != null) {
-							ImageRenderable3D imageRendarable3D = new ImageRenderable3D(
+							ImageRenderable imageRendarable3D = new ImageRenderable(
 									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
 									image.getRenderType(), 1.0f);
 
