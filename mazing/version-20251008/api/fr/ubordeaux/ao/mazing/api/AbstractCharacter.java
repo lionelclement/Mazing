@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.rmi.UnexpectedException;
+import java.util.function.Consumer;
 
 /**
  * Classe abstraite représentant un personnage dans le jeu.
@@ -23,8 +24,6 @@ import java.rmi.UnexpectedException;
     protected Animation<T>[][] animations; // [state][direction]
 
     protected float x, y, z;
-    protected float targetX, targetY, targetZ;
-    protected float speedX, speedY, speedZ;
     protected Direction currentDirection;
     protected int offsetX;
     protected int offsetY;
@@ -33,7 +32,7 @@ import java.rmi.UnexpectedException;
     private Runnable beginLoopAnimationTrigger;
     private Runnable midLoopAnimationTrigger;
     private Runnable endLoopAnimationTrigger;
-    private Runnable tickAnimationTrigger;
+    private Consumer<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
     AbstractCharacter(int numberStates, int offsetX, int offsetY) {
@@ -56,42 +55,6 @@ import java.rmi.UnexpectedException;
     }
 
     abstract RenderType getRenderType();
-
-    protected void setSpeed(float speedX, float speedY, float speedZ) {
-        Direction lastDirection = currentDirection;
-        Direction newDirection = currentDirection;
-        if (speedX > 0 && speedY == 0)
-            newDirection = Direction.EAST;
-        else if (speedX < 0 && speedY == 0)
-            newDirection = Direction.WEST;
-        else if (speedX == 0 && speedY > 0)
-            newDirection = Direction.SOUTH;
-        else if (speedX == 0 && speedY < 0)
-            newDirection = Direction.NORTH;
-        else if (speedX > 0 && speedY > 0)
-            newDirection = Direction.SOUTHEAST;
-        else if (speedX > 0 && speedY < 0)
-            newDirection = Direction.NORTHEAST;
-        else if (speedX < 0 && speedY > 0)
-            newDirection = Direction.SOUTHWEST;
-        else if (speedX < 0 && speedY < 0)
-            newDirection = Direction.NORTHWEST;
-
-        this.speedX = this.speedY = this.speedZ = 0;
-
-        if (newDirection != lastDirection) {
-            // Change la direction et lance le déplacement
-            turnPlayer(newDirection, 75, () -> {
-                this.speedX = speedX;
-                this.speedY = speedY;
-                this.speedZ = speedZ;
-            });
-        } else {
-            this.speedX = speedX;
-            this.speedY = speedY;
-            this.speedZ = speedZ;
-        }
-    }
 
     // Déplace le personnage vers une case et ajuste la direction progressivement
     @Override
@@ -150,64 +113,8 @@ import java.rmi.UnexpectedException;
 
     @Override
     public void setDirection(Direction newDirection) {
-        // Calculer la vitesse scalaire actuelle dans le plan XY
-        float currentSpeedXY = (float) Math.sqrt(speedX * speedX + speedY * speedY);
-        float currentSpeedZ = speedZ; // on conserve Z
-
-        // On met à zéro les vitesses pendant la rotation visuelle
-        speedX = speedY = speedZ = 0;
-
         turnPlayer(newDirection, 125, () -> {
             currentDirection = newDirection;
-
-            // Vecteur direction brute pour X et Y
-            float dirX = 0, dirY = 0;
-            switch (newDirection) {
-                case NORTH -> {
-                    dirX = 0;
-                    dirY = -1;
-                }
-                case SOUTH -> {
-                    dirX = 0;
-                    dirY = 1;
-                }
-                case EAST -> {
-                    dirX = 1;
-                    dirY = 0;
-                }
-                case WEST -> {
-                    dirX = -1;
-                    dirY = 0;
-                }
-                case NORTHEAST -> {
-                    dirX = 1;
-                    dirY = -1;
-                }
-                case NORTHWEST -> {
-                    dirX = -1;
-                    dirY = -1;
-                }
-                case SOUTHEAST -> {
-                    dirX = 1;
-                    dirY = 1;
-                }
-                case SOUTHWEST -> {
-                    dirX = -1;
-                    dirY = 1;
-                }
-            }
-
-            // Normaliser automatiquement (aucun if nécessaire)
-            float length = (float) Math.sqrt(dirX * dirX + dirY * dirY);
-            if (length > 0) {
-                dirX /= length;
-                dirY /= length;
-            }
-
-            // Appliquer la vitesse existante dans la nouvelle direction XY
-            speedX = dirX * currentSpeedXY;
-            speedY = dirY * currentSpeedXY;
-            speedZ = currentSpeedZ; // conserver la vitesse sur Z
         });
     }
 
@@ -228,12 +135,8 @@ import java.rmi.UnexpectedException;
     }
 
     void callTickTrigger(int frameIndex) {
-        x += speedX;
-        y += speedY;
-        z += speedZ;
-
         if (tickAnimationTrigger != null) {
-            tickAnimationTrigger.run();
+            tickAnimationTrigger.accept(this);
         }
     }
 
@@ -262,7 +165,7 @@ import java.rmi.UnexpectedException;
     }
 
     @Override
-    public void setTickAnimationTrigger(Runnable callback) {
+    public void setTickAnimationTrigger(Consumer<ICharacter<?>> callback) {
         tickAnimationTrigger = callback;
     }
 
@@ -301,41 +204,6 @@ import java.rmi.UnexpectedException;
 		return z;
 	}
 
-	@Override
-	public void startWalking() {
-		throw new IllegalStateException("Unexpected action: startWalking");
-	}
-
-	@Override
-	public void startRunning() {
-		throw new IllegalStateException("Unexpected action: startRunning");
-	}
-
-	@Override
-	public void stopMoving() {
-		throw new IllegalStateException("Unexpected action: stopMoving");
-	}
-
-	@Override
-	public void performAttack() {
-		throw new IllegalStateException("Unexpected action: performAttack");
-	}
-
-	@Override
-	public void performJump() {
-		throw new IllegalStateException("Unexpected action: performJump");
-	}
-
-	@Override
-	public void die() {
-		throw new IllegalStateException("Unexpected action: die");
-	}
-
-	@Override
-	public void takeHit() {
-		throw new IllegalStateException("Unexpected action: takeHit");
-	}
-	
 	abstract CharacterMode getCurrentMode();
 
 

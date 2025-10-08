@@ -3,6 +3,15 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import fr.ubordeaux.ao.mazing.api.AbstractCharacter;
+import fr.ubordeaux.ao.mazing.api.Animation;
+import fr.ubordeaux.ao.mazing.api.CharacterMode;
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.Loader;
+import fr.ubordeaux.ao.mazing.api.RenderType;
+import fr.ubordeaux.ao.mazing.api.SoundManager;
+import fr.ubordeaux.ao.mazing.api.TileMap;
+
 /**
  * Représente une araignée avec ses animations et comportements spécifiques.
  * Étend {@link AbstractCharacter} et utilise {@link CharacterMode} pour gérer
@@ -11,7 +20,6 @@ import java.awt.image.BufferedImage;
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final int DELAY = 60;
-    private static final float WALK_SPEED = 0.03f;
     private static final float SCALE = 2.5f;
     private static final int OFFSET_X = 0;
     private static final int OFFSET_Y = 0;
@@ -122,31 +130,10 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void stopMoving() {
-        super.setSpeed(0, 0, 0);
-        setMode(Mode.IDLE);
-    }
-
-    @Override
-    public void performAttack() {
-        setMode(Mode.ATTACK);
-    }
-
-    @Override
-    public void die() {
-        super.setSpeed(0, 0, 0);
-        setMode(Mode.DEATH);
-    }
-
-    @Override
     public void setMode(CharacterMode state) {
         Mode s = (Mode) state;
         System.out.println("changeMode: " + currentMode + " -> " + s);
         previousMode = currentMode;
-        previousSpeedX = speedX;
-        previousSpeedY = speedY;
-        previousSpeedZ = speedZ;
-        speedX = speedY = speedZ = 0;
         currentMode = s;
         animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
@@ -170,12 +157,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public String toString() {
-        return "Spider [x=" + x + ", y=" + y + ", z=" + z + ", getRenderType()=" + getRenderType() + ", getRank()="
-                + getRank() + "]";
-    }
-
-    @Override
     public void callBeginTrigger() {
         super.callEndTrigger();
     }
@@ -186,9 +167,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             case ATTACK -> {
                 SoundManager.getInstance().play(currentMode.name());
                 currentMode = previousMode;
-                speedX = previousSpeedX;
-                speedY = previousSpeedY;
-                speedZ = previousSpeedZ;
             }
             case FALL -> {
                 currentMode = Mode.DEATH;
@@ -199,42 +177,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             }
         }
         super.callEndTrigger();
-    }
-
-    private void moveForward(float speed) {
-        float vx = 0, vy = 0, vz = 0;
-
-        // Ajuste la vitesse selon la direction cardinale
-        switch (currentDirection) {
-            case NORTH -> vy = -speed;
-            case SOUTH -> vy = speed;
-            case EAST -> vx = speed;
-            case WEST -> vx = -speed;
-            case NORTHEAST -> {
-                vx = speed;
-                vy = -speed;
-            }
-            case NORTHWEST -> {
-                vx = -speed;
-                vy = -speed;
-            }
-            case SOUTHEAST -> {
-                vx = speed;
-                vy = speed;
-            }
-            case SOUTHWEST -> {
-                vx = -speed;
-                vy = speed;
-            }
-        }
-
-        setSpeed(vx, vy, vz);
-    }
-
-    @Override
-    public void startWalking() {
-        setMode(Mode.WALK);
-        moveForward(WALK_SPEED);
     }
 
     @Override
@@ -248,9 +190,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void setDirection(Direction newDirection) {
-        // On met à zéro les vitesses pendant la rotation
-        speedX = speedY = speedZ = 0;
-
         turnPlayer(newDirection, 125, () -> {
             currentDirection = newDirection;
 
@@ -299,16 +238,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
                 dirY *= invSqrt2;
             }
 
-            // Obtenir la vitesse scalaire selon l'état actuel
-            float speed = switch (currentMode) {
-                case WALK -> WALK_SPEED;
-                default -> 0;
-            };
-
-            // Appliquer la vitesse dans la direction choisie
-            speedX = dirX * speed;
-            speedY = dirY * speed;
-            speedZ = 0; // ou conserver speedZ si besoin
         });
     }
 

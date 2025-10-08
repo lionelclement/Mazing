@@ -13,9 +13,6 @@ import java.awt.image.BufferedImage;
 public class Crusader extends AbstractCharacter<CharacterMode> {
 
     private static final int DELAY = 60;
-    private static final float WALK_SPEED = 0.03f;
-    private static final float RUN_SPEED = 0.08f;
-    private static final float JUMP_SPEED = 1.5f;
     private static final float SCALE = 2.5f;
     private static final int OFFSET_X = 0;
     private static final int OFFSET_Y = 8;
@@ -63,7 +60,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     private Mode currentMode;
-    private final Sound currentSound;
+    private Sound currentSound;
     private Mode previousMode;
     private float previousSpeedX, previousSpeedY, previousSpeedZ;
     private float previousZ;
@@ -174,6 +171,15 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         previousMode = currentMode;
         Mode newMode = (Mode) mode;
         currentMode = newMode;
+        switch (mode) {
+        case Mode.WALK ->         currentSound = Sound.CARPET_SOFT;
+        case Mode.RUN ->         currentSound = Sound.CARPET;
+        case Mode.ATTACK -> currentSound = Sound.ATTACK;
+        case Mode.JUMP -> currentSound = Sound.WOOD_SOFT;
+        case Mode.GOTHIT -> currentSound = Sound.GOTHIT;
+        case Mode.DEATH -> currentSound = Sound.DEATH;
+		default -> {}
+        }
         animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
 
@@ -187,7 +193,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         BufferedImage shadow = anim.getCurrentShadow();
         TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
         TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-
         super.render(g, currentMode.ordinal());
     }
 
@@ -213,21 +218,12 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     @Override
     public void callBeginTrigger() {
         switch (currentMode) {
-            case ATTACK:
-                previousSpeedX = speedX;
-                previousSpeedY = speedY;
-                previousSpeedZ = speedZ;
-                break;
             case GOTHIT:
-                previousSpeedX = speedX;
-                previousSpeedY = speedY;
-                previousSpeedZ = speedZ;
-                SoundManager.getInstance().play(currentMode.name());
+                SoundManager.getInstance().play(currentSound.name());
                 break;
             case JUMP:
-                previousZ = z;
-                previousSpeedZ = speedZ;
-                speedZ = (float) Math.sqrt(speedX * speedX + speedY * speedY) * JUMP_SPEED;
+                SoundManager.getInstance().play(currentSound.name());
+                currentSound = Sound.CARPET;
             default:
                 break;
         }
@@ -238,7 +234,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     public void callMidTrigger() {
         switch (currentMode) {
             case JUMP:
-                speedZ = -speedZ;
+                //speedZ = -speedZ;
             default:
                 break;
         }
@@ -250,92 +246,31 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         switch (currentMode) {
             case ATTACK:
             case GOTHIT:
-                SoundManager.getInstance().play(currentMode.name());
+                SoundManager.getInstance().play(currentSound.name());
                 currentMode = previousMode;
-                speedX = previousSpeedX;
-                speedY = previousSpeedY;
-                speedZ = previousSpeedZ;
+                //speedX = previousSpeedX;
+                //speedY = previousSpeedY;
+                //speedZ = previousSpeedZ;
                 break;
             case FALL:
-                currentMode = Mode.IDLE;
                 currentMode = Mode.DEATH;
-                SoundManager.getInstance().play(currentMode.name());
+                SoundManager.getInstance().play(currentSound.name());
+                //SoundManager.getInstance().play(currentMode.name());
                 animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
                 break;
             case JUMP:
-                z = previousZ;
+                //z = previousZ;
                 currentMode = previousMode;
-                speedZ = previousSpeedZ;
+                SoundManager.getInstance().play(currentSound.name());
+                //speedZ = previousSpeedZ;
             default:
                 break;
         }
         super.callEndTrigger();
     }
 
-    private void moveForward(float speed) {
-        float vx = 0, vy = 0, vz = 0;
-
-        // Ajuste la vitesse selon la direction cardinale
-        switch (currentDirection) {
-            case NORTH -> vy = -speed;
-            case SOUTH -> vy = speed;
-            case EAST -> vx = speed;
-            case WEST -> vx = -speed;
-            case NORTHEAST -> {
-                vx = speed;
-                vy = -speed;
-            }
-            case NORTHWEST -> {
-                vx = -speed;
-                vy = -speed;
-            }
-            case SOUTHEAST -> {
-                vx = speed;
-                vy = speed;
-            }
-            case SOUTHWEST -> {
-                vx = -speed;
-                vy = speed;
-            }
-        }
-        setSpeed(vx, vy, vz);
-    }
-
-    @Override
-    public void startWalking() {
-        setMode(Mode.WALK);
-        moveForward(WALK_SPEED);
-    }
-
-    @Override
-    public void startRunning() {
-        setMode(Mode.RUN);
-        moveForward(RUN_SPEED);
-    }
-
-    @Override
-    public void stopMoving() {
-        super.setSpeed(0, 0, 0);
-        setMode(Mode.IDLE);
-    }
-
-    @Override
-    public void performAttack() {
-        setMode(Mode.ATTACK);
-    }
-
-    @Override
-    public void die() {
-        super.setSpeed(0, 0, 0);
-        setMode(Mode.DEATH);
-    }
-
-
     @Override
     public void setDirection(Direction newDirection) {
-        // On met à zéro les vitesses pendant la rotation
-        speedX = speedY = speedZ = 0;
-
         turnPlayer(newDirection, 125, () -> {
             currentDirection = newDirection;
 
@@ -384,17 +319,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 dirY *= invSqrt2;
             }
 
-            // Obtenir la vitesse scalaire selon l'état actuel
-            float speed = switch (currentMode) {
-                case WALK -> WALK_SPEED;
-                case RUN -> RUN_SPEED;
-                default -> 0;
-            };
-
-            // Appliquer la vitesse dans la direction choisie
-            speedX = dirX * speed;
-            speedY = dirY * speed;
-            speedZ = 0; // ou conserver speedZ si besoin
         });
     }
 
@@ -405,7 +329,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void setMode(String mode) {
-        // System.err.println("Crusader@changeMode");
         try {
             setMode(Mode.valueOf(mode));
         } catch (IllegalArgumentException e) {
@@ -422,10 +345,5 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Crusader [x=" + x + ", y=" + y + ", z=" + z + ", speedX=" + speedX + ", speedY=" + speedY + ", speedZ="
-                + speedZ + ", currentState=" + currentMode + "]";
-    }
 
 }
