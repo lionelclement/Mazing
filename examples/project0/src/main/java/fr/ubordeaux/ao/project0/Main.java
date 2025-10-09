@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.project0;
 
+
 import fr.ubordeaux.ao.mazing.api.WindowGame;
 import fr.ubordeaux.ao.project0.controller.MazingController;
 import fr.ubordeaux.ao.project0.model.MazingModel;

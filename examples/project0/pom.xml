@@ -10,12 +10,29 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>project0</name>
+
     <dependencies>
-        <!-- Dépendance vers ton JAR installé localement -->
+        <!-- Dépendance vers le JAR mazing installé localement -->
         <dependency>
-            <groupId>project0</groupId>
+            <groupId>fr.ubordeaux.ao.mazing</groupId>
             <artifactId>mazing</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin pour exécuter facilement la classe Main -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>fr.ubordeaux.ao.project0.Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

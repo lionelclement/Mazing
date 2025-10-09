@@ -23,12 +23,6 @@ public class MazingModel {
 	public MazingModel() {
 	}
 
-	public void updateCrusaderPosition() {
-		x += speedX;
-		y += speedY;
-		z += speedZ;
-	}
-
 	public float getX() {
 		return x;
 	}
@@ -40,6 +34,20 @@ public class MazingModel {
 	public float getZ() {
 		return z;
 	}
+
+	public void updateCrusaderPosition() {
+		x += speedX;
+		y += speedY;
+		z += speedZ;
+	}
+
+    public void updateSpiderPosition() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+	
+    public void updateSpiderDirection() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 	
 	
 	

@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
+import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project0.model.MazingModel;
 
 public class MazingView {
@@ -11,6 +12,7 @@ public class MazingView {
 	private IWindowGame window;
 	private Crusader crusader;
 	private MazingModel model;
+	private Spider spider;
 
 	public MazingView(IWindowGame window, MazingModel model) {
 		this.window = window;
@@ -26,6 +28,10 @@ public class MazingView {
     	crusader = new Crusader();
     	crusader.setTickAnimationTrigger(e -> onCrusaderTick((Crusader) e));
 		window.add(crusader);
+    	spider = new Spider();
+		spider.setPosition(2, 2, 0);
+    	spider.setTickAnimationTrigger(e -> onSpiderTick((Spider) e));
+		window.add(spider);
 	}
 
 	public IWindowGame getWindow() {
@@ -40,6 +46,15 @@ public class MazingView {
 	    model.updateCrusaderPosition();
 	    c.setPosition(model.getX(), model.getY(), model.getZ());
 	}
+	
+	private void onSpiderTick(Spider s) {
+	    model.updateSpiderPosition();
+	    //c.setPosition(model.getX(), model.getY(), model.getZ());
+	}
+
+    public Spider getSpider() {
+		return spider;
+    }
 	
 	
 

@@ -35,15 +35,19 @@ public class MazingController extends KeyAdapter {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_UP -> {
 			view.getCrusader().setDirection("NORTH");
+			view.getSpider().setDirection("NORTH");
 		}
 		case KeyEvent.VK_DOWN -> {
 			view.getCrusader().setDirection("SOUTH");
+			view.getSpider().setDirection("SOUTH");
 		}
 		case KeyEvent.VK_LEFT -> {
 			view.getCrusader().setDirection("WEST");
+			view.getSpider().setDirection("WEST");
 		}
 		case KeyEvent.VK_RIGHT -> {
 			view.getCrusader().setDirection("EAST");
+			view.getSpider().setDirection("EAST");
 		}
 		case KeyEvent.VK_Q -> System.exit(0);
 		}
