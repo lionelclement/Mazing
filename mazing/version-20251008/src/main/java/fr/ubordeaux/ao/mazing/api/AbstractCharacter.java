@@ -27,10 +27,10 @@ import java.util.function.Consumer;
     protected int offsetX;
     protected int offsetY;
 
-    private Runnable loopAnimationTrigger;
-    private Runnable beginLoopAnimationTrigger;
-    private Runnable midLoopAnimationTrigger;
-    private Runnable endLoopAnimationTrigger;
+    private Consumer<ICharacter<?>> loopAnimationTrigger;
+    private Consumer<ICharacter<?>> beginLoopAnimationTrigger;
+    private Consumer<ICharacter<?>> midLoopAnimationTrigger;
+    private Consumer<ICharacter<?>> endLoopAnimationTrigger;
     private Consumer<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
@@ -141,25 +141,25 @@ import java.util.function.Consumer;
 
     void callBeginTrigger() {
         if (beginLoopAnimationTrigger != null) {
-            beginLoopAnimationTrigger.run();
+            beginLoopAnimationTrigger.accept(this);
         }
     }
 
     void callMidTrigger() {
         if (midLoopAnimationTrigger != null) {
-            midLoopAnimationTrigger.run();
+            midLoopAnimationTrigger.accept(this);
         }
     }
 
     void callEndTrigger() {
         if (endLoopAnimationTrigger != null) {
-            endLoopAnimationTrigger.run();
+            endLoopAnimationTrigger.accept(this);
         }
     }
 
     void callLoopTrigger() {
         if (loopAnimationTrigger != null) {
-            loopAnimationTrigger.run();
+            loopAnimationTrigger.accept(this);
         }
     }
 
@@ -169,22 +169,22 @@ import java.util.function.Consumer;
     }
 
     @Override
-    public void setBeginAnimationTrigger(Runnable callback) {
+    public void setBeginAnimationTrigger(Consumer<ICharacter<?>> callback) {
         beginLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setMidAnimationTrigger(Runnable callback) {
+    public void setMidAnimationTrigger(Consumer<ICharacter<?>> callback) {
         midLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setEndAnimationTrigger(Runnable callback) {
+    public void setEndAnimationTrigger(Consumer<ICharacter<?>> callback) {
         endLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setLoopAnimationTrigger(Runnable callback) {
+    public void setLoopAnimationTrigger(Consumer<ICharacter<?>> callback) {
         loopAnimationTrigger = callback;
     }
 

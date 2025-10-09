@@ -3,6 +3,8 @@ package fr.ubordeaux.ao.project0.controller;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.project0.model.MazingModel;
 import fr.ubordeaux.ao.project0.view.MazingView;
 
@@ -19,35 +21,30 @@ public class MazingController extends KeyAdapter {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
-
 		// Actions liées aux lettres
 		switch (key) {
-		case 'w' -> view.getCrusader().setMode("WALK");
-		case 'r' -> view.getCrusader().setMode("RUN");
-		case 'a' -> view.getCrusader().setMode("ATTACK");
-		case 'g' -> view.getCrusader().setMode("GOTHIT");
-		case 'j' -> view.getCrusader().setMode("JUMP");
-		case 'd' -> view.getCrusader().setMode("DEATH");
-		case 's' -> view.getCrusader().setMode("IDLE");
+		case 'w' -> model.setMode(Crusader.Mode.WALK);
+		case 'r' -> model.setMode(Crusader.Mode.RUN);
+		case 'a' -> model.setMode(Crusader.Mode.ATTACK);
+		case 'g' -> model.setMode(Crusader.Mode.GOTHIT);
+		case 'j' -> model.setMode(Crusader.Mode.JUMP);
+		case 'd' -> model.setMode(Crusader.Mode.DEATH);
+		case 's' -> model.setMode(Crusader.Mode.IDLE);
 		}
 
 		// Actions liées aux flèches et sortie
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_UP -> {
-			view.getCrusader().setDirection("NORTH");
-			view.getSpider().setDirection("NORTH");
+			model.setDirection(Direction.NORTH);
 		}
 		case KeyEvent.VK_DOWN -> {
-			view.getCrusader().setDirection("SOUTH");
-			view.getSpider().setDirection("SOUTH");
+			model.setDirection(Direction.SOUTH);
 		}
 		case KeyEvent.VK_LEFT -> {
-			view.getCrusader().setDirection("WEST");
-			view.getSpider().setDirection("WEST");
+			model.setDirection(Direction.WEST);
 		}
 		case KeyEvent.VK_RIGHT -> {
-			view.getCrusader().setDirection("EAST");
-			view.getSpider().setDirection("EAST");
+			model.setDirection(Direction.EAST);
 		}
 		case KeyEvent.VK_Q -> System.exit(0);
 		}

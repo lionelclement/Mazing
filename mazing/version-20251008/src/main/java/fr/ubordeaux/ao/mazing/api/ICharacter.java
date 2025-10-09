@@ -19,13 +19,13 @@ public interface ICharacter<S extends CharacterMode> {
 
     void setMode(String mode);
 
-    void setLoopAnimationTrigger(Runnable callback);
+    void setLoopAnimationTrigger(Consumer<ICharacter<?>> callback);
 
-    void setBeginAnimationTrigger(Runnable callback);
+    void setBeginAnimationTrigger(Consumer<ICharacter<?>> callback);
 
-    void setMidAnimationTrigger(Runnable callback);
+    void setMidAnimationTrigger(Consumer<ICharacter<?>> callback);
 
-    void setEndAnimationTrigger(Runnable callback);
+    void setEndAnimationTrigger(Consumer<ICharacter<?>> callback);
 
     void setTickAnimationTrigger(Consumer<ICharacter<?>> callback);
 
