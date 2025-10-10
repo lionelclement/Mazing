@@ -12,8 +12,6 @@ public class MazingController extends KeyAdapter {
 
 	private final MazingModel model;
 	private final MazingView view;
-	private int scrollx;
-	private int scrolly;
 
 	public MazingController(MazingModel model, MazingView view) {
 		this.model = model;

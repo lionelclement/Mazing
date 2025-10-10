@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
-import fr.ubordeaux.ao.project0.gameloop.GameLoopListener;
 import fr.ubordeaux.ao.mazing.api.Direction;
 
 public class MazingModel {
@@ -20,7 +19,7 @@ public class MazingModel {
 	// La vue écoute le modèle (pour les changements de mode / direction)
 	public void attachModelListener(ModelListener listener) {
 	    this.modelListener = listener;
-	    this.crusader.attachModleListener(listener);
+	    this.crusader.attachModelListener(listener);
 	}
 
 	public void addCharacter(String id, CharacterModel character) {

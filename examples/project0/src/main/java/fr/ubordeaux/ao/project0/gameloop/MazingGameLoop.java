@@ -1,10 +1,10 @@
 package fr.ubordeaux.ao.project0.gameloop;
 
 import fr.ubordeaux.ao.project0.model.MazingModel;
+import fr.ubordeaux.ao.project0.view.AnimationListener;
 import fr.ubordeaux.ao.project0.view.MazingView;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
-import fr.ubordeaux.ao.mazing.api.Spider;
 
 public class MazingGameLoop {
 	
@@ -15,15 +15,15 @@ public class MazingGameLoop {
 	}
 
 	public void attachViewListener(MazingView view) {
-	    view.attachGameLoopListener(new GameLoopListener() {
-	        @Override
-	        public void updatePosition(ICharacter<?> character) {
-	            if (character instanceof Crusader) {
-	            	//System.out.println("VIEW ==> GAMELOOP");
-		            model.updateCrusaderPosition();
-	            }
-	        }
-	    });
-	}
+        view.attachAnimationListener(new AnimationListener() {
+            @Override
+            public void onTick(ICharacter<?> character) {
+                if (character instanceof Crusader) {
+                    model.updateCrusaderPosition();
+                }
+            }
+        });
+    }
+	
 
 }

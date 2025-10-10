@@ -96,7 +96,7 @@ public class CharacterModel {
         if (mode == Mode.DEATH) speedX = speedY = 0;
     }
     
-	public void attachModleListener(ModelListener modelListener) {
+	public void attachModelListener(ModelListener modelListener) {
 		this.listener = modelListener;
 		
 	}
