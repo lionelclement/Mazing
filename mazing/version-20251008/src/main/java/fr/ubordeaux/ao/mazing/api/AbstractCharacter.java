@@ -210,6 +210,16 @@ import java.util.function.Consumer;
 
 
     @Override
+    protected float getX() {
+        return x;
+    }
+
+    @Override
+    protected float getY() {
+        return y;
+    }
+
+    @Override
     protected float getZ() {
         return z;
     }

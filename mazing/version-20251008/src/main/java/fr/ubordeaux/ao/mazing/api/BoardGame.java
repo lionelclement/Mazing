@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.ArrayList;
@@ -72,6 +73,10 @@ class BoardGame extends JPanel implements IWindowGame {
 	/** Mapping du code d’image vers l’objet Image correspondant */
 	private Map<Integer, ImageRenderable> codeToImageMap;
 
+	//private int originX;
+
+	//private int originY;
+
 	/** Référence vers le joueur */
 	/**
 	 * Constructeur principal.
@@ -85,8 +90,8 @@ class BoardGame extends JPanel implements IWindowGame {
 		// this.tile_width = tile_width;
 		// this.tile_height = tile_height;
 
-		// this.originX = originX;
-		// this.originY = originY;
+		//this.originX = originX;
+		//this.originY = originY;
 
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -217,6 +222,9 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	private void renderScene(Graphics g, List<AbstractRenderable> sceneObjects) {
+
+		System.out.println(sceneObjects.size());
+
 		// Trier les objets par z, puis x+y, puis par type
 		List<AbstractRenderable> sorted = sceneObjects.stream()
 				.sorted(Comparator
@@ -241,13 +249,24 @@ class BoardGame extends JPanel implements IWindowGame {
 			g.drawImage(background, 0, 0, null);
 		}
 
-		// Centre de l'écran pour le rendu
-		// g.translate(width / 2, tile_height);
+		List<AbstractRenderable> renderableScene = new ArrayList<>();
+		for (AbstractRenderable ar : grounds) {
+			if (TileMap.distance(ar) < 2 * width){
+				renderableScene.add(ar);
+			}
+		}
+		for (AbstractRenderable ar : sceneObjects) {
+			if (TileMap.distance(ar) < 2 * width){
+				renderableScene.add(ar);
+			}
+		}
+		for (AbstractRenderable ar : sceneCharacters) {
+			if (TileMap.distance(ar) < 2 * width){
+				renderableScene.add(ar);
+			}
+		}
 
-		List<AbstractRenderable> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
-		renderableScene.addAll(grounds);
-		renderableScene.addAll(sceneObjects);
-		renderableScene.addAll(sceneCharacters);
+
 		renderScene(g, renderableScene);
 
 	}

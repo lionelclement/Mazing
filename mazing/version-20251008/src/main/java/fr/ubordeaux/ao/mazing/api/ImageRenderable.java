@@ -101,6 +101,16 @@ class ImageRenderable extends AbstractRenderable {
 	}
 
     @Override
+    protected float getX() {
+        return x;
+    }
+
+    @Override
+    protected float getY() {
+        return y;
+    }
+
+    @Override
     protected float getZ() {
         return z;
     }

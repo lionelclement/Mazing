@@ -53,8 +53,6 @@ class TileMap {
     }
 
     public Point2D screenToGrid(float isoX, float isoY) {
-        // float x = isoX - originX;
-        // float y = isoY - originY;
         float x = isoX;
         float y = isoY;
         float col = (x / (tileWidth / 2.0f) + y / (tileHeight / 4.0f)) / 2.0f;
@@ -80,11 +78,16 @@ class TileMap {
         // Définir l'alpha
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 
-        g.drawImage(image,
-                screenX - image.getWidth() / 2,
-                screenY - image.getHeight() + anchorY,
-                null);
+        int ix = screenX - image.getWidth() / 2;
+        int iy = screenY - image.getHeight() + anchorY;
+        int dx = ix - originX;
+        int dy = iy - originY;
+        // on prend une fenêtre pas plus large que width
+        if (Math.sqrt(dx*dx+dy*dy) < (2 * originX)) {
+            g.drawImage(image, ix, iy, null);
+        }
     }
+
 
     /** Dessine une tuile isométrique 3D */
     public void drawTile(int x, int y, int z, Graphics g, Color color) {
@@ -122,5 +125,12 @@ class TileMap {
     public static void scroll(int scrollX, int scrollY) {
         TileMap.scrollX = scrollX;
         TileMap.scrollY = scrollY;
+    }
+
+    public static int distance(AbstractRenderable ar) {
+			    Point2D p = TileMap.gridToScreen(ar.getX(), ar.getY(), ar.getZ());
+			 		int dx = (int) (p.getX() - originX);
+        			int dy = (int) (p.getY() - originY);
+        			return  (int) Math.sqrt(dx*dx+dy*dy);
     }
 }

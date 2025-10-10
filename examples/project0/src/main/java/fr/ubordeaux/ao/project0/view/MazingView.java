@@ -1,5 +1,7 @@
 package fr.ubordeaux.ao.project0.view;
 
+import java.util.Random;
+
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.Direction;
@@ -55,12 +57,12 @@ public class MazingView {
     
 	private void init() {
 		window.setTitle("Mon jeu à moi");
-		//window.setSize(1800, 1169);
+		window.setSize(1800, 1169);
 		window.setResizable(true);
 		//window.setBackground(Color.WHITE);
 		window.setTileSize(120, 120);
 		
-		window.fillTilesBackground(12, -24, -24, 48, 48);
+		window.fillTilesBackground(12, -240, -240, 480, 480);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);
 		window.setFPS(40);
 		
@@ -101,6 +103,10 @@ public class MazingView {
 			}};
 		
 		window.add(items);
+		
+		Random rand = new Random();
+
+		window.add(matrix);
 		
     	crusader = new Crusader();
     	crusader.setTickAnimationTrigger(e -> onTick(e));
