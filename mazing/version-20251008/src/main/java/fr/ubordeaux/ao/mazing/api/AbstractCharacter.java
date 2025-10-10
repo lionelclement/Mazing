@@ -26,6 +26,7 @@ import java.util.function.Consumer;
     protected Direction currentDirection;
     protected int offsetX;
     protected int offsetY;
+    protected float scale;
 
     private Consumer<ICharacter<?>> loopAnimationTrigger;
     private Consumer<ICharacter<?>> beginLoopAnimationTrigger;
@@ -130,7 +131,7 @@ import java.util.function.Consumer;
     }
 
     float getIsoDepth() {
-        return getX() + getY() + 0.5f;
+        return x + y + 0.5f;
     }
 
     void callTickTrigger(int frameIndex) {
@@ -188,22 +189,29 @@ import java.util.function.Consumer;
         loopAnimationTrigger = callback;
     }
 
-	@Override
-	public float getX() {
-		return x;
-	}
-
-	@Override
-	public float getY() {
-		return y;
-	}
-
-	@Override
-	public float getZ() {
-		return z;
-	}
-
 	abstract CharacterMode getCurrentMode();
+
+    @Override
+    public void setScale(float scale) {
+        this.scale = scale;
+        initAnimations(scale);
+    }
+
+        @Override
+    public void setOffset(int offsetX, int offsetY) {
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        initAnimations(this.scale);
+    }
+
+
+    @Override
+    protected float getZ() {
+        return z;
+    }
+
+
+    protected abstract void initAnimations(float scale);
 
 
 

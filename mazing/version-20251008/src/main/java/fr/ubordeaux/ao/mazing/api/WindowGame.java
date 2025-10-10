@@ -10,8 +10,13 @@ import java.util.Set;
 public class WindowGame extends JFrame implements IWindowGame {
 
     private static final long serialVersionUID = 1L;
-    private static final int WIDTH = 1366;
-    private static final int HEIGHT = 738;
+    private static final int DEFAULT_WIDTH = 1024;
+    private static final int DEFAULT_HEIGHT = 665;
+	/** Largeur d’une tuile en pixels */
+	private final static int DEFAULT_TILE_WIDTH = 100;
+	/** Hauteur d’une tuile en pixels */
+	private final static int DEFAULT_TILE_HEIGHT = 100;
+	private static final int DEFAULT_FRAMES_PER_SECOND = 50;
 
     private final BoardGame boardGame;
 
@@ -19,17 +24,37 @@ public class WindowGame extends JFrame implements IWindowGame {
         super("Isometric 3D Game");
 
         // Création du plateau
-        boardGame = new BoardGame(WIDTH, HEIGHT);
+        boardGame = new BoardGame(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TILE_WIDTH, DEFAULT_TILE_HEIGHT, DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4, DEFAULT_FRAMES_PER_SECOND);
 
         // Ajouter le plateau au content pane
         setContentPane(boardGame);
 
         // Définir la taille exacte de la zone de dessin
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        super.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         pack(); // Ajuste la JFrame à la taille du contentPane
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centrer
+        setLocationRelativeTo(null); 
+    }
+    
+
+    @Override
+    public void setTileSize(int tile_width, int tile_height) {
+		boardGame.initImagesSheet();
+		TileMap.getInstance();
+		TileMap.getInstance();
+		TileMap.initInstance(tile_width, tile_height, TileMap.originX, TileMap.originY);
+    }
+    
+    @Override
+    public void setFPS(int fps) {
+		boardGame.startGameLoop(fps);
+    }
+    
+    @Override
+    public void setSize(int width, int height) {
+		boardGame.setSize(width, height);
+		super.setSize(width, height);
     }
     
     @Override
@@ -39,7 +64,8 @@ public class WindowGame extends JFrame implements IWindowGame {
     
     @Override
     public void setBackground(Color c) {
-    	super.setBackground(c);
+		if (boardGame != null)
+			boardGame.setBackground(c);
     }
     
     @Override
@@ -54,38 +80,60 @@ public class WindowGame extends JFrame implements IWindowGame {
     
 
 	@Override
-	public void fillTilesBackground(int code, float alpha) {
-		this.boardGame.fillTilesBackground(code, alpha);
+	public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha){
+		boardGame.fillTilesBackground(code, x, y, width, height, alpha);
 	}
 
 	@Override
-	public void fillCheckerboardBackground(int size) {
-		this.boardGame.fillCheckerboardBackground(size);
+	public void fillTilesBackground(int code, int x, int y, int width, int height){
+		boardGame.fillTilesBackground(code, x, y, width, height, 1);
+	}
+
+	@Override
+	public void fillCheckerboardBackground(int x, int y, int width, int height) {
+		boardGame.fillCheckerboardBackground(x, y, width, height);
 	}
 
 	@Override
 	public void add(ICharacter<? extends CharacterMode> character) {
-		this.boardGame.add(character);
+		boardGame.add(character);
 	}
 
 	@Override
 	public void add(int code, int x, int y, int z, float alpha) {
-		this.boardGame.add(code, x, y, z, alpha);
+		boardGame.add(code, x, y, z, alpha);
+	}
+
+	@Override
+	public void add(int code, int x, int y, int z) {
+		boardGame.add(code, x, y, z, 1);
 	}
 
 	@Override
 	public void add(int[][][] matrix) {
-		this.boardGame.add(matrix);
+		boardGame.add(matrix);
 	}
 
 	@Override
 	public void clear() {
-		this.boardGame.clear();
+		boardGame.clear();
 	}
 
 	@Override
 	public Set<Integer> getCodesFromPoint(int x, int y, int z) {
-		return this.boardGame.getCodesFromPoint(x, y, z);
+		return boardGame.getCodesFromPoint(x, y, z);
 	}
+
+	@Override
+	public void scroll(int x, int y) {
+		TileMap.scroll(x, y);
+	}
+
+
+	@Override
+	public void drawTile(Color color, int x, int y, int z) {
+		boardGame.drawTile(color, x, y, z);
+	}
+
 
 }

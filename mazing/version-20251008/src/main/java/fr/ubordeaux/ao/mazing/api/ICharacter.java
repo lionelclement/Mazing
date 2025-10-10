@@ -29,4 +29,8 @@ public interface ICharacter<S extends CharacterMode> {
 
     void setTickAnimationTrigger(Consumer<ICharacter<?>> callback);
 
+    void setScale(float scale);
+
+    void setOffset(int x, int y);
+
 }

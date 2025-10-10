@@ -34,21 +34,6 @@ class ImageRenderable extends AbstractRenderable {
 		this(bufferedImage, 0, 0, 0, offsetX, offsetY, 0, renderType, 0);
 	}
 
-	@Override
-    public float getX() {
-        return x;
-    }
-
-    @Override
-    public float getY() {
-        return y;
-    }
-
-    @Override
-    public float getZ() {
-        return z;
-    }
-
     public int getHeight() {
         return rank;
     }
@@ -66,7 +51,7 @@ class ImageRenderable extends AbstractRenderable {
     }
 
     float getIsoDepth() {
-        return getX() + getY();
+        return x + y;
     }
 
     @Override
@@ -114,5 +99,10 @@ class ImageRenderable extends AbstractRenderable {
 	public int getOffsetY() {
 		return offsetY;
 	}
+
+    @Override
+    protected float getZ() {
+        return z;
+    }
 
 }

@@ -4,12 +4,6 @@ import java.awt.Graphics;
 
 abstract class AbstractRenderable {
 
-    abstract float getX();
-
-    abstract float getY();
-
-    abstract float getZ();
-
     abstract RenderType getRenderType();
 
     abstract void render(Graphics g);
@@ -17,4 +11,7 @@ abstract class AbstractRenderable {
     abstract int getRank();
 
     abstract float getIsoDepth();
+
+    protected abstract float getZ();
+
 }

@@ -21,6 +21,8 @@ public class Main {
     	
     	view.bindToModel(model);
     	
+    	model.init();
+    	
     	
     }
 

@@ -12,10 +12,9 @@ import java.awt.image.BufferedImage;
  */
 public class Crusader extends AbstractCharacter<CharacterMode> {
 
-    private static final int DELAY = 60;
-    private static final float SCALE = 2.5f;
-    private static final int OFFSET_X = 0;
-    private static final int OFFSET_Y = 8;
+    private static final float DEFAULT_SCALE = 3.0f;
+    private static final int DEFAULT_OFFSET_X = 0;
+    private static final int DEFAULT_OFFSET_Y = 12;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 15, true),
@@ -65,12 +64,13 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private Sound savedSound;
 
     public Crusader() {
-        super(Mode.values().length, OFFSET_X, OFFSET_Y);
+        super(Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
         savedMode = currentMode = Mode.IDLE;
         currentSound = Sound.CARPET_SOFT;
         currentDirection = Direction.EAST;
         initSounds();
-        initAnimations();
+        this.scale = DEFAULT_SCALE;
+        initAnimations(DEFAULT_SCALE);
     }
 
     private void initSounds() {
@@ -130,7 +130,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void initAnimations() {
+    protected void initAnimations(float scale) {
         Mode[] modes = Mode.values();
         Direction[] directions = Direction.values();
 
@@ -142,19 +142,19 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                         String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
                                 mode.getName(),
                                 mode.getName()),
-                        SCALE);
+                        scale);
 
                 shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
                         direction.ordinal(),
                         String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                 mode.getName(),
                                 mode.getName()),
-                        SCALE);
+                        scale);
 
                 animations[mode.ordinal()][direction.ordinal()] = new Animation(
                         images[mode.ordinal()][direction.ordinal()],
                         shadow_images[mode.ordinal()][direction.ordinal()],
-                        DELAY, mode.isLoop(), this);
+                        mode.isLoop(), this);
 
             }
         }
@@ -184,15 +184,15 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     RenderType getRenderType() {
-        return RenderType.OBJECT;
+        return RenderType.CONSTRUCTION;
     }
 
     void render(Graphics g) {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.OBJECT, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
         super.render(g, currentMode.ordinal());
     }
 
@@ -311,7 +311,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public float getIsoDepth() {
-        return getX() + getY() + 0.9f;
+        return x + y + 1.5f;
     }
 
     @Override
@@ -331,6 +331,5 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     		throw new IllegalStateException("Unexpected direction");
         }
     }
-
 
 }

@@ -32,18 +32,10 @@ import javax.swing.Timer;
 public class BoardGame extends JPanel implements IWindowGame {
 
 	private static final long serialVersionUID = 1L;
-	/** Largeur d’une tuile en pixels */
-	private final static int TILE_WIDTH = 128;
-	/** Hauteur d’une tuile en pixels */
-	private final static int TILE_HEIGHT = 100;
-	private final static int DEFAULT_WIDTH = 1024;
-	private final static int DEFAULT_HEIGHT = 800;
 
-	/** Largeur du plateau */
-	private final int width;
+	int width;
 
-	/** Hauteur du plateau */
-	private final int height;
+	int height;
 
 	/** Largeur d'une image à découper dans la spritesheet */
 	private final static int CROP_WIDTH = 256;
@@ -56,6 +48,9 @@ public class BoardGame extends JPanel implements IWindowGame {
 
 	/** Mapping du code d’image vers son rang de rendu */
 	private final Map<Integer, Integer> codeToRankMap = new HashMap<>();
+
+	/** Liste des sols présents dans la scène */
+	List<AbstractRenderable> grounds = new ArrayList<>();
 
 	/** Liste des objets 3D présents dans la scène */
 	List<AbstractRenderable> sceneObjects = new ArrayList<>();
@@ -84,33 +79,23 @@ public class BoardGame extends JPanel implements IWindowGame {
 	 * @param width  largeur du plateau en pixels
 	 * @param height hauteur du plateau en pixels
 	 */
-	public BoardGame(int width, int height) {
+	public BoardGame(int width, int height, int tile_width, int tile_height, int originX, int originY, int fps) {
 		this.width = width;
 		this.height = height;
+		// this.tile_width = tile_width;
+		// this.tile_height = tile_height;
+
+		// this.originX = originX;
+		// this.originY = originY;
+
+		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		// Initialisation du TileMap pour le rendu
-		TileMap.getInstance(TILE_WIDTH, TILE_HEIGHT, width, height, 8, 8);
+		TileMap.initInstance(tile_width, tile_height, originX, originY);
 		characters = new ArrayList<>();
 		codeToImageMap = new HashMap<>();
 
-		// Chargement et découpe des spritesheets
-		BufferedImage imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR);
-
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.OBJECT);
-
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.OBJECT);
-
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.OBJECT);
-
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.OBJECT);
-
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.OBJECT);
+		initImagesSheet();
 
 		// Initialisation des rangs de rendu des objets
 		codeToRankMap.put(138, 0);
@@ -126,18 +111,51 @@ public class BoardGame extends JPanel implements IWindowGame {
 		codeToRankMap.put(182, 2);
 		codeToRankMap.put(183, 2);
 
-		// Timer de mise à jour des animations (40 fps)
-		gameLoop = new Timer(1000 / 40, _ -> {
+		startGameLoop(fps);
+	}
+
+	public void startGameLoop(int fps) {
+		if (gameLoop != null) {
+			gameLoop.stop();
+		}
+		gameLoop = new Timer(1000 / fps, _ -> {
 			updateAnimations();
 		});
 		gameLoop.start();
 	}
 
-	/**
-	 * Constructeur par défaut avec taille 1024x800.
-	 */
-	public BoardGame() {
-		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	@Override
+	public void setSize(int width, int height) {
+		super.setSize(width, height);
+		TileMap.getInstance();
+		TileMap.originX = width / 2;
+		TileMap.getInstance();
+		TileMap.originY = height / 4;
+		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	}
+
+	void initImagesSheet() {
+
+		// codeToImageMap.clear();
+
+		// Chargement et découpe des spritesheets
+		BufferedImage imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR);
+
+		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION);
+
+		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION);
+
+		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION);
+
+		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION);
+
+		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.ITEM);
 	}
 
 	/**
@@ -161,9 +179,11 @@ public class BoardGame extends JPanel implements IWindowGame {
 		for (int i = 0; i < maxSize; i++) {
 			BufferedImage sub = sheet.getSubimage(col * width, row * height, width, height);
 
+			TileMap.getInstance();
 			// Calcul des dimensions après scale
-			int scaledWidth = (int) (TILE_WIDTH * scale);
-			int scaledHeight = (int) (TILE_HEIGHT * 2 * scale);
+			int scaledWidth = (int) (TileMap.tileWidth * scale);
+			TileMap.getInstance();
+			int scaledHeight = (int) (TileMap.tileHeight * 2 * scale);
 
 			// Créer l'image redimensionnée
 			BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
@@ -222,9 +242,10 @@ public class BoardGame extends JPanel implements IWindowGame {
 		}
 
 		// Centre de l'écran pour le rendu
-		g.translate(width / 2, TILE_HEIGHT);
+		// g.translate(width / 2, tile_height);
 
 		List<AbstractRenderable> renderableScene = new ArrayList<>(sceneObjects.size() + sceneCharacters.size());
+		renderableScene.addAll(grounds);
 		renderableScene.addAll(sceneObjects);
 		renderableScene.addAll(sceneCharacters);
 		renderScene(g, renderableScene);
@@ -237,21 +258,21 @@ public class BoardGame extends JPanel implements IWindowGame {
 	 * @param size taille du damier (nombre de tuiles par côté)
 	 */
 	@Override
-	public void fillCheckerboardBackground(int size) {
+	public void fillCheckerboardBackground(int x, int y, int width, int height) {
 
-		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		// background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = background.createGraphics();
 
 		// centrer l'origine comme dans paintComponent
-		g.translate(width / 2, TILE_HEIGHT);
+		// g.translate(width / 2, tile_height);
 
 		// dessiner la grille à partir des codes (exemple avec CODEBG = 72)
-		for (int y = -size / 2; y < size - size / 2; y++) {
-			for (int x = -size / 2; x < size - size / 2; x++) {
-				if ((Math.abs(x) + Math.abs(y)) % 2 == 0) {
-					TileMap.getInstance().drawTile(x, y, 0, g, Color.BLACK);
+		for (int _y = y; _y < y + height; _y++) {
+			for (int _x = x; _x < x + width; _x++) {
+				if ((Math.abs(_x) + Math.abs(_y)) % 2 == 0) {
+					TileMap.getInstance().drawTile(_x, _y, 0, g, Color.BLACK);
 				} else {
-					TileMap.getInstance().drawTile(x, y, 0, g, Color.WHITE);
+					TileMap.getInstance().drawTile(_x, _y, 0, g, Color.WHITE);
 				}
 			}
 		}
@@ -265,30 +286,34 @@ public class BoardGame extends JPanel implements IWindowGame {
 	 * @param alpha transparence de la tuile
 	 */
 	@Override
-	public void fillTilesBackground(int code, float alpha) {
+	public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha) {
 
-		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = background.createGraphics();
 
-		// remplir par défaut
-		g.setColor(new Color(0xEAD4AF));
-		g.fillRect(0, 0, width, height);
-
-		// centrer l'origine comme dans paintComponent
-		g.translate(width / 2, TILE_HEIGHT);
-
-		int XMINBG = -15;
-		int XMAXBG = 15;
-		int YMINBG = -15;
-		int YMAXBG = 15;
+		int XMINBG = x;
+		int XMAXBG = x + width;
+		int YMINBG = y;
+		int YMAXBG = y + height;
 
 		ImageRenderable tileImg = codeToImageMap.get(code);
 		if (tileImg != null) {
-			for (int y = YMINBG; y < YMAXBG; y++) {
-				for (int x = XMINBG; x < XMAXBG; x++) {
-					TileMap.getInstance().drawImage(x, y, 0, tileImg.getBufferedImage(),
-							g, tileImg.getOffsetX(), tileImg.getOffsetY(),
-							RenderType.FLOOR, alpha);
+			for (int _y = YMINBG; _y < YMAXBG; _y++) {
+				for (int _x = XMINBG; _x < XMAXBG; _x++) {
+
+					if (code != -1) {
+						ImageRenderable image = codeToImageMap.get(code);
+						int rank = codeToRank(code);
+						if (image != null) {
+							ImageRenderable imageRendarable3D = new ImageRenderable(
+									image.getBufferedImage(), _x, _y, 0, image.getOffsetX(),
+									image.getOffsetY(), rank,
+									image.getRenderType(), alpha);
+							grounds.add(imageRendarable3D);
+							pointToSceneObjectsMap
+									.computeIfAbsent(new DiscretePoint(_x, _y, 0), _ -> new HashSet<>())
+									.add(code);
+						}
+					}
 				}
 			}
 		}
@@ -422,12 +447,53 @@ public class BoardGame extends JPanel implements IWindowGame {
 
 	@Override
 	public void setTitle(String s) {
-		throw new IllegalStateException("Unexpected code");
+		throw new UnsupportedOperationException("Unimplemented method 'setTitle'");
 	}
 
 	@Override
 	public void setResizable(boolean b) {
-		throw new IllegalStateException("Unexpected code");
+		throw new UnsupportedOperationException("Unimplemented method 'setResizable'");
+	}
+
+	@Override
+	public void scroll(int x, int y) {
+		throw new UnsupportedOperationException("Unimplemented method 'scroll'");
+	}
+
+	@Override
+	public void drawTile(Color color, int x, int y, int z) {
+
+		// Réutilise l'image existante
+		Graphics2D g = background.createGraphics();
+
+		// centrer l'origine comme dans paintComponent
+		// late(width / 2, tile_height);
+
+		// Dessine la tuile sur l'image actuelle
+		TileMap.getInstance().drawTile(x, y, z, g, color);
+
+		g.dispose();
+	}
+
+	@Override
+	public void add(int code, int x, int y, int z) {
+		add(code, x, y, z, 1);
+	}
+
+	@Override
+	public void setFPS(int fps) {
+		throw new UnsupportedOperationException("Unimplemented method 'setFPS'");
+	}
+
+	@Override
+	public void setTileSize(int tile_width, int tile_height) {
+		throw new UnsupportedOperationException("Unimplemented method 'setTileSize'");
+	}
+
+	@Override
+	public void fillTilesBackground(int code, int x, int y, int width, int height) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'fillTilesBackground'");
 	}
 
 }

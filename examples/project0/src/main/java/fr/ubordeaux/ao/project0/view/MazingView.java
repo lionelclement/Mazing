@@ -1,9 +1,5 @@
 package fr.ubordeaux.ao.project0.view;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.Direction;
@@ -17,6 +13,10 @@ public class MazingView {
 	private IWindowGame window;
 	private Crusader crusader;
 	private MazingModel model;
+	private int originX;
+    private int originY;
+    private static int SCROLL_SPEED = 1;
+    
 
 	public MazingView(IWindowGame window, MazingModel model) {
 		this.window = window;
@@ -26,51 +26,90 @@ public class MazingView {
 	
 	private void init() {
 		window.setTitle("Mon jeu à moi");
-		window.setResizable(true);
-		window.setBackground(Color.GRAY);
+		window.setSize(1800, 1169);
 		window.setVisible(true);
+		window.setResizable(true);
+		//window.setBackground(Color.WHITE);
+		//window.setTileSize(100, 100);
 		
-		window.fillTilesBackground(72, 1);
+		window.fillTilesBackground(12, -24, -24, 48, 48);
+		//window.fillCheckerboardBackground(-12, -12, 24, 24);
+		//window.setFPS(50);
+		
 		int[][][] walls = {
 				{
-			{138, 110, 110, 110, 139},
-			{108, -1, -1, -1, 111},
-			{108, -1, -1, -1, 111},
-			{108, -1, -1, -1, 111},
-			{136, 109, 113, 109, 137},
+					{-1, -1, -1, -1, -1, -1, -1},
+			{-1, 138, 110, 110, 110, 139, -1},
+			{-1, 108, -1, -1, -1, 111, -1},
+			{-1, 108, -1, -1, -1, 111, -1},
+			{-1, 108, -1, -1, -1, 111, -1},
+			{-1, 136, 109, 113, 109, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
 			},
 				};
 		
 		window.add(walls);
 		
 		int[][][] grounds = {{
-			{24, 24, 24, 24, 24},
-			{24, 24, 24, 24, 24},
-			{24, 24, 24, 24, 24},
-			{24, 24, 24, 24, 24},
-			{24, 24, 24, 24, 24},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, 72, 72, 72, 72, 72, -1},
+			{-1, 72, 72, 72, 72, 72, -1},
+			{-1, 72, 72, 72, 72, 72, -1},
+			{-1, 72, 72, 72, 72, 72, -1},
+			{-1, 72, 72, 72, 72, 72, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
 			}};
 		
 		window.add(grounds);
 		
 		int[][][] items = {{
-			{-1, -1, -1, -1, -1},
-			{-1, -1, -1, -1, -1},
-			{-1, -1, 520, -1, -1},
-			{-1, -1, -1, -1, -1},
-			{-1, -1, -1, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, -1, -1, 520, -1, -1, 540},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, -1, -1, -1, -1, -1, -1},
 			}};
 		
 		window.add(items);
-		
-		
 		
     	crusader = new Crusader();
     	crusader.setTickAnimationTrigger(e -> onCrusaderTick((Crusader) e));
     	crusader.setBeginAnimationTrigger(e -> onCrusaderBegin((Crusader) e));
     	crusader.setEndAnimationTrigger(e -> onCrusaderEnd((Crusader) e));
     	crusader.setMidAnimationTrigger(e -> onCrusaderMid((Crusader) e));
-		window.add(crusader);
+    	crusader.setScale(3.0f);
+    	crusader.setOffset(0, 12);
+    	window.add(crusader);
+    	
+    	Spider spider = new Spider();
+    	spider.setPosition(6, 6, 0);
+    	spider.setScale(1.5f);
+    	window.add(spider);
+		
+		
+	}
+	
+	// 🔸 Déplacements
+    public void scrollRight() {
+        originX += SCROLL_SPEED;
+		window.scroll(originX, originY);
+    }
+
+    public void scrollLeft() {
+        originX -= SCROLL_SPEED;
+		window.scroll(originX, originY);
+    }
+
+    public void scrollUp() {
+        originY -= SCROLL_SPEED;
+		window.scroll(originX, originY);
+    }
+
+    public void scrollDown() {
+        originY += SCROLL_SPEED;
+		window.scroll(originX, originY);
 	}
 
 	private void onCrusaderTick(Crusader crusader) {

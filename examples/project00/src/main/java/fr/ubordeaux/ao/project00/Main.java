@@ -1,0 +1,27 @@
+package fr.ubordeaux.ao.project00;
+
+
+import fr.ubordeaux.ao.mazing.api.WindowGame;
+
+import fr.ubordeaux.ao.project00.controller.MazingController;
+import fr.ubordeaux.ao.project00.model.MazingModel;
+import fr.ubordeaux.ao.project00.view.MazingView;
+
+
+public class Main {
+    public static void main(String[] args) {
+    	
+    	MazingModel model = new MazingModel();
+    	WindowGame window = new WindowGame();
+    	MazingView view = new MazingView(window, model);
+    	
+    	MazingController controller = new MazingController(model);
+    	
+    	window.addKeyListener(controller);
+    	
+    	view.bindToModel(model);
+    	
+    	
+    }
+
+}

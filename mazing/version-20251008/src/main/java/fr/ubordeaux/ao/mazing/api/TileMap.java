@@ -13,25 +13,29 @@ import java.awt.image.BufferedImage;
  * profondeur iso du rendu.
  */
 public class TileMap {
-    private final int tileWidth;
-    private final int tileHeight;
-    private final int originX;
-    private final int originY;
+    static int tileWidth;
+    static int tileHeight;
+    static int originX;
+    static int originY;
     private static TileMap instance;
+    private static int scrollX;
+    private static int scrollY;
 
-    private TileMap(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols, int rows) {
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
-        originX = 0;
-        originY = windowHeight / 4;
+    private TileMap(int tileWidth, int tileHeight, int originX, int originY) {
+
+        TileMap.tileWidth = tileWidth;
+        TileMap.tileHeight = tileHeight;
+        TileMap.originX = originX;
+        TileMap.originY = originY;
+
     }
 
-    public static TileMap getInstance(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols,
-            int rows) {
-        if (instance == null) {
-            instance = new TileMap(tileWidth, tileHeight, windowWidth, windowHeight, cols, rows);
-        }
-        return instance;
+    public static void initInstance(int tileWidth, int tileHeight, int originX, int originY) {
+        instance = new TileMap(tileWidth, tileHeight, originX, originY);
+    }
+
+    public static void initInstance(int tileWidth, int tileHeight) {
+        instance = new TileMap(tileWidth, tileHeight, originX, originY);
     }
 
     public static TileMap getInstance() {
@@ -41,19 +45,23 @@ public class TileMap {
         return instance;
     }
 
-    public Point2D gridToScreen(float col, float row, float step, boolean origin) {
+    public static Point2D gridToScreen(float col, float row, float step) {
+        float x = col + scrollX;
+        float y = row + scrollY;
 
-        int _originX = origin ? this.originX : 0;
-        int _originY = origin ? this.originY : 0;
-
-        // Projection isométrique
-        // float isoX = originX + (col - row) * tileWidth / 2;
-        // float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight *
-        // 0.60f;
-        float isoX = _originX + (col - row) * (tileWidth / 2.0f);
-        float isoY = _originY + (col + row) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
-
+        float isoX = originX + scrollX + (x - y) * (tileWidth / 2.0f);
+        float isoY = originY + scrollY + (x + y) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
         return new Point2D.Float(isoX, isoY);
+    }
+
+    public Point2D screenToGrid(float isoX, float isoY) {
+        // float x = isoX - originX;
+        // float y = isoY - originY;
+        float x = isoX;
+        float y = isoY;
+        float col = (x / (tileWidth / 2.0f) + y / (tileHeight / 4.0f)) / 2.0f;
+        float row = (y / (tileHeight / 4.0f) - x / (tileWidth / 2.0f)) / 2.0f;
+        return new Point2D.Float(col, row);
     }
 
     public void drawImage(float x, float y, float z, BufferedImage image, Graphics g, int offsetX, int offsetY,
@@ -64,7 +72,7 @@ public class TileMap {
                 : tileHeight
                         / 2 - 8;
 
-        Point2D p = gridToScreen(x, y, z, true);
+        Point2D p = gridToScreen(x, y, z);
         int screenX = (int) p.getX() + offsetX;
         int screenY = (int) p.getY() + offsetY;
 
@@ -81,8 +89,8 @@ public class TileMap {
     }
 
     /** Dessine une tuile isométrique 3D */
-    public void drawTile(int col, int row, int step, Graphics g, Color color) {
-        Point2D p = gridToScreen(col, row, step, true);
+    public void drawTile(int x, int y, int z, Graphics g, Color color) {
+        Point2D p = gridToScreen(x, y, z);
 
         // isométrique
         int halfW = tileWidth / 2;
@@ -99,8 +107,8 @@ public class TileMap {
     }
 
     /** Dessine un point (utilisé pour le survol) */
-    public void drawPoint(int col, int row, int step, Graphics g, Color color) {
-        Point2D p = gridToScreen(col, row, step, true);
+    public void drawPoint(int x, int y, int z, Graphics g, Color color) {
+        Point2D p = gridToScreen(x, y, z);
         g.setColor(color);
         g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
     }
@@ -111,5 +119,10 @@ public class TileMap {
 
     public int getTileHeight() {
         return tileHeight;
+    }
+
+    public static void scroll(int scrollX, int scrollY) {
+        TileMap.scrollX = scrollX;
+        TileMap.scrollY = scrollY;
     }
 }

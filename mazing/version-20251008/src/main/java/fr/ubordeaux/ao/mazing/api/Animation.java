@@ -13,7 +13,7 @@ import java.util.Random;
  *
  * @param <S> Type du mode de personnage (CharacterMode)
  */
-public class Animation<S extends CharacterMode> implements IAnimation<S> {
+class Animation<S extends CharacterMode> implements IAnimation<S> {
 
 	/** Tableau des images de l'animation */
 	private final BufferedImage[] images;
@@ -45,7 +45,7 @@ public class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 * @param loop         indique si l'animation doit boucler
 	 * @param owner        personnage propriétaire de l'animation
 	 */
-	public Animation(BufferedImage[] frames, BufferedImage[] shadows, int frameDelayMs, boolean loop,
+	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop,
 			AbstractCharacter<CharacterMode> owner) {
 		this.images = frames;
 		this.shadows = shadows;

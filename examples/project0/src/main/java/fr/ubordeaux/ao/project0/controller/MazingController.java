@@ -11,7 +11,9 @@ import fr.ubordeaux.ao.project0.view.MazingView;
 public class MazingController extends KeyAdapter {
 
 	private final MazingModel model;
-	private MazingView view;
+	private final MazingView view;
+	private int scrollx;
+	private int scrolly;
 
 	public MazingController(MazingModel model, MazingView view) {
 		this.model = model;
@@ -21,6 +23,8 @@ public class MazingController extends KeyAdapter {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		char key = e.getKeyChar();
+		boolean shiftDown = e.isShiftDown();
+		
 		// Actions liées aux lettres
 		switch (key) {
 		case 'w' -> model.setMode(Crusader.Mode.WALK);
@@ -34,17 +38,31 @@ public class MazingController extends KeyAdapter {
 
 		// Actions liées aux flèches et sortie
 		switch (e.getKeyCode()) {
+		case KeyEvent.VK_SPACE -> {
+		}
 		case KeyEvent.VK_UP -> {
-			model.setDirection(Direction.NORTH);
+			if (shiftDown)
+				view.scrollUp();
+			else
+				model.setDirection(Direction.NORTH);
 		}
 		case KeyEvent.VK_DOWN -> {
-			model.setDirection(Direction.SOUTH);
+			if (shiftDown)
+				view.scrollDown();
+			else
+				model.setDirection(Direction.SOUTH);
 		}
 		case KeyEvent.VK_LEFT -> {
-			model.setDirection(Direction.WEST);
+			if (shiftDown)
+				view.scrollLeft();
+			else
+				model.setDirection(Direction.WEST);
 		}
 		case KeyEvent.VK_RIGHT -> {
-			model.setDirection(Direction.EAST);
+			if (shiftDown)
+				view.scrollRight();
+			else
+				model.setDirection(Direction.EAST);
 		}
 		case KeyEvent.VK_Q -> System.exit(0);
 		}
