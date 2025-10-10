@@ -3,7 +3,6 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.ArrayList;
@@ -73,10 +72,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	/** Mapping du code d’image vers l’objet Image correspondant */
 	private Map<Integer, ImageRenderable> codeToImageMap;
 
-	//private int originX;
-
-	//private int originY;
-
 	/** Référence vers le joueur */
 	/**
 	 * Constructeur principal.
@@ -87,11 +82,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	public BoardGame(int width, int height, int tile_width, int tile_height, int originX, int originY, int fps) {
 		this.width = width;
 		this.height = height;
-		// this.tile_width = tile_width;
-		// this.tile_height = tile_height;
-
-		//this.originX = originX;
-		//this.originY = originY;
 
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -222,9 +212,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	private void renderScene(Graphics g, List<AbstractRenderable> sceneObjects) {
-
-		System.out.println(sceneObjects.size());
-
 		// Trier les objets par z, puis x+y, puis par type
 		List<AbstractRenderable> sorted = sceneObjects.stream()
 				.sorted(Comparator
@@ -389,34 +376,25 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * Ajoute une matrice complète de tuiles à la scène.
 	 * 
 	 * @param matrix matrice 3D de codes de tuiles
+	 * @param alpha transparence
 	 */
 	@Override
-	public void add(int[][][] matrix) {
+	public void add(int[][][] matrix, float alpha) {
 		for (int z = 0; z < matrix.length; z++) {
 			for (int y = 0; y < matrix[z].length; y++) {
 				for (int x = 0; x < matrix[z][y].length; x++) {
 
-					// final float finalX = x;
-					// final float finalY = y;
-					// final float finalZ = z;
 					int code = matrix[z][y][x];
 
 					if (code != -1) {
-						// int indexTable = (code <= 100) ? 0
-						// : (code <= 200) ? 1
-						// : 2;
-						// int newCode = imageMatrix[z][y][x] % 100;
 						ImageRenderable image = codeToImageMap.get(code);
 						int rank = codeToRank(code);
 						if (image != null) {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
 									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
-									image.getRenderType(), 1.0f);
+									image.getRenderType(), alpha);
 
 							sceneObjects.add(imageRendarable3D);
-							// pointToSceneObjectsMap
-							// .computeIfAbsent(new DiscretePoint(x, y, z), k -> new HashSet<>())
-							// .add(code);
 							pointToSceneObjectsMap
 									.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
 									.add(code);
@@ -485,9 +463,6 @@ class BoardGame extends JPanel implements IWindowGame {
 		// Réutilise l'image existante
 		Graphics2D g = background.createGraphics();
 
-		// centrer l'origine comme dans paintComponent
-		// late(width / 2, tile_height);
-
 		// Dessine la tuile sur l'image actuelle
 		TileMap.getInstance().drawTile(x, y, z, g, color);
 
@@ -513,6 +488,12 @@ class BoardGame extends JPanel implements IWindowGame {
 	public void fillTilesBackground(int code, int x, int y, int width, int height) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'fillTilesBackground'");
+	}
+
+	@Override
+	public void add(int[][][] matrix) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'add'");
 	}
 
 }

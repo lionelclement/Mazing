@@ -13,7 +13,7 @@ public class MazingModel {
 	private ModelListener modelListener;
 
 	public MazingModel() {
-		crusader = new CharacterModel(5, 5, Direction.SOUTH);
+		crusader = new CharacterModel(2, 2, Direction.SOUTH);
 	}
 	
 	// La vue écoute le modèle (pour les changements de mode / direction)
@@ -43,7 +43,7 @@ public class MazingModel {
     }
 
 	public void setMode(Mode mode) {
-		System.out.println("Model@setMode");
+		//System.out.println("Model@setMode");
 		crusader.setMode(mode);
 		if (this.modelListener !=null) {
 			this.modelListener.onModeChanged(mode);

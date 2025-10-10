@@ -111,8 +111,14 @@ public class WindowGame extends JFrame implements IWindowGame {
 
 	@Override
 	public void add(int[][][] matrix) {
-		boardGame.add(matrix);
+		boardGame.add(matrix, 1);
 	}
+
+	@Override
+	public void add(int[][][] matrix, float alpha) {
+		boardGame.add(matrix, alpha);
+	}
+
 
 	@Override
 	public void clear() {

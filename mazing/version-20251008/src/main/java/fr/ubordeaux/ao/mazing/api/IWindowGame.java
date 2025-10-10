@@ -173,6 +173,15 @@ public interface IWindowGame {
     void add(int[][][] matrix);
 
 
+    /**
+     * Ajoute un ensemble complet de tuiles (matrice 3D).
+     *
+     * @param matrix matrice [x][y][z] représentant le plateau
+     * @param alpha transparence (0.0 = invisible, 1.0 = opaque)
+     */
+    void add(int[][][] matrix, float alpha);
+
+
     // =========================
     // ✏️ OUTILS DE DESSIN
     // =========================

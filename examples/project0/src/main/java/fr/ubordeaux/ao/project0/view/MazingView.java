@@ -39,7 +39,7 @@ public class MazingView {
             @Override
             public void onModeChanged(Mode mode) {
                 if (crusader != null) {
-    				System.out.println("MODEL ==> VIEW\n");
+    				//System.out.println("MODEL ==> VIEW\n");
                 	crusader.setMode(mode);
                 }
             }
@@ -60,7 +60,7 @@ public class MazingView {
 		window.setSize(1800, 1169);
 		window.setResizable(true);
 		//window.setBackground(Color.WHITE);
-		window.setTileSize(120, 120);
+		//window.setTileSize(130, 120);
 		
 		window.fillTilesBackground(12, -240, -240, 480, 480);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);
@@ -69,16 +69,30 @@ public class MazingView {
 		int[][][] walls = {
 				{
 					{-1, -1, -1, -1, -1, -1, -1},
-			{-1, 138, 110, 110, 110, 139, -1},
-			{-1, 108, -1, -1, -1, 111, -1},
-			{-1, 108, -1, -1, -1, 111, -1},
-			{-1, 108, -1, -1, -1, 111, -1},
-			{-1, 136, 109, 113, 109, -1, -1},
-			{-1, -1, -1, -1, -1, -1, -1},
-			},
-				};
+					{-1, 138, 110, 110, 110, 139, -1},
+					{-1, 108, -1, -1, -1, -1, -1},
+					{-1, 108, -1, -1, -1, -1, -1},
+					{-1, 108, -1, -1, -1, -1, -1},
+					{-1, 136, -1, -1, -1, -1, -1},
+					{-1, -1, -1, -1, -1, -1, -1},
+				},
+			};
 		
 		window.add(walls);
+		
+		int[][][] transparentWalls = {
+				{
+					{-1, -1, -1, -1, -1, -1, -1},
+					{-1, -1, -1, -1, -1, -1, -1},
+					{-1, -1, -1, -1, -1, 111, -1},
+					{-1, -1, -1, -1, -1, 111, -1},
+					{-1, -1, -1, -1, -1, 111, -1},
+					{-1, -1, 109, 113, 109, 137, -1},
+					{-1, -1, -1, -1, -1, -1, -1},
+				},
+			};
+		
+		window.add(transparentWalls, 0.7f);
 		
 		int[][][] grounds = {{
 			{-1, -1, -1, -1, -1, -1, -1},
@@ -106,20 +120,20 @@ public class MazingView {
 		
 		Random rand = new Random();
 
-		window.add(matrix);
+		//window.add(matrix);
 		
     	crusader = new Crusader();
     	crusader.setTickAnimationTrigger(e -> onTick(e));
     	crusader.setBeginAnimationTrigger(e -> onBegin(e));
     	crusader.setEndAnimationTrigger(e -> onEnd(e));
     	crusader.setMidAnimationTrigger(e -> onMid(e));
-    	crusader.setScale(3.0f);
-    	crusader.setOffset(0, 6);
+    	//crusader.setScale(2.8f);
+    	//crusader.setOffset(0, 6);
     	window.add(crusader);
     	
     	Spider spider = new Spider();
-    	spider.setPosition(6, 6, 0);
-    	spider.setScale(2.5f);
+    	spider.setPosition(7, 7, 0);
+    	//spider.setScale(2.5f);
     	spider.setTickAnimationTrigger(e -> onTick(e));
     	window.add(spider);
 		
