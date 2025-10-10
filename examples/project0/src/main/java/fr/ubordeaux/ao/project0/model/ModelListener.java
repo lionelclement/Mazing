@@ -4,6 +4,9 @@ import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.Direction;
 
 public interface ModelListener {
-    void onModeChanged(Mode mode);
-    void onDirectionChanged(Direction direction);
+
+	public void onModeChanged(Mode mode) ;
+
+	public void onDirectionChanged(Direction direction) ;
+
 }

@@ -6,21 +6,24 @@ import fr.ubordeaux.ao.mazing.api.WindowGame;
 import fr.ubordeaux.ao.project0.controller.MazingController;
 import fr.ubordeaux.ao.project0.model.MazingModel;
 import fr.ubordeaux.ao.project0.view.MazingView;
+import fr.ubordeaux.ao.project0.gameloop.MazingGameLoop;
 
 
 public class Main {
     public static void main(String[] args) {
     	
-    	MazingModel model = new MazingModel();
     	WindowGame window = new WindowGame();
+
+    	MazingModel model = new MazingModel();
+    	MazingGameLoop gameLoop = new MazingGameLoop(model);
     	MazingView view = new MazingView(window, model);
-    	
     	MazingController controller = new MazingController(model, view);
     	
     	window.addKeyListener(controller);
     	
-    	view.bindToModel(model);
-    	
+    	view.attachModelListener(model);
+    	gameLoop.attachViewListener(view);
+
     	model.init();
     	
     	

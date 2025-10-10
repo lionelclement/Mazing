@@ -29,7 +29,7 @@ import javax.swing.Timer;
  * 
  * 
  */
-public class BoardGame extends JPanel implements IWindowGame {
+class BoardGame extends JPanel implements IWindowGame {
 
 	private static final long serialVersionUID = 1L;
 

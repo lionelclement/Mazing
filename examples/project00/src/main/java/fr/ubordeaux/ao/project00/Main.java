@@ -14,13 +14,7 @@ public class Main {
     	MazingModel model = new MazingModel();
     	WindowGame window = new WindowGame();
     	MazingView view = new MazingView(window, model);
-    	
-    	MazingController controller = new MazingController(model);
-    	
-    	window.addKeyListener(controller);
-    	
-    	view.bindToModel(model);
-    	
+    	MazingController controller = new MazingController();
     	
     }
 

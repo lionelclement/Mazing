@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class Loader {
+class Loader {
 	
 	private static Loader instance;
 	

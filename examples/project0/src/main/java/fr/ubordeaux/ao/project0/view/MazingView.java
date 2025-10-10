@@ -1,10 +1,14 @@
 package fr.ubordeaux.ao.project0.view;
 
+import java.util.UUID;
+
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.ICharacter;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
+import fr.ubordeaux.ao.project0.gameloop.GameLoopListener;
 import fr.ubordeaux.ao.project0.model.MazingModel;
 import fr.ubordeaux.ao.project0.model.ModelListener;
 
@@ -15,6 +19,7 @@ public class MazingView {
 	private MazingModel model;
 	private int originX;
     private int originY;
+	private GameLoopListener gameLoopListener;
     private static int SCROLL_SPEED = 1;
     
 
@@ -24,17 +29,21 @@ public class MazingView {
 		init();
 	}
 	
+	// Le GameLoop écoute la vue (pour les tick d’animation)
+	public void attachGameLoopListener(GameLoopListener listener) {
+	    this.gameLoopListener = listener;
+	}
+	
 	private void init() {
 		window.setTitle("Mon jeu à moi");
-		window.setSize(1800, 1169);
-		window.setVisible(true);
+		//window.setSize(1800, 1169);
 		window.setResizable(true);
 		//window.setBackground(Color.WHITE);
-		//window.setTileSize(100, 100);
+		window.setTileSize(120, 120);
 		
 		window.fillTilesBackground(12, -24, -24, 48, 48);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);
-		//window.setFPS(50);
+		window.setFPS(40);
 		
 		int[][][] walls = {
 				{
@@ -75,23 +84,66 @@ public class MazingView {
 		window.add(items);
 		
     	crusader = new Crusader();
-    	crusader.setTickAnimationTrigger(e -> onCrusaderTick((Crusader) e));
-    	crusader.setBeginAnimationTrigger(e -> onCrusaderBegin((Crusader) e));
-    	crusader.setEndAnimationTrigger(e -> onCrusaderEnd((Crusader) e));
-    	crusader.setMidAnimationTrigger(e -> onCrusaderMid((Crusader) e));
+    	crusader.setTickAnimationTrigger(e -> onTick(e));
+    	crusader.setBeginAnimationTrigger(e -> onBegin(e));
+    	crusader.setEndAnimationTrigger(e -> onEnd(e));
+    	crusader.setMidAnimationTrigger(e -> onMid(e));
     	crusader.setScale(3.0f);
-    	crusader.setOffset(0, 12);
+    	crusader.setOffset(0, 6);
     	window.add(crusader);
     	
     	Spider spider = new Spider();
     	spider.setPosition(6, 6, 0);
-    	spider.setScale(1.5f);
+    	spider.setScale(2.5f);
+    	spider.setTickAnimationTrigger(e -> onTick(e));
     	window.add(spider);
 		
+		window.setVisible(true);
 		
 	}
 	
-	// 🔸 Déplacements
+	private void onMid(ICharacter<?> e) {
+		// TODO Auto-generated method stub
+	}
+
+	private void onEnd(ICharacter<?> e) {
+		// TODO Auto-generated method stub
+	}
+
+	private void onBegin(ICharacter<?> e) {
+		// TODO Auto-generated method stub
+	}
+
+    // La vue lit la position dans le modèle et se met à jour 
+    private void onTick(ICharacter<?> character) {
+		if (gameLoopListener != null) {
+			gameLoopListener.updatePosition(character);
+		}
+		if (character.equals(crusader))
+			character.setPosition(model.getX(), model.getY(), model.getZ());
+	}
+	
+    // Le modèle met à jour automatiquement la vue à chaque modification
+    public void attachModelListener(MazingModel model) {
+    	model.attachModelListener(new ModelListener() {
+            @Override
+            public void onModeChanged(Mode mode) {
+                if (crusader != null) {
+    				System.out.println("MODEL ==> VIEW\n");
+                	crusader.setMode(mode);
+                }
+            }
+
+            @Override
+            public void onDirectionChanged(Direction direction) {
+                if (crusader != null) {
+                	crusader.setDirection(direction);
+                }
+            }
+        });
+    }
+
+	// Déplacements du plateau
     public void scrollRight() {
         originX += SCROLL_SPEED;
 		window.scroll(originX, originY);
@@ -111,39 +163,6 @@ public class MazingView {
         originY += SCROLL_SPEED;
 		window.scroll(originX, originY);
 	}
-
-	private void onCrusaderTick(Crusader crusader) {
-	    model.updateCrusaderPosition();
-	    crusader.setPosition(model.getX(), model.getY(), model.getZ());
-	}
-	
-	private void onCrusaderBegin(Crusader crusader) {
-		model.updateCrusaderBegin();
-	}
-	
-	private void onCrusaderEnd(Crusader crusader) {
-		model.updateCrusaderEnd();
-	}
-	
-	private void onCrusaderMid(Crusader crusader) {
-		model.updateCrusaderMid();
-	}
-	
-    public void bindToModel(MazingModel model) {
-        model.setListener(new ModelListener() {
-            @Override
-            public void onModeChanged(Mode mode) {
-                if (crusader != null) crusader.setMode(mode);
-            }
-
-            @Override
-            public void onDirectionChanged(Direction direction) {
-                if (crusader != null) {
-                	crusader.setDirection(direction);
-                }
-            }
-        });
-    }
 
 	
 

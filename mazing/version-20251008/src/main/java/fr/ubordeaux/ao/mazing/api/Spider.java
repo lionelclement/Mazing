@@ -2,6 +2,7 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Représente une araignée avec ses animations et comportements spécifiques.
@@ -257,5 +258,25 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         return z;
     }
 
+    	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Spider other = (Spider) obj;
+		return Objects.equals(id, other.id);
+	}
+
     
+
+
+
 }

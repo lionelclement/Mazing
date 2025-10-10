@@ -22,6 +22,10 @@ public class MazingController extends KeyAdapter {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		
+		System.out.println("Controller@keyPressed");
+		
+		
 		char key = e.getKeyChar();
 		boolean shiftDown = e.isShiftDown();
 		

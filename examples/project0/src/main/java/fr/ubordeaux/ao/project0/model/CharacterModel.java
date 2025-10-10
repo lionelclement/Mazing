@@ -34,10 +34,6 @@ public class CharacterModel {
         if (listener != null) listener.onDirectionChanged(direction);
     }
 
-    public void setListener(ModelListener listener) {
-        this.listener = listener;
-    }
-
     public float getX() { return x; }
     public float getY() { return y; }
     public float getZ() { return z; }
@@ -75,10 +71,13 @@ public class CharacterModel {
     }
 
     public void setMode(Mode mode) {
+    	System.out.println("CharacterModel@setMode");
         savedMode = this.mode;
         this.mode = mode;
         updateVelocity();
-        if (listener != null) listener.onModeChanged(mode);
+        if (listener != null) {
+        	listener.onModeChanged(mode);
+        }
     }
 
     public void setDirection(Direction direction) {
@@ -96,4 +95,10 @@ public class CharacterModel {
         if (mode == Mode.GOTHIT) setMode(Mode.IDLE);
         if (mode == Mode.DEATH) speedX = speedY = 0;
     }
+    
+	public void attachModleListener(ModelListener modelListener) {
+		this.listener = modelListener;
+		
+	}
+
 }

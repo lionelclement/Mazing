@@ -4,18 +4,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
+import fr.ubordeaux.ao.project0.gameloop.GameLoopListener;
 import fr.ubordeaux.ao.mazing.api.Direction;
 
 public class MazingModel {
 
     private final Map<String, CharacterModel> characters = new HashMap<>();
 	private CharacterModel crusader;
+	private ModelListener modelListener;
 
 	public MazingModel() {
 		crusader = new CharacterModel(5, 5, Direction.SOUTH);
 	}
 	
-    public void addCharacter(String id, CharacterModel character) {
+	// La vue écoute le modèle (pour les changements de mode / direction)
+	public void attachModelListener(ModelListener listener) {
+	    this.modelListener = listener;
+	    this.crusader.attachModleListener(listener);
+	}
+
+	public void addCharacter(String id, CharacterModel character) {
         characters.put(id, character);
     }
 
@@ -36,7 +44,11 @@ public class MazingModel {
     }
 
 	public void setMode(Mode mode) {
+		System.out.println("Model@setMode");
 		crusader.setMode(mode);
+		if (this.modelListener !=null) {
+			this.modelListener.onModeChanged(mode);
+		}
 	}
 
 	public void updateCrusaderPosition() {
@@ -65,10 +77,6 @@ public class MazingModel {
 	public void updateCrusaderMid() {
 	}
 
-	public void setListener(ModelListener modelListener) {
-		crusader.setListener(modelListener);
-	}
-
 	public void setDirection(Direction direction) {
 		crusader.setDirection(direction);
 	}
@@ -76,4 +84,5 @@ public class MazingModel {
 	public void init() {
 		crusader.init();
 	}
+
 }

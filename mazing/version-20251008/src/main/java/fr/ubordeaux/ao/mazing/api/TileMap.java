@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  * Permet de dessiner des tuiles, des images 3D et de gérer la position et la
  * profondeur iso du rendu.
  */
-public class TileMap {
+class TileMap {
     static int tileWidth;
     static int tileHeight;
     static int originX;
@@ -22,12 +22,10 @@ public class TileMap {
     private static int scrollY;
 
     private TileMap(int tileWidth, int tileHeight, int originX, int originY) {
-
         TileMap.tileWidth = tileWidth;
         TileMap.tileHeight = tileHeight;
         TileMap.originX = originX;
         TileMap.originY = originY;
-
     }
 
     public static void initInstance(int tileWidth, int tileHeight, int originX, int originY) {

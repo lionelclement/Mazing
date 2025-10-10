@@ -40,10 +40,10 @@ public class WindowGame extends JFrame implements IWindowGame {
 
     @Override
     public void setTileSize(int tile_width, int tile_height) {
-		boardGame.initImagesSheet();
 		TileMap.getInstance();
 		TileMap.getInstance();
 		TileMap.initInstance(tile_width, tile_height, TileMap.originX, TileMap.originY);
+		boardGame.initImagesSheet();
     }
     
     @Override

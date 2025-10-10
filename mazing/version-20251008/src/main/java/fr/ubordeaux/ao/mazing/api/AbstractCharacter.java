@@ -2,6 +2,8 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -27,6 +29,7 @@ import java.util.function.Consumer;
     protected int offsetX;
     protected int offsetY;
     protected float scale;
+    protected UUID id;
 
     private Consumer<ICharacter<?>> loopAnimationTrigger;
     private Consumer<ICharacter<?>> beginLoopAnimationTrigger;
@@ -36,6 +39,7 @@ import java.util.function.Consumer;
 
     @SuppressWarnings("unchecked")
     AbstractCharacter(int numberStates, int offsetX, int offsetY) {
+        id = UUID.randomUUID();
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         images = new BufferedImage[numberStates][Direction.values().length][];
@@ -197,7 +201,7 @@ import java.util.function.Consumer;
         initAnimations(scale);
     }
 
-        @Override
+    @Override
     public void setOffset(int offsetX, int offsetY) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
@@ -213,6 +217,8 @@ import java.util.function.Consumer;
 
     protected abstract void initAnimations(float scale);
 
-
+    public UUID getId(){
+        return id;
+    }
 
 }

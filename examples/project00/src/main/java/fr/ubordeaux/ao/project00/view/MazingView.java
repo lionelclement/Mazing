@@ -1,11 +1,9 @@
 package fr.ubordeaux.ao.project00.view;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project00.model.MazingModel;
-import fr.ubordeaux.ao.project00.model.ModelListener;
 
 public class MazingView {
 
@@ -41,7 +39,6 @@ public class MazingView {
 		
     	crusader = new Crusader();
     	crusader.setPosition(5, 5, 0);
-    	crusader.setTickAnimationTrigger(e -> onCrusaderTick((Crusader) e));
     	crusader.setScale(3.0f);
     	crusader.setOffset(0, 12);
     	window.add(crusader);
@@ -75,17 +72,4 @@ public class MazingView {
 		window.scroll(originX, originY);
 	}
 
-	private void onCrusaderTick(Crusader crusader) {
-	    model.updateCrusaderPosition();
-	    crusader.setPosition(model.getX(), model.getY(), model.getZ());
-	}
-	
-    public void bindToModel(MazingModel model) {
-        model.setListener(new ModelListener() {
-            @Override
-            public void onModeChanged(Mode mode) {
-                if (crusader != null) crusader.setMode(mode);
-            }
-        });
-    }
 }
