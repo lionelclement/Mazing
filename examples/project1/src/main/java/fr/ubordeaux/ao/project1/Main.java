@@ -1,18 +1,34 @@
 package fr.ubordeaux.ao.project1;
 
+import fr.ubordeaux.ao.mazing.api.WindowGame;
+
 import fr.ubordeaux.ao.project1.controller.MazingController;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.view.MazingView;
+import fr.ubordeaux.ao.project1.gameloop.MazingGameLoop;
+
 
 public class Main {
     public static void main(String[] args) {
-        MazingView view = new MazingView();
-        MazingModel model = new MazingModel();
-        view.bindToModel(model);
+    	
+    	WindowGame window = new WindowGame();
 
-        MazingController controller = new MazingController(model, view);
-        view.addKeyListener(controller);
-        view.setVisible(true);
+    	MazingModel model = new MazingModel();
+    	MazingView view = new MazingView(window, model);
+
+    	MazingGameLoop gameLoop = new MazingGameLoop(model);
+    	MazingController controller = new MazingController(model, view);
+    	
+    	window.addKeyListener(controller);
+    	
+    	view.attachModelListener(model);
+    	gameLoop.attachViewListener(view);
+
+		view.createCrusader(model.getCrusaderId());
+		view.createSpiders(model.getSpidersIds());
+    	
+		model.init();
+    	
     }
 
 }

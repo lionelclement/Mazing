@@ -38,8 +38,8 @@ import java.util.function.Consumer;
     private Consumer<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
-    AbstractCharacter(int numberStates, int offsetX, int offsetY) {
-        id = UUID.randomUUID();
+    AbstractCharacter(UUID id, int numberStates, int offsetX, int offsetY) {
+        this.id = id;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         images = new BufferedImage[numberStates][Direction.values().length][];

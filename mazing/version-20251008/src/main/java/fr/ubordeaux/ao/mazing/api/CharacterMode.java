@@ -1,11 +1,13 @@
 package fr.ubordeaux.ao.mazing.api;
 
-interface CharacterMode {
+public interface CharacterMode {
 
     int getNumFrames();
 
     boolean isLoop();
 
     int ordinal();
+
+    String name();
 
 }

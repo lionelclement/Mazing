@@ -1,56 +1,106 @@
 package fr.ubordeaux.ao.project1.model;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import fr.ubordeaux.ao.mazing.api.CharacterMode;
+import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.ICharacter;
+import fr.ubordeaux.ao.mazing.api.Spider;
+
 public class MazingModel {
 
-        private float playerSpeedX = 0;
-        private float playerSpeedY = 0;
-        private float playerSpeedZ = 0;
-        private String playerMode = "IDLE";
+	private ModelListener modelListener;
 
-        // Interface pour le callback
-        public interface ModelListener {
-                void onModelUpdated(ModelEvent event);
-        }
+	private CharacterModel crusader;
+	private final Map<UUID, CharacterModel> charactersById = new HashMap<>();
+	private final Map<UUID, CharacterModel> crusadersById = new HashMap<>();
+	private final Map<UUID, CharacterModel> spidersById = new HashMap<>();
 
-        private ModelListener listener;
+	private Maze maze;
 
-        // Méthode pour enregistrer la vue
-        public void setListener(ModelListener listener) {
-                this.listener = listener;
-        }
+	public MazingModel() {
+		this.maze = new Maze(6, 6, 1);
+		crusader = new CharacterModel(5, 5, 0, Direction.SOUTH);
+		crusadersById.put(crusader.getId(), crusader);
+		charactersById.put(crusader.getId(), crusader);
 
-        public void setPlayerSpeed(float playerSpeedX, float playerSpeedY, float playerSpeedZ) {
-                this.playerSpeedX = playerSpeedX;
-                this.playerSpeedY = playerSpeedY;
-                this.playerSpeedZ = playerSpeedZ;
+		for (int i = 1; i <= 12; i++) {
+			CharacterModel characterModel = new CharacterModel(i, i + 1, 0,
+					Direction.SOUTH);
+			System.err.println(characterModel);
+			characterModel.speedX = 0.1f * i;
+			characterModel.speedY = 0.1f * i;
+			characterModel.init();
+			spidersById.put(characterModel.getId(), characterModel);
+			charactersById.put(characterModel.getId(), characterModel);
+		}
 
-                if (listener != null) {
-                        Point speed = new Point(playerSpeedX, playerSpeedY, playerSpeedZ);
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_SPEED, speed));
-                }
-        }
+	}
 
-        public float getPlayerSpeedX() {
-                return playerSpeedX;
-        }
+	// La vue écoute le modèle (pour les changements de mode / direction)
+	public void attachModelListener(ModelListener listener) {
+		this.modelListener = listener;
+		for (UUID id : charactersById.keySet()) {
+			charactersById.get(id).attachModelListener(listener);
+		}
+	}
 
-        public float getPlayerSpeedY() {
-                return playerSpeedY;
-        }
+	public void init() {
+		crusader.init();
+		for (UUID id : charactersById.keySet()) {
+			charactersById.get(id).init();
+		}
+	}
 
-        public float getPlayerSpeedZ() {
-                return playerSpeedZ;
-        }
+	public void generateMaze() {
+		if (this.modelListener != null) {
+			this.modelListener.onMazeChanged(maze.generate());
+		}
+	}
 
-        public String getPlayerMode() {
-                return playerMode;
-        }
+	public CharacterModel getCharacterById(UUID id) {
+		return this.charactersById.get(id);
+	}
 
-        public void setPlayerMode(String playerMode) {
-                this.playerMode = playerMode;
-                if (listener != null) {
-                        listener.onModelUpdated(new ModelEvent(ModelEvent.Type.PLAYER_MODE,
-                                        playerMode));
-                }
-        }
+	public void setMode(CharacterMode mode) {
+		crusader.setMode(mode);
+		if (this.modelListener != null) {
+			this.modelListener.onModeChanged(crusader.getId(), mode);
+		}
+	}
+
+	public void setDirection(Direction direction) {
+		crusader.setDirection(direction);
+		if (this.modelListener != null) {
+			this.modelListener.onDirectionChanged(crusader.getId(), direction);
+		}
+	}
+
+	public UUID getCrusaderId() {
+		return crusader.getId();
+	}
+
+	public Set<UUID> getCrusadersIds() {
+		return this.crusadersById.keySet();
+	}
+
+	public Set<UUID> getSpidersIds() {
+		return this.spidersById.keySet();
+	}
+
+	public void setModeSpider(CharacterMode mode) {
+		for (UUID id : spidersById.keySet()) {
+			CharacterModel spider = spidersById.get(id);
+
+			spider.setMode(mode);
+			if (this.modelListener != null) {
+				this.modelListener.onModeChanged(id, mode);
+			}
+		}
+	}
+
 }

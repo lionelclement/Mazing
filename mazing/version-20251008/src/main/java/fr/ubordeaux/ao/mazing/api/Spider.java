@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Représente une araignée avec ses animations et comportements spécifiques.
@@ -52,13 +53,23 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private Mode previousMode;
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
 
+    public Spider(UUID id) {
+        super(id, Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        init();
+    }
+
     public Spider() {
-        super(Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        this(UUID.randomUUID());
+        init();
+    }
+
+    private void init() {
         currentMode = Mode.WALK;
         currentDirection = Direction.EAST;
         initSounds();
         this.scale = DEFAULT_SCALE;
         initAnimations(DEFAULT_SCALE);
+
     }
 
     private void initSounds() {
@@ -86,8 +97,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected
-    void initAnimations(float scale) {
+    protected void initAnimations(float scale) {
         Mode[] modes = Mode.values();
         Direction[] directions = Direction.values();
 
@@ -177,7 +187,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         try {
             setDirection(Direction.valueOf(newDirection));
         } catch (IllegalArgumentException e) {
-    		throw new IllegalStateException("Unexpected direction");
+            throw new IllegalStateException("Unexpected direction");
         }
     }
 
@@ -244,7 +254,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         try {
             setMode(Mode.valueOf(mode));
         } catch (IllegalArgumentException e) {
-    		throw new IllegalStateException("Unexpected mode");
+            throw new IllegalStateException("Unexpected mode");
         }
     }
 
@@ -258,25 +268,21 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         return z;
     }
 
-    	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Spider other = (Spider) obj;
-		return Objects.equals(id, other.id);
-	}
-
-    
-
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Spider other = (Spider) obj;
+        return Objects.equals(id, other.id);
+    }
 
 }

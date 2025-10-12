@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Représente le personnage jouable "Crusader" avec ses animations,
@@ -64,14 +65,24 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private Mode savedMode;
     private Sound savedSound;
 
+    public Crusader(UUID id) {
+        super(id, Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        init();
+    }
+
     public Crusader() {
-        super(Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        this(UUID.randomUUID());
+        init();
+    }
+
+    private void init() {
         savedMode = currentMode = Mode.IDLE;
         currentSound = Sound.CARPET_SOFT;
         currentDirection = Direction.EAST;
         initSounds();
         this.scale = DEFAULT_SCALE;
         initAnimations(DEFAULT_SCALE);
+
     }
 
     private void initSounds() {
@@ -173,13 +184,14 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         currentMode = newMode;
         savedSound = currentSound;
         switch (mode) {
-        case Mode.WALK ->         currentSound = Sound.CARPET_SOFT;
-        case Mode.RUN ->         currentSound = Sound.CARPET;
-        case Mode.ATTACK -> currentSound = Sound.ATTACK;
-        case Mode.JUMP -> currentSound = Sound.WOOD_SOFT;
-        case Mode.GOTHIT -> currentSound = Sound.GOTHIT;
-        case Mode.DEATH -> currentSound = Sound.DEATH;
-		default -> {}
+            case Mode.WALK -> currentSound = Sound.CARPET_SOFT;
+            case Mode.RUN -> currentSound = Sound.CARPET;
+            case Mode.ATTACK -> currentSound = Sound.ATTACK;
+            case Mode.JUMP -> currentSound = Sound.WOOD_SOFT;
+            case Mode.GOTHIT -> currentSound = Sound.GOTHIT;
+            case Mode.DEATH -> currentSound = Sound.DEATH;
+            default -> {
+            }
         }
         animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
@@ -320,7 +332,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         try {
             setMode(Mode.valueOf(mode));
         } catch (IllegalArgumentException e) {
-    		throw new IllegalStateException("Unexpected mode");
+            throw new IllegalStateException("Unexpected mode");
         }
     }
 
@@ -329,30 +341,25 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         try {
             setDirection(Direction.valueOf(newDirection));
         } catch (IllegalArgumentException e) {
-    		throw new IllegalStateException("Unexpected direction");
+            throw new IllegalStateException("Unexpected direction");
         }
     }
 
-    	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Crusader other = (Crusader) obj;
-		return Objects.equals(id, other.id);
-	}
-
-    
-
-
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Crusader other = (Crusader) obj;
+        return Objects.equals(id, other.id);
+    }
 
 }
