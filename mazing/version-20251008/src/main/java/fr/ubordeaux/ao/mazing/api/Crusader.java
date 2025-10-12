@@ -15,9 +15,7 @@ import java.util.UUID;
 public class Crusader extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 3.0f;
-    private static final int DEFAULT_OFFSET_X = 0;
-    private static final int DEFAULT_OFFSET_Y = 12;
-
+    
     public enum Mode implements CharacterMode {
         WALK("walk", 15, true),
         RUN("run", 17, true),
@@ -66,7 +64,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private Sound savedSound;
 
     public Crusader(UUID id) {
-        super(id, Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        super(id, Mode.values().length);
         init();
     }
 
@@ -137,7 +135,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 default -> {
                 }
             }
-
         }
     }
 
@@ -149,14 +146,14 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         for (Mode mode : modes) {
             int numFrames = mode.getNumFrames();
             for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
+                images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
                         direction.ordinal(),
                         String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
                                 mode.getName(),
                                 mode.getName()),
                         scale);
 
-                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
+                shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
                         direction.ordinal(),
                         String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                 mode.getName(),
@@ -204,8 +201,8 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1.0f);
         super.render(g, currentMode.ordinal());
     }
 
@@ -324,7 +321,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public float getIsoDepth() {
-        return x + y + 1.5f;
+        return x + y + 1.0f;
     }
 
     @Override

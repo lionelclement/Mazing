@@ -152,17 +152,6 @@ public interface ICharacter<S extends CharacterMode> {
      */
     void setScale(float scale);
 
-    /**
-     * Applique un décalage d’affichage pour corriger la position du sprite à l’écran.
-     * 
-     * Exemple : {@code (0, 12)} pour remonter légèrement le personnage sur sa tuile.
-     * 
-     *
-     * @param x décalage horizontal (en pixels)
-     * @param y décalage vertical (en pixels)
-     */
-    void setOffset(int x, int y);
-
     UUID getId();
 
 }

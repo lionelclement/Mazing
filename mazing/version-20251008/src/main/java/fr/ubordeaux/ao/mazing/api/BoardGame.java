@@ -134,22 +134,22 @@ class BoardGame extends JPanel implements IWindowGame {
 		// codeToImageMap.clear();
 
 		// Chargement et découpe des spritesheets
-		BufferedImage imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
+		BufferedImage imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR);
 
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
+		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION);
 
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
+		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION);
 
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
+		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION);
 
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
+		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION);
 
-		imagesSheet = Loader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
+		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.ITEM);
 	}
 
@@ -311,8 +311,8 @@ class BoardGame extends JPanel implements IWindowGame {
 						int rank = codeToRank(code);
 						if (image != null) {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
-									image.getBufferedImage(), _x, _y, 0, image.getOffsetX(),
-									image.getOffsetY(), rank,
+									image.getBufferedImage(), _x, _y, 0,
+									rank,
 									image.getRenderType(), alpha);
 							grounds.add(imageRendarable3D);
 							pointToSceneObjectsMap
@@ -361,8 +361,7 @@ class BoardGame extends JPanel implements IWindowGame {
 			int rank = codeToRank(code);
 			if (image != null) {
 				ImageRenderable imageRendarable3D = new ImageRenderable(
-						image.getBufferedImage(), x, y, z, image.getOffsetX(),
-						image.getOffsetY(), rank,
+						image.getBufferedImage(), x, y, z, rank,
 						image.getRenderType(), alpha);
 				sceneObjects.add(imageRendarable3D);
 				pointToSceneObjectsMap
@@ -391,7 +390,7 @@ class BoardGame extends JPanel implements IWindowGame {
 						int rank = codeToRank(code);
 						if (image != null) {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
-									image.getBufferedImage(), x, y, z, image.getOffsetX(), image.getOffsetY(), rank,
+									image.getBufferedImage(), x, y, z, rank,
 									image.getRenderType(), alpha);
 
 							sceneObjects.add(imageRendarable3D);

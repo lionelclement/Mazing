@@ -4,8 +4,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.Spider;
+import fr.ubordeaux.ao.project1.model.Direction;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
@@ -30,6 +30,7 @@ public class MazingController extends KeyAdapter {
 		// Actions liées aux lettres
 		switch (key) {
 			case 'm' -> model.generateMaze();
+			case 'M' -> model.clearMaze();
 			case 'w' -> model.setMode(Crusader.Mode.WALK);
 			case 'r' -> model.setMode(Crusader.Mode.RUN);
 			case 'a' -> model.setMode(Crusader.Mode.ATTACK);
@@ -49,25 +50,25 @@ public class MazingController extends KeyAdapter {
 			}
 			case KeyEvent.VK_UP -> {
 				if (shiftDown)
-					view.scrollUp();
+					view.scrollDown();
 				else
 					model.setDirection(Direction.NORTH);
 			}
 			case KeyEvent.VK_DOWN -> {
 				if (shiftDown)
-					view.scrollDown();
+					view.scrollUp();
 				else
 					model.setDirection(Direction.SOUTH);
 			}
 			case KeyEvent.VK_LEFT -> {
 				if (shiftDown)
-					view.scrollLeft();
+					view.scrollRight();
 				else
 					model.setDirection(Direction.WEST);
 			}
 			case KeyEvent.VK_RIGHT -> {
 				if (shiftDown)
-					view.scrollRight();
+					view.scrollLeft();
 				else
 					model.setDirection(Direction.EAST);
 			}

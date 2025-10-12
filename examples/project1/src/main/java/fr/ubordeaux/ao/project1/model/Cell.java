@@ -69,8 +69,4 @@ public class Cell {
         return z;
     }
 
-    public boolean getPaths(Direction direction) {
-        return paths.get(direction);
-    }
-
 }

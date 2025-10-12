@@ -40,7 +40,6 @@ public class MazingView {
     	crusader = new Crusader();
     	crusader.setPosition(5, 5, 0);
     	crusader.setScale(3.0f);
-    	crusader.setOffset(0, 12);
     	window.add(crusader);
     	
     	Spider spider = new Spider();

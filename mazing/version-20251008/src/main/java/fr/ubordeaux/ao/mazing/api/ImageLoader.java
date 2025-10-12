@@ -6,22 +6,23 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-class Loader {
-	
-	private static Loader instance;
-	
-	private Loader() {}
-	
-	public static Loader getInstance() {
+class ImageLoader {
+
+	private static ImageLoader instance;
+
+	private ImageLoader() {
+	}
+
+	public static ImageLoader getInstance() {
 		if (instance == null) {
-			instance = new Loader();
+			instance = new ImageLoader();
 		}
 		return instance;
 	}
 
 	public static BufferedImage loadImage(String path) {
 		try {
-			return ImageIO.read(Loader.class.getResource(path));
+			return ImageIO.read(ImageLoader.class.getResource(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -41,19 +42,20 @@ class Loader {
 			String frameNumber = String.format("%04d", frame); // 0000,0001,...
 			String directionNumber = String.format("%01d", direction);
 			String path = String.format("%s%s%s.png", prefix, directionNumber, frameNumber);
-			// System.err.println(path);
 
 			BufferedImage img = loadImage(path);
 			if (img != null) {
 				// Scale l'image
 				int newWidth = (int) (img.getWidth() / scale);
 				int newHeight = (int) (img.getHeight() / scale);
-				BufferedImage scaled = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+				BufferedImage scaled = new BufferedImage(newWidth, newHeight,
+						BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g2d = scaled.createGraphics();
 				g2d.drawImage(img, 0, 0, newWidth, newHeight, null);
 				g2d.dispose();
 				animations[frame] = scaled;
 			}
+
 		}
 
 		return animations; // tableau d'images réduites

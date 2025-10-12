@@ -18,7 +18,7 @@ public class Maze {
         clear();
     }
 
-    public void clear() {
+    public Cell[][][] clear() {
         grid = new Cell[depth][height][width];
         for (int z = 0; z < depth; z++) {
             for (int y = 0; y < height; y++) {
@@ -35,13 +35,14 @@ public class Maze {
                 }
             }
         }
+        return grid;
     }
 
     public Cell[][][] generate() {
         clear();
         Stack<Cell> stack = new Stack<>();
         Cell start = grid[0][0][0];
-        Cell lastCell = start;
+        // Cell lastCell = start;
         start.setVisited(true);
         stack.push(start);
 
@@ -65,8 +66,8 @@ public class Maze {
                 stack.pop();
             }
         }
-        //System.err.println("Maze generated:");
-        //System.err.println(this);
+        // System.err.println("Maze generated:");
+        // System.err.println(this);
         return grid;
     }
 
@@ -89,6 +90,9 @@ public class Maze {
             case EAST -> nx++;
             case UP -> nz++;
             case DOWN -> nz--;
+            default -> {
+            }
+
         }
         if (nx < 0 || nx >= width || ny < 0 || ny >= height || nz < 0 || nz >= depth)
             return null;
@@ -103,6 +107,11 @@ public class Maze {
             case SOUTH -> Direction.NORTH;
             case UP -> Direction.DOWN;
             case DOWN -> Direction.UP;
+            case NORTHEAST -> Direction.SOUTHWEST;
+            case NORTHWEST -> Direction.SOUTHEAST;
+            case SOUTHEAST -> Direction.NORTHWEST;
+            case SOUTHWEST -> Direction.NORTHEAST;
+
         };
     }
 
@@ -134,6 +143,7 @@ public class Maze {
     public String toString() {
         StringBuilder result = new StringBuilder();
 
+
         for (int z = 0; z < depth; z++) {
             result.append("Layer ").append(z).append(":\n");
 
@@ -141,19 +151,20 @@ public class Maze {
                 // Ligne du haut de chaque cellule (mur NORTH)
                 for (int x = 0; x < width; x++) {
                     Cell c = grid[z][y][x];
-                    result.append(c.getPaths(Direction.NORTH) ? "+   " : "+___");
+                    result.append(c.isPath(Direction.NORTH) ? "+   " : "+___");
                 }
                 result.append("+\n");
 
                 // Ligne du corps de chaque cellule (mur WEST / EAST)
                 for (int x = 0; x < width; x++) {
                     Cell c = grid[z][y][x];
+
                     // mur OUEST à gauche, espace à l'intérieur
-                    result.append(c.getPaths(Direction.WEST) ? " " : "|");
+                    result.append(c.isPath(Direction.WEST) ? " " : "|");
                     // symbole au centre de la cellule
                     String symbol = "   ";
-                    boolean up = c.getPaths(Direction.UP);
-                    boolean down = c.getPaths(Direction.DOWN);
+                    boolean up = c.isPath(Direction.UP);
+                    boolean down = c.isPath(Direction.DOWN);
                     if (up && down)
                         symbol = " x ";
                     else if (up)
@@ -164,14 +175,14 @@ public class Maze {
                 }
                 // Mur EST de la dernière cellule
                 Cell last = grid[z][y][width - 1];
-                result.append(last.getPaths(Direction.EAST) ? " " : "|");
+                result.append(last.isPath(Direction.EAST) ? " " : "|");
                 result.append("\n");
             }
 
             // Ligne du bas de la dernière rangée (mur SOUTH)
             for (int x = 0; x < width; x++) {
                 Cell c = grid[z][height - 1][x];
-                result.append(c.getPaths(Direction.SOUTH) ? "+   " : "+___");
+                result.append(c.isPath(Direction.SOUTH) ? "+   " : "+___");
             }
             result.append("+\n\n");
         }
@@ -193,6 +204,74 @@ public class Maze {
 
     public Cell getCell(int x, int y, int z) {
         return grid[z][y][x];
+    }
+
+/**
+ * Détermine s’il y a un obstacle à la position donnée dans la direction donnée.
+ * Retourne true si un mur ou la limite du labyrinthe bloque le passage.
+ */
+public boolean isObstacleAt(float x, float y, float z, Direction direction) {
+    // Marges de sécurité autour des murs
+    final float wallWidth = 0.20f;
+    final float wallHeight = 0.20f;
+    final float wallDepth = 0.20f;
+
+    // Vérifie les limites du labyrinthe (en dehors = obstacle)
+    if (x <= wallWidth || x >= width - wallWidth ||
+        y <= wallHeight || y >= height - wallHeight ||
+        z < 0 || z >= depth) {
+        return true;
+    }
+
+    // Tolérance pour éviter que le personnage soit bloqué avant d’atteindre la frontière d’une cellule
+    final float edgeTolerance = 1.0f - wallWidth;
+
+    // On autorise le mouvement tant qu’on n’a pas atteint le bord de la cellule
+    switch (direction) {
+        case EAST:
+            if (x % 1 < edgeTolerance) return false;
+            break;
+        case WEST:
+            if (x % 1 > wallWidth) return false;
+            break;
+        case SOUTH:
+            if (y % 1 < edgeTolerance) return false;
+            break;
+        case NORTH:
+            if (y % 1 > wallHeight) return false;
+            break;
+        case UP:
+            if (z % 1 < 1.0f - wallDepth) return false;
+            break;
+        case DOWN:
+            if (z % 1 > wallDepth) return false;
+            break;
+        default:
+            break;
+    }
+
+    // Calcul de la cellule actuelle (centrée sur les coordonnées entières)
+    int cellX = Math.max(0, Math.min(width - 1, (int) Math.floor(x)));
+    int cellY = Math.max(0, Math.min(height - 1, (int) Math.floor(y)));
+    int cellZ = Math.max(0, Math.min(depth - 1, (int) Math.floor(z)));
+
+    Cell cell = grid[cellZ][cellY][cellX];
+
+    // Si aucun chemin n'est ouvert dans cette direction, c'est un obstacle
+    return !cell.isPath(direction);
+}
+
+    /**
+     * Vérifie si un personnage peut se déplacer dans une direction donnée.
+     * Retourne false s’il y a un mur ou que le déplacement sortirait du labyrinthe.
+     */
+    public boolean canMove(float cellX, float cellY, float cellZ, Direction direction) {
+        if (isObstacleAt(cellX, cellY, cellZ, direction))
+            return false;
+        return true;
+        // Cell next = getNeighbor(grid[(int) cellZ][(int) cellY][(int) cellX],
+        // direction);
+        // return next != null; // on peut aller dedans
     }
 
 }

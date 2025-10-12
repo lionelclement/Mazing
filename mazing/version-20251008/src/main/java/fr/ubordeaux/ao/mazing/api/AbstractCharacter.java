@@ -2,7 +2,6 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -26,8 +25,6 @@ import java.util.function.Consumer;
 
     protected float x, y, z;
     protected Direction currentDirection;
-    protected int offsetX;
-    protected int offsetY;
     protected float scale;
     protected UUID id;
 
@@ -38,10 +35,8 @@ import java.util.function.Consumer;
     private Consumer<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
-    AbstractCharacter(UUID id, int numberStates, int offsetX, int offsetY) {
+    AbstractCharacter(UUID id, int numberStates) {
         this.id = id;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
         images = new BufferedImage[numberStates][Direction.values().length][];
         shadow_images = new BufferedImage[numberStates][Direction.values().length][];
         animations = new Animation[numberStates][Direction.values().length];
@@ -55,7 +50,7 @@ import java.util.function.Consumer;
     void render(Graphics g, int state) {
         Animation<T> anim = getCurrentAnimation(state);
         BufferedImage image = anim.getCurrentFrame();
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, getRenderType(), 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, image, g, getRenderType(), 1.0f);
     }
 
     abstract RenderType getRenderType();
@@ -200,14 +195,6 @@ import java.util.function.Consumer;
         this.scale = scale;
         initAnimations(scale);
     }
-
-    @Override
-    public void setOffset(int offsetX, int offsetY) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        initAnimations(this.scale);
-    }
-
 
     @Override
     protected float getX() {

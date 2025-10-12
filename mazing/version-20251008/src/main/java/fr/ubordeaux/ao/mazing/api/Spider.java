@@ -13,8 +13,6 @@ import java.util.UUID;
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 2.5f;
-    private static final int DEFAULT_OFFSET_X = 0;
-    private static final int DEFAULT_OFFSET_Y = 0;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 25, true),
@@ -54,7 +52,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
 
     public Spider(UUID id) {
-        super(id, Mode.values().length, DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
+        super(id, Mode.values().length);
         init();
     }
 
@@ -104,14 +102,14 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         for (Mode mode : modes) {
             int numFrames = mode.getNumFrames();
             for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
+                images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
                         (direction.ordinal() + 6) % 8,
                         String.format("/bw_spider/%s/%s-BW_Spider_",
                                 mode.getName(),
                                 mode.getName()),
                         scale);
 
-                shadow_images[mode.ordinal()][direction.ordinal()] = Loader.loadAnimations(numFrames,
+                shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
                         (direction.ordinal() + 6) % 8,
                         String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
                                 mode.getName(),
@@ -149,8 +147,8 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, offsetX, offsetY, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.getInstance().drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1.0f);
 
         super.render(g, currentMode.ordinal());
     }

@@ -60,7 +60,7 @@ class TileMap {
         return new Point2D.Float(col, row);
     }
 
-    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g, int offsetX, int offsetY,
+    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
             RenderType renderType, float alpha) {
 
         // Projection isométrique
@@ -69,8 +69,8 @@ class TileMap {
                         / 2 - 8;
 
         Point2D p = gridToScreen(x, y, z);
-        int screenX = (int) p.getX() + offsetX;
-        int screenY = (int) p.getY() + offsetY;
+        int screenX = (int) p.getX();
+        int screenY = (int) p.getY();
 
         // Cast Graphics en Graphics2D pour pouvoir gérer alpha
         Graphics2D g2d = (Graphics2D) g;

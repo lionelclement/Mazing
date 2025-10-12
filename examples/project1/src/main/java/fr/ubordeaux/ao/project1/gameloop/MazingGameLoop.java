@@ -5,6 +5,10 @@ import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.view.AnimationListener;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
+import java.util.UUID;
+
+import fr.ubordeaux.ao.mazing.api.CharacterMode;
+import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 
 public class MazingGameLoop {
@@ -20,6 +24,8 @@ public class MazingGameLoop {
 
             @Override
             public void checkCollision(ICharacter<?> character) {
+                CharacterModel characterModel = model.getCharacterById(character.getId());
+                characterModel.checkCollision(character.getId());
                 //System.out.println("checkCollision");
                 //model.checkCollision(character.getId());
             }
@@ -28,6 +34,19 @@ public class MazingGameLoop {
             public void updatePosition(ICharacter<?> character) {
                 CharacterModel characterModel = model.getCharacterById(character.getId());
                 characterModel.updatePosition();
+            }
+
+            @Override
+            public void updateMode(ICharacter<?> e) 
+            {
+                UUID id = e.getId();
+                CharacterModel characterModel = model.getCharacterById(id);
+                CharacterMode mode = characterModel.getMode();
+                switch (mode) {
+                    case Crusader.Mode.GOTHIT -> characterModel.setMode(Crusader.Mode.IDLE);
+                    default -> {}
+                }
+
             }
         });
     }

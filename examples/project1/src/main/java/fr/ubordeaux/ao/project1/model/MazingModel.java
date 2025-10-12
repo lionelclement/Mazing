@@ -6,10 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import fr.ubordeaux.ao.mazing.api.CharacterMode;
-import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.ICharacter;
-import fr.ubordeaux.ao.mazing.api.Spider;
 
 public class MazingModel {
 
@@ -24,13 +20,13 @@ public class MazingModel {
 
 	public MazingModel() {
 		this.maze = new Maze(6, 6, 1);
-		crusader = new CharacterModel(5, 5, 0, Direction.SOUTH);
+		crusader = new CharacterModel(2.0f, 2.0f, 0, -0.6f, -0.6f, Direction.SOUTH, maze);
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
-		for (int i = 1; i <= 12; i++) {
-			CharacterModel characterModel = new CharacterModel(i, i + 1, 0,
-					Direction.SOUTH);
+		for (int i = 1; i <= 0; i++) {
+			CharacterModel characterModel = new CharacterModel(i, i + 1, 0, 0, 0,
+					Direction.SOUTH, maze);
 			System.err.println(characterModel);
 			characterModel.speedX = 0.1f * i;
 			characterModel.speedY = 0.1f * i;
@@ -61,6 +57,12 @@ public class MazingModel {
 			this.modelListener.onMazeChanged(maze.generate());
 		}
 	}
+
+    public void clearMaze() {
+		if (this.modelListener != null) {
+			this.modelListener.onMazeChanged(maze.clear());
+		}
+    }
 
 	public CharacterModel getCharacterById(UUID id) {
 		return this.charactersById.get(id);
