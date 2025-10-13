@@ -1,7 +1,11 @@
 package fr.ubordeaux.ao.project1.model;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -9,6 +13,8 @@ public class Maze {
     private final int width, height, depth;
     private Cell[][][] grid;
     private final Random rand = new Random();
+    private Cell begin;
+    private Cell end;
 
     public Maze(int width, int height, int depth) {
         this.width = width;
@@ -18,7 +24,7 @@ public class Maze {
         clear();
     }
 
-    public Cell[][][] clear() {
+    public void clear() {
         grid = new Cell[depth][height][width];
         for (int z = 0; z < depth; z++) {
             for (int y = 0; y < height; y++) {
@@ -35,28 +41,25 @@ public class Maze {
                 }
             }
         }
-        return grid;
     }
 
-    public Cell[][][] generate() {
+    public void generate() {
         clear();
-        Stack<Cell> stack = new Stack<>();
-        Cell start = grid[0][0][0];
-        // Cell lastCell = start;
-        start.setVisited(true);
-        stack.push(start);
 
+        Stack<Cell> stack = new Stack<>();
+        begin = grid[0][0][0];
+        begin.setVisited(true);
+        stack.push(begin);
+
+        // Génération du labyrinthe avec DFS
         while (!stack.isEmpty()) {
             Cell current = stack.peek();
-
             List<Direction> neighbors = unvisitedNeighbors(current);
 
             if (!neighbors.isEmpty()) {
-                // on tire au sort un chemin vers une nouvelle cellule
                 Direction dir = neighbors.get(rand.nextInt(neighbors.size()));
                 Cell next = getNeighbor(current, dir);
 
-                // mettre une porte entre current et next
                 current.putOnPaths(dir, true);
                 next.putOnPaths(opposite(dir), true);
 
@@ -66,9 +69,11 @@ public class Maze {
                 stack.pop();
             }
         }
-        // System.err.println("Maze generated:");
-        // System.err.println(this);
-        return grid;
+
+        System.err.println("Maze generated:");
+        System.err.println(this);
+        System.err.println("Start: " + begin + ", End: " + end);
+
     }
 
     private List<Direction> unvisitedNeighbors(Cell c) {
@@ -143,7 +148,6 @@ public class Maze {
     public String toString() {
         StringBuilder result = new StringBuilder();
 
-
         for (int z = 0; z < depth; z++) {
             result.append("Layer ").append(z).append(":\n");
 
@@ -163,6 +167,10 @@ public class Maze {
                     result.append(c.isPath(Direction.WEST) ? " " : "|");
                     // symbole au centre de la cellule
                     String symbol = "   ";
+                    if (c == begin){
+                        symbol = " $ ";
+                    }
+                    else{
                     boolean up = c.isPath(Direction.UP);
                     boolean down = c.isPath(Direction.DOWN);
                     if (up && down)
@@ -171,6 +179,7 @@ public class Maze {
                         symbol = " ^ ";
                     else if (down)
                         symbol = " v ";
+                    }
                     result.append(symbol); // espace intérieur de la cellule
                 }
                 // Mur EST de la dernière cellule
@@ -206,60 +215,67 @@ public class Maze {
         return grid[z][y][x];
     }
 
-/**
- * Détermine s’il y a un obstacle à la position donnée dans la direction donnée.
- * Retourne true si un mur ou la limite du labyrinthe bloque le passage.
- */
-public boolean isObstacleAt(float x, float y, float z, Direction direction) {
-    // Marges de sécurité autour des murs
-    final float wallWidth = 0.20f;
-    final float wallHeight = 0.20f;
-    final float wallDepth = 0.20f;
+    /**
+     * Détermine s’il y a un obstacle à la position donnée dans la direction donnée.
+     * Retourne true si un mur ou la limite du labyrinthe bloque le passage.
+     */
+    public boolean isObstacleAt(float x, float y, float z, Direction direction) {
+        // Marges de sécurité autour des murs
+        final float wallWidth = 0.20f;
+        final float wallHeight = 0.20f;
+        final float wallDepth = 0.20f;
 
-    // Vérifie les limites du labyrinthe (en dehors = obstacle)
-    if (x <= wallWidth || x >= width - wallWidth ||
-        y <= wallHeight || y >= height - wallHeight ||
-        z < 0 || z >= depth) {
-        return true;
+        // Vérifie les limites du labyrinthe (en dehors = obstacle)
+        if (x <= wallWidth || x >= width - wallWidth ||
+                y <= wallHeight || y >= height - wallHeight ||
+                z < 0 || z >= depth) {
+            return true;
+        }
+
+        // Tolérance pour éviter que le personnage soit bloqué avant d’atteindre la
+        // frontière d’une cellule
+        final float edgeTolerance = 1.0f - wallWidth;
+
+        // On autorise le mouvement tant qu’on n’a pas atteint le bord de la cellule
+        switch (direction) {
+            case EAST:
+                if (x % 1 < edgeTolerance)
+                    return false;
+                break;
+            case WEST:
+                if (x % 1 > wallWidth)
+                    return false;
+                break;
+            case SOUTH:
+                if (y % 1 < edgeTolerance)
+                    return false;
+                break;
+            case NORTH:
+                if (y % 1 > wallHeight)
+                    return false;
+                break;
+            case UP:
+                if (z % 1 < 1.0f - wallDepth)
+                    return false;
+                break;
+            case DOWN:
+                if (z % 1 > wallDepth)
+                    return false;
+                break;
+            default:
+                break;
+        }
+
+        // Calcul de la cellule actuelle (centrée sur les coordonnées entières)
+        int cellX = Math.max(0, Math.min(width - 1, (int) Math.floor(x)));
+        int cellY = Math.max(0, Math.min(height - 1, (int) Math.floor(y)));
+        int cellZ = Math.max(0, Math.min(depth - 1, (int) Math.floor(z)));
+
+        Cell cell = grid[cellZ][cellY][cellX];
+
+        // Si aucun chemin n'est ouvert dans cette direction, c'est un obstacle
+        return !cell.isPath(direction);
     }
-
-    // Tolérance pour éviter que le personnage soit bloqué avant d’atteindre la frontière d’une cellule
-    final float edgeTolerance = 1.0f - wallWidth;
-
-    // On autorise le mouvement tant qu’on n’a pas atteint le bord de la cellule
-    switch (direction) {
-        case EAST:
-            if (x % 1 < edgeTolerance) return false;
-            break;
-        case WEST:
-            if (x % 1 > wallWidth) return false;
-            break;
-        case SOUTH:
-            if (y % 1 < edgeTolerance) return false;
-            break;
-        case NORTH:
-            if (y % 1 > wallHeight) return false;
-            break;
-        case UP:
-            if (z % 1 < 1.0f - wallDepth) return false;
-            break;
-        case DOWN:
-            if (z % 1 > wallDepth) return false;
-            break;
-        default:
-            break;
-    }
-
-    // Calcul de la cellule actuelle (centrée sur les coordonnées entières)
-    int cellX = Math.max(0, Math.min(width - 1, (int) Math.floor(x)));
-    int cellY = Math.max(0, Math.min(height - 1, (int) Math.floor(y)));
-    int cellZ = Math.max(0, Math.min(depth - 1, (int) Math.floor(z)));
-
-    Cell cell = grid[cellZ][cellY][cellX];
-
-    // Si aucun chemin n'est ouvert dans cette direction, c'est un obstacle
-    return !cell.isPath(direction);
-}
 
     /**
      * Vérifie si un personnage peut se déplacer dans une direction donnée.
@@ -272,6 +288,73 @@ public boolean isObstacleAt(float x, float y, float z, Direction direction) {
         // Cell next = getNeighbor(grid[(int) cellZ][(int) cellY][(int) cellX],
         // direction);
         // return next != null; // on peut aller dedans
+    }
+
+    public List<Direction> shortestPath(int startX, int startY, int startZ,
+            int endX, int endY, int endZ) {
+
+        class Node {
+            int x, y, z;
+            List<Direction> path;
+
+            Node(int x, int y, int z, List<Direction> path) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.path = path;
+            }
+        }
+
+        boolean[][][] visited = new boolean[depth][height][width];
+        Queue<Node> queue = new LinkedList<>();
+
+        queue.add(new Node(startX, startY, startZ, new ArrayList<>()));
+        visited[startZ][startY][startX] = true;
+
+        while (!queue.isEmpty()) {
+            Node current = queue.poll();
+
+            // Si on est arrivé à la destination → on renvoie le chemin
+            if (current.x == endX && current.y == endY && current.z == endZ) {
+                return current.path;
+            }
+
+            Cell currentCell = grid[current.z][current.y][current.x];
+
+            // Explorer toutes les directions possibles
+            for (Direction dir : Direction.values()) {
+                if (!currentCell.isPath(dir))
+                    continue; // pas de passage dans cette direction
+
+                Cell next = getNeighbor(currentCell, dir);
+                if (next == null)
+                    continue; // hors limites
+
+                if (!visited[next.getZ()][next.getY()][next.getX()]) {
+                    visited[next.getZ()][next.getY()][next.getX()] = true;
+
+                    List<Direction> newPath = new ArrayList<>(current.path);
+                    newPath.add(dir);
+
+                    queue.add(new Node(next.getX(), next.getY(), next.getZ(), newPath));
+                }
+            }
+        }
+
+        // Aucun chemin trouvé
+        return Collections.emptyList();
+    }
+
+    public Cell[][][] getGrid() {
+        return grid;
+    }
+
+    public Cell getBegin() {
+        return begin;
+    }
+
+    public Cell getEnd() {
+        return end;
     }
 
 }

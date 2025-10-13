@@ -13,21 +13,23 @@ class ImageRenderable extends AbstractRenderable {
     private final RenderType renderType;
     private final int rank;
     private final float alpha;
+    private float iso;
 
     public ImageRenderable(BufferedImage bufferedImage, float x, float y, float z,
             int rank,
-            RenderType renderType, float alpha) {
+            RenderType renderType, float iso, float alpha) {
         this.bufferedImage = bufferedImage;
         this.x = x;
         this.y = y;
         this.z = z;
         this.rank = rank;
         this.renderType = renderType;
+        this.iso = iso;
         this.alpha = alpha;
     }
 
-    public ImageRenderable(BufferedImage bufferedImage, int offsetX, int offsetY, RenderType renderType) {
-		this(bufferedImage, 0, 0, 0, 0, renderType, 0);
+    public ImageRenderable(BufferedImage bufferedImage, int offsetX, int offsetY, RenderType renderType, float iso) {
+		this(bufferedImage, 0, 0, 0, 0, renderType, iso, 0);
 	}
 
     public int getHeight() {
@@ -47,7 +49,7 @@ class ImageRenderable extends AbstractRenderable {
     }
 
     float getIsoDepth() {
-        return x + y;
+        return x + y + iso;
     }
 
     @Override
@@ -101,6 +103,10 @@ class ImageRenderable extends AbstractRenderable {
     @Override
     protected float getZ() {
         return z;
+    }
+
+    public float getIso() {
+        return iso;
     }
 
 }

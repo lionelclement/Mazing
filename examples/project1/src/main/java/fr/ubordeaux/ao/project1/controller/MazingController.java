@@ -26,6 +26,7 @@ public class MazingController extends KeyAdapter {
 
 		char key = e.getKeyChar();
 		boolean shiftDown = e.isShiftDown();
+		boolean altDown = e.isAltDown();
 
 		// Actions liées aux lettres
 		switch (key) {
@@ -38,10 +39,10 @@ public class MazingController extends KeyAdapter {
 			case 'j' -> model.setMode(Crusader.Mode.JUMP);
 			case 'd' -> model.setMode(Crusader.Mode.DEATH);
 			case 's' -> model.setMode(Crusader.Mode.IDLE);
-			case 'W' -> model.setModeSpider(Spider.Mode.WALK);
-			case 'A' -> model.setModeSpider(Spider.Mode.ATTACK);
-			case 'D' -> model.setModeSpider(Spider.Mode.DEATH);
-			case 'S' -> model.setModeSpider(Spider.Mode.IDLE);
+			case 'W' -> model.setModeSpiders(Spider.Mode.WALK);
+			case 'A' -> model.setModeSpiders(Spider.Mode.ATTACK);
+			case 'D' -> model.setModeSpiders(Spider.Mode.DEATH);
+			case 'S' -> model.setModeSpiders(Spider.Mode.IDLE);
 		}
 
 		// Actions liées aux flèches et sortie
@@ -51,24 +52,32 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_UP -> {
 				if (shiftDown)
 					view.scrollDown();
+				else if (altDown)
+				model.setDirectionSpiders(Direction.NORTH);
 				else
 					model.setDirection(Direction.NORTH);
 			}
 			case KeyEvent.VK_DOWN -> {
 				if (shiftDown)
 					view.scrollUp();
+				else if (altDown)
+				model.setDirectionSpiders(Direction.SOUTH);
 				else
 					model.setDirection(Direction.SOUTH);
 			}
 			case KeyEvent.VK_LEFT -> {
 				if (shiftDown)
 					view.scrollRight();
+				else if (altDown)
+				model.setDirectionSpiders(Direction.WEST);
 				else
 					model.setDirection(Direction.WEST);
 			}
 			case KeyEvent.VK_RIGHT -> {
 				if (shiftDown)
 					view.scrollLeft();
+				else if (altDown)
+				model.setDirectionSpiders(Direction.EAST);
 				else
 					model.setDirection(Direction.EAST);
 			}

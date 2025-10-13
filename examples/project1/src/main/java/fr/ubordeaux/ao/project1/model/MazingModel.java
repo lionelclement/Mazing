@@ -20,12 +20,12 @@ public class MazingModel {
 
 	public MazingModel() {
 		this.maze = new Maze(6, 6, 1);
-		crusader = new CharacterModel(2.0f, 2.0f, 0, -0.6f, -0.6f, Direction.SOUTH, maze);
+		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, Direction.SOUTH, maze);
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
-		for (int i = 1; i <= 0; i++) {
-			CharacterModel characterModel = new CharacterModel(i, i + 1, 0, 0, 0,
+		for (int i = 1; i <= 10; i++) {
+			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, 1 * i, 1 * i, 0,
 					Direction.SOUTH, maze);
 			System.err.println(characterModel);
 			characterModel.speedX = 0.1f * i;
@@ -53,14 +53,16 @@ public class MazingModel {
 	}
 
 	public void generateMaze() {
+		maze.generate();
 		if (this.modelListener != null) {
-			this.modelListener.onMazeChanged(maze.generate());
+			this.modelListener.onMazeChanged(maze);
 		}
 	}
 
     public void clearMaze() {
+		maze.clear();
 		if (this.modelListener != null) {
-			this.modelListener.onMazeChanged(maze.clear());
+			this.modelListener.onMazeChanged(maze);
 		}
     }
 
@@ -94,7 +96,7 @@ public class MazingModel {
 		return this.spidersById.keySet();
 	}
 
-	public void setModeSpider(CharacterMode mode) {
+	public void setModeSpiders(CharacterMode mode) {
 		for (UUID id : spidersById.keySet()) {
 			CharacterModel spider = spidersById.get(id);
 
@@ -103,6 +105,21 @@ public class MazingModel {
 				this.modelListener.onModeChanged(id, mode);
 			}
 		}
+	}
+
+	public void setDirectionSpiders(Direction direction) {
+		for (UUID id : spidersById.keySet()) {
+			CharacterModel spider = spidersById.get(id);
+
+			spider.setDirection(direction);
+			if (this.modelListener != null) {
+				this.modelListener.onDirectionChanged(id, direction);
+			}
+		}
+	}
+
+	public void printMaze() {
+		System.out.println(maze);
 	}
 
 }

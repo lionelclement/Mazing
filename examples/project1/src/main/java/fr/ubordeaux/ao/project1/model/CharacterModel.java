@@ -8,6 +8,7 @@ import javax.swing.Timer;
 
 import fr.ubordeaux.ao.mazing.api.CharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
 public class CharacterModel {
@@ -15,6 +16,10 @@ public class CharacterModel {
 	private static final float WALK_SPEED = 0.03f;
 	private static final float RUN_SPEED = 0.08f;
 
+	public static enum Type {
+		CRUSADER,
+		SPIDER};
+	
 	private ModelListener listener;
 
 	private float x, y, z;
@@ -22,7 +27,6 @@ public class CharacterModel {
 	public float speedY;
 	private float speedZ;
 	private CharacterMode mode;
-	private CharacterMode savedMode;
 	private Direction direction;
 	private boolean freeze;
 	private UUID id;
@@ -30,16 +34,14 @@ public class CharacterModel {
 	private float oldx;
 	private float oldy;
 	private float oldz;
-	private float offsetX;
-	private float offsetY;
+	private Type type;
 
-	public CharacterModel(float x, float y, float z, float offsetX, float offsetY, Direction startDir, Maze maze) {
+	public CharacterModel(Type type, float x, float y, float z, Direction startDir, Maze maze) {
 		this.id = UUID.randomUUID();
+		this.type = type;
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
 		this.maze = maze;
 		this.mode = Crusader.Mode.IDLE;
 		this.direction = startDir;
@@ -75,7 +77,7 @@ public class CharacterModel {
 		return z;
 	}
 
-	public void checkCollision(UUID id2) {
+	public void checkCollision() {
 		float cellX = x / MazingView.CELL_WIDTH;
 		float cellY = y / MazingView.CELL_HEIGHT;
 		float cellZ = z / MazingView.CELL_DEPTH;
@@ -83,12 +85,23 @@ public class CharacterModel {
 			x = oldx;
 			y = oldy;
 			z = oldz;
-			this.setMode(Crusader.Mode.GOTHIT);
+			switch (type){
+				case CRUSADER:
+				this.setMode(Crusader.Mode.GOTHIT);
+					break;
+				case SPIDER:
+				this.setMode(Spider.Mode.IDLE);
+					break;
+				default:
+					break;
+				
+			}
+			
 			speedX = speedY = speedZ = 0;
 		}
 	}
 
-	public void updatePosition() {
+	public void _updatePosition() {
 		if (!freeze) {
 			oldx = x;
 			oldy = y;
@@ -98,7 +111,7 @@ public class CharacterModel {
 			z += speedZ;
 		}
 		if (listener != null) {
-			listener.updatePosition(id, offsetX, offsetY, x, y, z);
+			listener.updatePosition(id, /*offsetX, offsetY, */x, y, z);
 		}
 	}
 
@@ -127,8 +140,7 @@ public class CharacterModel {
 	}
 
 	public void setMode(CharacterMode mode) {
-		System.out.println("CharacterModel@setMode");
-		savedMode = this.mode;
+		//System.out.println("CharacterModel@setMode");
 		this.mode = mode;
 		updateVelocity();
 		if (listener != null) {
@@ -137,7 +149,7 @@ public class CharacterModel {
 	}
 
 	public void setDirection(Direction direction) {
-		System.out.println("CharacterModel@setDirection");
+		//System.out.println("CharacterModel@setDirection");
 		freeze = true;
 		this.direction = direction;
 		updateVelocity();

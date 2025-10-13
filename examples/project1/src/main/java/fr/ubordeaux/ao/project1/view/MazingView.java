@@ -1,6 +1,5 @@
 package fr.ubordeaux.ao.project1.view;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,17 +10,19 @@ import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
+import fr.ubordeaux.ao.project1.gameloop.AnimationListener;
 import fr.ubordeaux.ao.project1.model.Cell;
 import fr.ubordeaux.ao.project1.model.Direction;
+import fr.ubordeaux.ao.project1.model.Maze;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.model.ModelListener;
 
-public class MazingView<E extends Enum<E>> {
+public class MazingView {
 
 	private static final int WALL_WEST = 108;
 	private static final int WALL_SOUTH = 109;
 	private static final int WALL_NORTH = 110;
-	private static final int WALL_EAST = 175;
+	private static final int WALL_EAST = 111;
 
 	private static final int WALL_HALF_WEST = 172;
 	private static final int WALL_HALF_NORTH = 174;
@@ -39,17 +40,17 @@ public class MazingView<E extends Enum<E>> {
 	private static final int GROUND_1 = 72;
 	private static final int GROUND_2 = 12;
 
+	private static final int COLUMN = 400;
+
 	private IWindowGame window;
 	private Map<UUID, ICharacter<?>> characterById;
-	private MazingModel model;
 	private int originX;
 	private int originY;
 	private AnimationListener animationListener;
 	private static int SCROLL_SPEED = 1;
 
-	public MazingView(IWindowGame window, MazingModel model) {
+	public MazingView(IWindowGame window) {
 		this.window = window;
-		this.model = model;
 		characterById = new HashMap<>();
 		init();
 	}
@@ -79,17 +80,16 @@ public class MazingView<E extends Enum<E>> {
 			}
 
 			@Override
-			public void onMazeChanged(Cell[][][] cells) {
-				System.out.println(cells);
+			public void onMazeChanged(Maze maze) {
 				window.clear();
-				generateMaze(cells);
+				generateMaze(maze);
 			}
 
 			@Override
-			public void updatePosition(UUID id, float offsetX, float offsetY, float x, float y, float z) {
+			public void updatePosition(UUID id, float x, float y, float z) {
 				ICharacter<?> character = characterById.get(id);
 				if (character != null) {
-					character.setPosition(x + offsetX, y + offsetY, z);
+					character.setPosition(x, y, z);
 				}
 
 			}
@@ -97,7 +97,15 @@ public class MazingView<E extends Enum<E>> {
 		});
 	}
 
-	private void generateMaze(Cell[][][] cells) {
+	private void generateMaze(Maze maze) {
+
+		Cell begin = maze.getBegin();
+		Cell end = maze.getEnd();
+
+		window.add(519, begin.getX() * CELL_WIDTH + CELL_WIDTH / 2, begin.getY() * CELL_HEIGHT + CELL_HEIGHT / 2, begin.getZ() * CELL_DEPTH + CELL_DEPTH / 2);
+		//window.add(519, end.getX()+1, end.getY()+1, end.getZ());
+
+		Cell [][][] cells = maze.getGrid();
 		int depth = CELL_DEPTH * cells.length; // z dimension
 		int height = CELL_HEIGHT * cells[0].length; // y dimension
 		int width = CELL_WIDTH * cells[0][0].length; // x dimension
@@ -105,10 +113,11 @@ public class MazingView<E extends Enum<E>> {
 		int[][][] grounds = new int[depth][height][width];
 		int[][][] corners = new int[depth][height][width];
 		int[][][] walls = new int[depth][height][width];
-		int[][][] grid1 = new int[depth][height][width];
+		int[][][] walls_west = new int[depth][height][width];
 		int[][][] grid2 = new int[depth][height][width];
-		int[][][] grid3 = new int[depth][height][width];
+		int[][][] walls_north = new int[depth][height][width];
 		int[][][] grid4 = new int[depth][height][width];
+		int[][][] columns = new int[depth][height][width];
 
 		// On parcourt chaque cellule
 		for (int iz = 0; iz < cells.length; iz++) {
@@ -134,10 +143,11 @@ public class MazingView<E extends Enum<E>> {
 								//}
 								corners[z][y][x] = NONE;
 								walls[z][y][x] = NONE;
-								grid1[z][y][x] = NONE;
+								walls_west[z][y][x] = NONE;
 								grid2[z][y][x] = NONE;
-								grid3[z][y][x] = NONE;
+								walls_north[z][y][x] = NONE;
 								grid4[z][y][x] = NONE;
+								columns[z][y][x] = NONE;
 							}
 						}
 					}
@@ -155,14 +165,15 @@ public class MazingView<E extends Enum<E>> {
 					if (ix != xStart && !cell.isPath(Direction.WEST)) {
 						for (int z = zStart; z < zEnd; z++) {
 							for (int y = yStart; y < yEnd; y++) {
-								grid1[z][y][xStart] = WALL_HALF_WEST;
+								walls_west[z][y][xStart] = WALL_HALF_WEST;
 							}
+							columns[0][2][2] = COLUMN;
 						}
 					}
 					if (iy != yStart && !cell.isPath(Direction.NORTH)) {
 						for (int z = zStart; z < zEnd; z++) {
 							for (int x = xStart; x < xEnd; x++) {
-								grid3[z][yStart][x] = WALL_HALF_NORTH;
+								walls_north[z][yStart][x] = WALL_HALF_NORTH;
 							}
 						}
 					}
@@ -173,10 +184,11 @@ public class MazingView<E extends Enum<E>> {
 		window.add(grounds);
 		window.add(corners);
 		window.add(walls);
-		window.add(grid1);
+		window.add(walls_west);
 		window.add(grid2);
-		window.add(grid3);
+		window.add(walls_north);
 		window.add(grid4);
+		window.add(columns);
 	}
 
 	private void handleGrounds(int[][][] grounds, int ix, int iy, int iz,
@@ -190,7 +202,7 @@ public class MazingView<E extends Enum<E>> {
 					if ((ix + iy) % 2 == 0)
 					grounds[z][y][x] = GROUND_1;
 					else
-					grounds[z][y][x] = GROUND_2;
+					grounds[z][y][x] = GROUND_1;
 				}
 			}
 		}

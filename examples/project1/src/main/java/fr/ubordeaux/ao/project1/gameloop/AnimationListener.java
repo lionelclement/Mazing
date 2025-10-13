@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.project1.view;
+package fr.ubordeaux.ao.project1.gameloop;
 
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 

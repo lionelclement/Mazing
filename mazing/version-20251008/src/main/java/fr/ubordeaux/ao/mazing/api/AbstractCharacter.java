@@ -56,13 +56,15 @@ import java.util.function.Consumer;
     abstract RenderType getRenderType();
 
     // Déplace le personnage vers une case et ajuste la direction progressivement
-    @Override
-    public void setPosition(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
+    protected void setPosition(float x, float y, float z, float offsetX, float offsetY) {
+        this.x = x + offsetX;
+        this.y = y + offsetY;
         this.z = z;
     }
 
+    // Déplace le personnage vers une case et ajuste la direction progressivement
+    abstract public void setPosition(float x, float y, float z);
+    
     void turnPlayer(Direction targetDirection, int delayMs, Runnable onFinished) {
 
         Direction direction = currentDirection;

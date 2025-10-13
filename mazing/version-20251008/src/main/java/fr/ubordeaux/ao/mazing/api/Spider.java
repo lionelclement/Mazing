@@ -13,10 +13,12 @@ import java.util.UUID;
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 2.5f;
+    private static final float OFFSETX = -0.8f;
+    private static final float OFFSETY = -0.8f;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 25, true),
-        IDLE("walk", 2, true),
+        IDLE("walk", 1, true),
         ATTACK("attack", 8, false),
         FALL("death", 8, false),
         DEATH("death", 8, false);
@@ -281,6 +283,11 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             return false;
         Spider other = (Spider) obj;
         return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public void setPosition(float x, float y, float z) {
+        setPosition(x, y, z, OFFSETX, OFFSETY);
     }
 
 }

@@ -135,22 +135,22 @@ class BoardGame extends JPanel implements IWindowGame {
 
 		// Chargement et découpe des spritesheets
 		BufferedImage imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR, -1.5f);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION, 0);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION, 0);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION, 0);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION, 0);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.ITEM);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.ITEM, 0);
 	}
 
 	/**
@@ -168,7 +168,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * @param renderType type de rendu de l’image
 	 */
 	private void crop(BufferedImage sheet, int width, int height, int colsPerRow,
-			int maxSize, int offset, double scale, int offsetX, int offsetY, RenderType renderType) {
+			int maxSize, int offset, double scale, int offsetX, int offsetY, RenderType renderType, float iso) {
 		int col = 0;
 		int row = 0;
 		for (int i = 0; i < maxSize; i++) {
@@ -188,7 +188,7 @@ class BoardGame extends JPanel implements IWindowGame {
 			g2d.drawImage(sub, 0, 0, scaledWidth, scaledHeight, null);
 			g2d.dispose();
 
-			codeToImageMap.put(i + offset, new ImageRenderable(scaled, offsetX, offsetY, renderType));
+			codeToImageMap.put(i + offset, new ImageRenderable(scaled, offsetX, offsetY, renderType, iso));
 
 			col++;
 			if (col == colsPerRow) {
@@ -313,7 +313,7 @@ class BoardGame extends JPanel implements IWindowGame {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
 									image.getBufferedImage(), _x, _y, 0,
 									rank,
-									image.getRenderType(), alpha);
+									image.getRenderType(), image.getIso(), alpha);
 							grounds.add(imageRendarable3D);
 							pointToSceneObjectsMap
 									.computeIfAbsent(new DiscretePoint(_x, _y, 0), _ -> new HashSet<>())
@@ -362,7 +362,7 @@ class BoardGame extends JPanel implements IWindowGame {
 			if (image != null) {
 				ImageRenderable imageRendarable3D = new ImageRenderable(
 						image.getBufferedImage(), x, y, z, rank,
-						image.getRenderType(), alpha);
+						image.getRenderType(), image.getIso(), alpha);
 				sceneObjects.add(imageRendarable3D);
 				pointToSceneObjectsMap
 						.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
@@ -391,7 +391,7 @@ class BoardGame extends JPanel implements IWindowGame {
 						if (image != null) {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
 									image.getBufferedImage(), x, y, z, rank,
-									image.getRenderType(), alpha);
+									image.getRenderType(), image.getIso(), alpha);
 
 							sceneObjects.add(imageRendarable3D);
 							pointToSceneObjectsMap
