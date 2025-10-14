@@ -17,8 +17,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private static final float DEFAULT_SCALE = 3.0f;
     private static final float OFFSETX = -0.6f;
     private static final float OFFSETY = -0.6f;
-    
-    
+
     public enum Mode implements CharacterMode {
         WALK("walk", 15, true),
         RUN("run", 17, true),
@@ -27,7 +26,9 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         ATTACK("attack", 18, false),
         FALL("death", 9, false),
         DEATH("death", 9, false),
-        IDLE("idle", 16, true);
+        IDLE("idle", 16, true),
+        TURL_LEFT("idle", 16, true),
+        TURL_RIGHT("idle", 16, true);
 
         private final String name;
         private final int numFrames;
@@ -147,27 +148,65 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         Direction[] directions = Direction.values();
 
         for (Mode mode : modes) {
-            int numFrames = mode.getNumFrames();
-            for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
-                                mode.getName(),
-                                mode.getName()),
-                        scale);
+            switch (mode) {
+                case ATTACK:
+                case DEATH:
+                case FALL:
+                case GOTHIT:
+                case IDLE:
+                case JUMP:
+                case RUN:
+                case WALK: {
+                    int numFrames = mode.getNumFrames();
+                    for (Direction direction : directions) {
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
+                                direction.ordinal(),
+                                String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale);
 
-                shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                        direction.ordinal(),
-                        String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
-                                mode.getName(),
-                                mode.getName()),
-                        scale);
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
+                                direction.ordinal(),
+                                String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale);
 
-                animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                        images[mode.ordinal()][direction.ordinal()],
-                        shadow_images[mode.ordinal()][direction.ordinal()],
-                        mode.isLoop(), this);
+                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                                images[mode.ordinal()][direction.ordinal()],
+                                shadow_images[mode.ordinal()][direction.ordinal()],
+                                mode.isLoop(), this);
 
+                    }
+                }
+
+                    break;
+                case TURL_LEFT: 
+                case TURL_RIGHT: {
+                    int numFrames = mode.getNumFrames();
+                    for (Direction direction : directions) {
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
+                                String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale, mode == Mode.TURL_LEFT);
+
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
+                                String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale, mode == Mode.TURL_LEFT);
+
+                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                                images[mode.ordinal()][direction.ordinal()],
+                                shadow_images[mode.ordinal()][direction.ordinal()],
+                                mode.isLoop(), this);
+
+                    }
+
+                }
+                    break;
             }
         }
     }
