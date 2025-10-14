@@ -42,8 +42,7 @@ class ImageLoader {
 			String frameNumber = String.format("%04d", frame); // 0000,0001,...
 			String directionNumber = String.format("%01d", direction);
 			String path = String.format("%s%s%s.png", prefix, directionNumber, frameNumber);
-			System.out.println(path);
-
+			
 			BufferedImage img = loadImage(path);
 			if (img != null) {
 				// Scale l'image
@@ -71,7 +70,6 @@ class ImageLoader {
 	 */
 	public static BufferedImage[] loadTurnAnimations(int numFrames, String prefix, float scale, boolean left) {
 		BufferedImage[] animations = new BufferedImage[numFrames];
-
 		for (int frame = 0; frame < numFrames; frame++) {
 			Direction d = Direction.values()[frame % Direction.values().length];
 			int direction = d.ordinal();
@@ -80,7 +78,6 @@ class ImageLoader {
 			String directionNumber = String.format("%01d", direction);
 			String path = String.format("%s%s%s.png", prefix, directionNumber, frameNumber);
 
-			System.out.println(path);
 			BufferedImage img = loadImage(path);
 			if (img != null) {
 				// Scale l'image

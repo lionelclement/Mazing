@@ -1,6 +1,5 @@
 package fr.ubordeaux.ao.project1.model;
 
-import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.UUID;
 
@@ -8,6 +7,7 @@ import javax.swing.Timer;
 
 import fr.ubordeaux.ao.mazing.api.CharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
@@ -15,11 +15,13 @@ public class CharacterModel {
 
 	private static final float WALK_SPEED = 0.03f;
 	private static final float RUN_SPEED = 0.08f;
+	private static final float TURN_LEFT_SPEED = 0.01f;
 
 	public static enum Type {
 		CRUSADER,
-		SPIDER};
-	
+		SPIDER
+	};
+
 	private ModelListener listener;
 
 	private float x, y, z;
@@ -81,27 +83,27 @@ public class CharacterModel {
 		float cellX = x / MazingView.CELL_WIDTH;
 		float cellY = y / MazingView.CELL_HEIGHT;
 		float cellZ = z / MazingView.CELL_DEPTH;
-		if (!maze.canMove(cellX, cellY, cellZ, direction)) {
+		if (!maze.canMove(cellX, cellY, cellZ, direction.name())) {
 			x = oldx;
 			y = oldy;
 			z = oldz;
-			switch (type){
+			switch (type) {
 				case CRUSADER:
-				this.setMode(Crusader.Mode.GOTHIT);
+					this.setMode(Crusader.Mode.GOTHIT);
 					break;
 				case SPIDER:
-				this.setMode(Spider.Mode.IDLE);
+					this.setMode(Spider.Mode.IDLE);
 					break;
 				default:
 					break;
-				
+
 			}
-			
+
 			speedX = speedY = speedZ = 0;
 		}
 	}
 
-	public void _updatePosition() {
+	public void updatePosition() {
 		if (!freeze) {
 			oldx = x;
 			oldy = y;
@@ -111,36 +113,48 @@ public class CharacterModel {
 			z += speedZ;
 		}
 		if (listener != null) {
-			listener.updatePosition(id, /*offsetX, offsetY, */x, y, z);
+			listener.updatePosition(id, x, y, z);
 		}
 	}
 
-	private void updateVelocity() {
-		System.err.println("updateVelocity");
-		Map<Direction, Point2D.Double> dirVectors = Map.of(
-				Direction.EAST, new Point2D.Double(1, 0),
-				Direction.NORTH, new Point2D.Double(0, -1),
-				Direction.NORTHEAST, new Point2D.Double(1, -1),
-				Direction.NORTHWEST, new Point2D.Double(-1, -1),
-				Direction.SOUTH, new Point2D.Double(0, 1),
-				Direction.SOUTHEAST, new Point2D.Double(1, 1),
-				Direction.SOUTHWEST, new Point2D.Double(-1, 1),
-				Direction.WEST, new Point2D.Double(-1, 0));
+private void updateVelocity() {
+    Map<Direction, Point3D> dirVectors = Map.of(
+        Direction.EAST,      new Point3D( 1,  0,  0),
+        Direction.WEST,      new Point3D(-1,  0,  0),
+        Direction.NORTH,     new Point3D( 0, -1,  0),
+        Direction.SOUTH,     new Point3D( 0,  1,  0),
+        Direction.NORTHEAST, new Point3D( 1, -1,  0),
+        Direction.NORTHWEST, new Point3D(-1, -1,  0),
+        Direction.SOUTHEAST, new Point3D( 1,  1,  0),
+        Direction.SOUTHWEST, new Point3D(-1,  1,  0)
+    );
 
-		Point2D.Double vector = dirVectors.get(direction);
-		double speed = switch (mode.name()) {
-			case "WALK" -> WALK_SPEED;
-			case "RUN" -> RUN_SPEED;
-			case "IDLE", "GOTHIT" -> 0;
-			default -> Math.hypot(speedX, speedY);
-		};
+    Point3D vector = dirVectors.get(direction);
+    if (vector == null) {
+        this.speedX = 0;
+        this.speedY = 0;
+        this.speedZ = 0;
+        return;
+    }
 
-		this.speedX = (float) (vector.x * speed);
-		this.speedY = (float) (vector.y * speed);
-	}
+    double speed = switch (mode.name()) {
+        case "WALK" -> WALK_SPEED;
+        case "TURN_LEFT" -> TURN_LEFT_SPEED;
+        case "RUN" -> RUN_SPEED;
+        case "IDLE", "GOTHIT" -> 0;
+        default -> Math.hypot(speedX, speedY);
+    };
 
+    // Normaliser les diagonales (XY ou XYZ)
+    double norm = Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+    if (norm == 0) norm = 1;
+
+    this.speedX = (float) (vector.x / norm * speed);
+    this.speedY = (float) (vector.y / norm * speed);
+    this.speedZ = (float) (vector.z / norm * speed);
+}
 	public void setMode(CharacterMode mode) {
-		//System.out.println("CharacterModel@setMode");
+		// System.out.println("CharacterModel@setMode");
 		this.mode = mode;
 		updateVelocity();
 		if (listener != null) {
@@ -149,7 +163,7 @@ public class CharacterModel {
 	}
 
 	public void setDirection(Direction direction) {
-		//System.out.println("CharacterModel@setDirection");
+		// System.out.println("CharacterModel@setDirection");
 		freeze = true;
 		this.direction = direction;
 		updateVelocity();
@@ -170,6 +184,22 @@ public class CharacterModel {
 
 	public CharacterMode getMode() {
 		return mode;
+	}
+
+	public void setPosition(float x, float y, float z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		if (listener != null) {
+			listener.updatePosition(id, x, y, z);
+		}
+
+	}
+
+	public void setSpeed(int x, int y, float z) {
+		speedX = x;
+		speedY = y;
+		speedZ = z;
 	}
 
 }

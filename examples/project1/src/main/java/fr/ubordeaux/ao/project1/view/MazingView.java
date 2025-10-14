@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.project1.view;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -7,387 +8,296 @@ import java.util.UUID;
 
 import fr.ubordeaux.ao.mazing.api.CharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project1.gameloop.AnimationListener;
 import fr.ubordeaux.ao.project1.model.Cell;
-import fr.ubordeaux.ao.project1.model.Direction;
+import fr.ubordeaux.ao.project1.model.Direction3D;
 import fr.ubordeaux.ao.project1.model.Maze;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.model.ModelListener;
 
 public class MazingView {
 
-	private static final int WALL_WEST = 108;
-	private static final int WALL_SOUTH = 109;
-	private static final int WALL_NORTH = 110;
-	private static final int WALL_EAST = 111;
+    private static final int NONE = -1;
 
-	private static final int WALL_HALF_WEST = 172;
-	private static final int WALL_HALF_NORTH = 174;
+    // Dimensions
+    public static final int CELL_WIDTH = 3;
+    public static final int CELL_HEIGHT = 3;
+    public static final int CELL_DEPTH = 1;
 
-	private static final int WALL_NW_CORNER = 138;
-	private static final int WALL_NE_CORNER = 139;
-	private static final int WALL_SW_CORNER = 136;
-	private static final int WALL_SE_CORNER = 137;
+    // Tiles
+    private static final int GROUND_STONE = 72;
+    private static final int GROUND_WOOD = 25;
+    private static final int GROUND_TRAPDOOR = 20;
+    private static final int STAIRS = 308;
 
-	private static final int NONE = -1;
-	public static final int CELL_WIDTH = 2;
-	public static final int CELL_HEIGHT = 2;
-	public static final int CELL_DEPTH = 1;
+    private static final int WALL_WEST = 108, WALL_SOUTH = 109, WALL_NORTH = 110, WALL_EAST = 111;
+    private static final int WALL_HALF_WEST = 172, WALL_HALF_NORTH = 174;
+    private static final int WALL_NW_CORNER = 138, WALL_NE_CORNER = 139, WALL_SW_CORNER = 136, WALL_SE_CORNER = 137;
 
-	private static final int GROUND_1 = 72;
-	private static final int GROUND_2 = 12;
+    private IWindowGame window;
+    private Map<UUID, ICharacter<?>> characterById = new HashMap<>();
+    private AnimationListener animationListener;
+    private int originX, originY;
+    private static final int SCROLL_SPEED = 1;
 
-	private static final int COLUMN = 400;
+    public MazingView(IWindowGame window) {
+        this.window = window;
+        init();
+    }
 
-	private IWindowGame window;
-	private Map<UUID, ICharacter<?>> characterById;
-	private int originX;
-	private int originY;
-	private AnimationListener animationListener;
-	private static int SCROLL_SPEED = 1;
+    public void attachAnimationListener(AnimationListener listener) {
+        this.animationListener = listener;
+    }
 
-	public MazingView(IWindowGame window) {
-		this.window = window;
-		characterById = new HashMap<>();
-		init();
-	}
+    public void attachModelListener(MazingModel model) {
+        model.attachModelListener(new ModelListener() {
+            @Override
+            public void onModeChanged(UUID id, CharacterMode mode) {
+                ICharacter<?> c = characterById.get(id);
+                if (c != null)
+                    c.setMode(mode.name());
+            }
 
-	// Le game loop s'abonne ici
-	public void attachAnimationListener(AnimationListener listener) {
-		this.animationListener = listener;
-	}
+            @Override
+            public void onDirectionChanged(UUID id, Direction direction) {
+                ICharacter<?> c = characterById.get(id);
+                if (c != null)
+                    c.setDirection(direction.name());
+            }
 
-	// La vue écoute le modèle
-	public void attachModelListener(MazingModel model) {
-		model.attachModelListener(new ModelListener() {
-			@Override
-			public void onModeChanged(UUID id, CharacterMode mode) {
-				ICharacter<?> crusader = characterById.get(id);
-				if (crusader != null) {
-					crusader.setMode(mode.name());
-				}
-			}
+            @Override
+            public void onMazeChanged(Maze maze, float level) {
+                window.clear();
+                drawMaze(maze, level);
+            }
 
-			@Override
-			public void onDirectionChanged(UUID id, Direction direction) {
-				ICharacter<?> character = characterById.get(id);
-				if (character != null) {
-					character.setDirection(direction.name());
-				}
-			}
+            @Override
+            public void updatePosition(UUID id, float x, float y, float z) {
+                ICharacter<?> c = characterById.get(id);
+                if (c != null)
+                    c.setPosition(x, y, z);
+            }
+        });
+    }
 
-			@Override
-			public void onMazeChanged(Maze maze) {
-				window.clear();
-				generateMaze(maze);
-			}
+    private void drawMaze(Maze maze, float level) {
+        Cell begin = maze.getBegin();
+        if (level == 0)
+            window.add(519, begin.getX() + CELL_WIDTH / 2, begin.getY() + CELL_HEIGHT / 2, begin.getZ());
 
-			@Override
-			public void updatePosition(UUID id, float x, float y, float z) {
-				ICharacter<?> character = characterById.get(id);
-				if (character != null) {
-					character.setPosition(x, y, z);
-				}
+        Cell[][][] cells = maze.getGrid();
+        int cellCountZ = cells.length, cellCountY = cells[0].length, cellCountX = cells[0][0].length;
+        int depth = CELL_DEPTH * cellCountZ, height = CELL_HEIGHT * cellCountY, width = CELL_WIDTH * cellCountX;
 
-			}
+        int[][][] grounds = new int[depth][height][width];
+        //int[][][] transparentGrounds = new int[depth][height][width];
+        int[][][] corners = new int[depth][height][width];
+        int[][][] walls = new int[depth][height][width];
+        int[][][] wallsWest = new int[depth][height][width];
+        int[][][] wallsNorth = new int[depth][height][width];
+        int[][][] stairs = new int[depth][height][width];
 
-		});
-	}
+        fillVolumeWithNone(grounds, corners, walls, wallsWest, wallsNorth, stairs);
 
-	private void generateMaze(Maze maze) {
+        for (int iz = 0; iz < cellCountZ; iz++) {
+            for (int iy = 0; iy < cellCountY; iy++) {
+                for (int ix = 0; ix < cellCountX; ix++) {
 
-		Cell begin = maze.getBegin();
-		Cell end = maze.getEnd();
+                    Cell cell = cells[iz][iy][ix];
+                    int xStart = ix * CELL_WIDTH, xEnd = xStart + CELL_WIDTH;
+                    int yStart = iy * CELL_HEIGHT, yEnd = yStart + CELL_HEIGHT;
+                    int zStart = iz * CELL_DEPTH, zEnd = zStart + CELL_DEPTH;
 
-		window.add(519, begin.getX() * CELL_WIDTH + CELL_WIDTH / 2, begin.getY() * CELL_HEIGHT + CELL_HEIGHT / 2, begin.getZ() * CELL_DEPTH + CELL_DEPTH / 2);
-		//window.add(519, end.getX()+1, end.getY()+1, end.getZ());
+                    int[][][] groundLayer = layerForLevel(iz, level, grounds, null);
+                    int[][][] stairLayer = layerForLevel(iz, level, stairs, null);
+                    int[][][] cornerLayer = layerForLevel(iz, level, corners, null);
+                    int[][][] wallLayer = layerForLevel(iz, level, walls, null);
+                    int[][][] wallWestLayer = layerForLevel(iz, level, wallsWest, null);
+                    int[][][] wallNorthLayer = layerForLevel(iz, level, wallsNorth, null);
 
-		Cell [][][] cells = maze.getGrid();
-		int depth = CELL_DEPTH * cells.length; // z dimension
-		int height = CELL_HEIGHT * cells[0].length; // y dimension
-		int width = CELL_WIDTH * cells[0][0].length; // x dimension
+                    if (groundLayer != null)
+                        handleGrounds(groundLayer, iz, xStart, xEnd, yStart, yEnd);
+                    if (cell.isPath(Direction3D.DOWN) && groundLayer != null)
+                        placeTileAtCenter(groundLayer, iz, xStart, xEnd, yStart, yEnd, GROUND_TRAPDOOR);
+                    if (cell.isPath(Direction3D.UP) && stairLayer != null)
+                        placeTileAtCenter(stairLayer, iz, xStart, xEnd, yStart, yEnd, STAIRS);
+                    if (cornerLayer != null)
+                        handleCorners(cornerLayer, ix, iy, iz, xStart, xEnd, yStart, yEnd, zStart, zEnd, cellCountX - 1,
+                                cellCountY - 1);
+                    if (wallLayer != null)
+                        handleBorders(wallLayer, ix, iy, iz, xStart, xEnd, yStart, yEnd, zStart, zEnd, cellCountX - 1,
+                                cellCountY - 1);
 
-		int[][][] grounds = new int[depth][height][width];
-		int[][][] corners = new int[depth][height][width];
-		int[][][] walls = new int[depth][height][width];
-		int[][][] walls_west = new int[depth][height][width];
-		int[][][] grid2 = new int[depth][height][width];
-		int[][][] walls_north = new int[depth][height][width];
-		int[][][] grid4 = new int[depth][height][width];
-		int[][][] columns = new int[depth][height][width];
+                    // demi-murs
+                    if (iy != 0 && !cell.isPath(Direction3D.NORTH) && wallNorthLayer != null)
+                        for (int x = xStart; x < xEnd; x++)
+                            wallNorthLayer[zStart][yStart][x] = WALL_HALF_NORTH;
+                    if (ix != 0 && !cell.isPath(Direction3D.WEST) && wallWestLayer != null)
+                        for (int y = yStart; y < yEnd; y++)
+                            wallWestLayer[zStart][y][xStart] = WALL_HALF_WEST;
+                }
+            }
+        }
 
-		// On parcourt chaque cellule
-		for (int iz = 0; iz < cells.length; iz++) {
-			for (int iy = 0; iy < cells[0].length; iy++) {
-				for (int ix = 0; ix < cells[0][0].length; ix++) {
+        window.add(grounds);
+        //window.add(transparentGrounds, 0.5f);
+        window.add(stairs);
+        window.add(corners);
+        window.add(walls);
+        window.add(wallsWest);
+        window.add(wallsNorth);
+    }
 
-					Cell cell = cells[iz][iy][ix];
+    private void fillVolumeWithNone(int[][][]... volumes) {
+        for (int[][][] vol : volumes)
+            for (int z = 0; z < vol.length; z++)
+                for (int y = 0; y < vol[z].length; y++)
+                    Arrays.fill(vol[z][y], NONE);
+    }
 
-					// Calcul des bornes de la cellule dans la grille
-					int zStart = iz * CELL_DEPTH;
-					int zEnd = zStart + CELL_DEPTH;
-					int yStart = iy * CELL_HEIGHT;
-					int yEnd = yStart + CELL_HEIGHT;
-					int xStart = ix * CELL_WIDTH;
-					int xEnd = xStart + CELL_WIDTH;
+    private int[][][] layerForLevel(int iz, float level, int[][][] opaque, int[][][] transparent) {
+        if (iz <= level)
+            return opaque;
+        else if (transparent != null && iz == level + 1)
+            return transparent;
+        return null;
+    }
 
-					// Remplir toutes les cellules avec NONE
-					for (int z = zStart; z < zEnd; z++) {
-						for (int y = yStart; y < yEnd; y++) {
-							for (int x = xStart; x < xEnd; x++) {
-								//if (z == 0) {
-									grounds[z][y][x] = NONE;
-								//}
-								corners[z][y][x] = NONE;
-								walls[z][y][x] = NONE;
-								walls_west[z][y][x] = NONE;
-								grid2[z][y][x] = NONE;
-								walls_north[z][y][x] = NONE;
-								grid4[z][y][x] = NONE;
-								columns[z][y][x] = NONE;
-							}
-						}
-					}
+    private void handleGrounds(int[][][] layer, int iz, int xStart, int xEnd, int yStart, int yEnd) {
+        int tile = (iz == 0) ? GROUND_STONE : GROUND_WOOD;
+        for (int y = yStart; y < yEnd; y++)
+            for (int x = xStart; x < xEnd; x++)
+                layer[iz][y][x] = tile;
+    }
 
-					handleGrounds(grounds, ix, iy, iz, xStart, xEnd, yStart, yEnd, zStart, zEnd,
-							cells[0][0].length - 1, cells[0].length - 1, cells.length - 1);
+    private void placeTileAtCenter(int[][][] layer, int iz, int xStart, int xEnd, int yStart, int yEnd, int tile) {
+        int xMid = xStart + (xEnd - xStart) / 2;
+        int yMid = yStart + (yEnd - yStart) / 2;
+        layer[iz][yMid][xMid] = tile;
+    }
 
-					handleCorners(corners, ix, iy, iz, xStart, xEnd, yStart, yEnd, zStart, zEnd,
-							cells[0][0].length - 1, cells[0].length - 1, cells.length - 1);
+    private void handleCorners(int[][][] corners, int ix, int iy, int iz, int xStart, int xEnd, int yStart, int yEnd,
+            int zStart, int zEnd, int maxX, int maxY) {
+        // NW corner
+        if (ix == 0 && iy == 0) {
+            for (int z = zStart; z < zEnd; z++) {
+                corners[z][yStart][xStart] = WALL_NW_CORNER;
+                for (int y = yStart + 1; y < yEnd; y++)
+                    corners[z][y][xStart] = WALL_WEST;
+                for (int x = xStart + 1; x < xEnd; x++)
+                    corners[z][yStart][x] = WALL_NORTH;
+            }
+            return;
+        }
+        // NE corner
+        if (ix == maxX && iy == 0) {
+            for (int z = zStart; z < zEnd; z++) {
+                corners[z][yStart][xEnd - 1] = WALL_NE_CORNER;
+                for (int y = yStart + 1; y < yEnd; y++)
+                    corners[z][y][xEnd - 1] = WALL_EAST;
+                for (int x = xStart; x < xEnd - 1; x++)
+                    corners[z][yStart][x] = WALL_NORTH;
+            }
+            return;
+        }
+        // SW corner
+        if (ix == 0 && iy == maxY) {
+            for (int z = zStart; z < zEnd; z++) {
+                corners[z][yEnd - 1][xStart] = WALL_SW_CORNER;
+                for (int y = yStart; y < yEnd - 1; y++)
+                    corners[z][y][xStart] = WALL_WEST;
+                for (int x = xStart + 1; x < xEnd; x++)
+                    corners[z][yEnd - 1][x] = WALL_SOUTH;
+            }
+            return;
+        }
+        // SE corner
+        if (ix == maxX && iy == maxY) {
+            for (int z = zStart; z < zEnd; z++) {
+                corners[z][yEnd - 1][xEnd - 1] = WALL_SE_CORNER;
+                for (int y = yStart; y < yEnd - 1; y++)
+                    corners[z][y][xEnd - 1] = WALL_EAST;
+                for (int x = xStart; x < xEnd - 1; x++)
+                    corners[z][yEnd - 1][x] = WALL_SOUTH;
+            }
+        }
+    }
 
-					handleBorders(walls, ix, iy, iz, xStart, xEnd, yStart, yEnd, zStart, zEnd,
-							cells[0][0].length - 1, cells[0].length - 1, cells.length - 1);
+    private void handleBorders(int[][][] walls, int ix, int iy, int iz, int xStart, int xEnd, int yStart, int yEnd,
+            int zStart, int zEnd, int maxX, int maxY) {
+        if (ix == 0 && iy > 0 && iy < maxY) // Ouest
+            for (int z = zStart; z < zEnd; z++)
+                for (int y = yStart; y < yEnd; y++)
+                    walls[z][y][xStart] = WALL_WEST;
+        if (ix == maxX && iy > 0 && iy < maxY) // Est
+            for (int z = zStart; z < zEnd; z++)
+                for (int y = yStart; y < yEnd; y++)
+                    walls[z][y][xEnd - 1] = WALL_EAST;
+        if (iy == 0 && ix > 0 && ix < maxX) // Nord
+            for (int z = zStart; z < zEnd; z++)
+                for (int x = xStart; x < xEnd; x++)
+                    walls[z][yStart][x] = WALL_NORTH;
+        if (iy == maxY && ix > 0 && ix < maxX) // Sud
+            for (int z = zStart; z < zEnd; z++)
+                for (int x = xStart; x < xEnd; x++)
+                    walls[z][yEnd - 1][x] = WALL_SOUTH;
+    }
 
-					// --- Murs internes selon les chemins de la cellule ---
-					if (ix != xStart && !cell.isPath(Direction.WEST)) {
-						for (int z = zStart; z < zEnd; z++) {
-							for (int y = yStart; y < yEnd; y++) {
-								walls_west[z][y][xStart] = WALL_HALF_WEST;
-							}
-							columns[0][2][2] = COLUMN;
-						}
-					}
-					if (iy != yStart && !cell.isPath(Direction.NORTH)) {
-						for (int z = zStart; z < zEnd; z++) {
-							for (int x = xStart; x < xEnd; x++) {
-								walls_north[z][yStart][x] = WALL_HALF_NORTH;
-							}
-						}
-					}
-				}
-			}
-		}
+    private void init() {
+        window.setTitle("Mon jeu à moi");
+        window.setSize(1800, 1169);
+        window.setResizable(true);
+        window.setTileSize(130, 120);
+        window.setFPS(40);
+        window.setVisible(true);
+    }
 
-		window.add(grounds);
-		window.add(corners);
-		window.add(walls);
-		window.add(walls_west);
-		window.add(grid2);
-		window.add(walls_north);
-		window.add(grid4);
-		window.add(columns);
-	}
+    private void onMid(ICharacter<?> e) {
+    }
 
-	private void handleGrounds(int[][][] grounds, int ix, int iy, int iz,
-			int xStart, int xEnd,
-			int yStart, int yEnd,
-			int zStart, int zEnd,
-			int maxX, int maxY, int maxZ) {
-		for (int z = zStart; z < zEnd; z++) {
-			for (int y = yStart; y < yEnd; y++) {
-				for (int x = xStart; x < xEnd; x++) {
-					if ((ix + iy) % 2 == 0)
-					grounds[z][y][x] = GROUND_1;
-					else
-					grounds[z][y][x] = GROUND_1;
-				}
-			}
-		}
-	}
+    private void onBegin(ICharacter<?> e) {
+    }
 
-	private void handleCorners(int[][][] walls, int ix, int iy, int iz,
-			int xStart, int xEnd,
-			int yStart, int yEnd,
-			int zStart, int zEnd,
-			int maxX, int maxY, int maxZ) {
-		// --- NW corner ---
-		if (ix == 0 && iy == 0) {
-			for (int z = zStart; z < zEnd; z++) {
-				walls[z][yStart][xStart] = WALL_NW_CORNER;
-				for (int y = yStart + 1; y < yEnd; y++)
-					walls[z][y][xStart] = WALL_WEST;
-				for (int x = xStart + 1; x < xEnd; x++)
-					walls[z][yStart][x] = WALL_NORTH;
-			}
-			return;
-		}
+    private void onEnd(ICharacter<?> e) {
+        if (animationListener != null)
+            animationListener.updateMode(e);
+    }
 
-		// --- NE corner ---
-		if (ix == maxX && iy == 0) {
-			for (int z = zStart; z < zEnd; z++) {
-				walls[z][yStart][xEnd - 1] = WALL_NE_CORNER;
-				for (int y = yStart + 1; y < yEnd; y++)
-					walls[z][y][xEnd - 1] = WALL_EAST;
-				for (int x = xStart; x < xEnd - 1; x++)
-					walls[z][yStart][x] = WALL_NORTH;
-			}
-			return;
-		}
+    private void onTick(UUID id, ICharacter<?> e) {
+        if (animationListener != null) {
+            animationListener.updatePosition(e);
+            animationListener.checkCollision(e);
+        }
+    }
 
-		// --- SW corner ---
-		if (ix == 0 && iy == maxY) {
-			for (int z = zStart; z < zEnd; z++) {
-				walls[z][yEnd - 1][xStart] = WALL_SW_CORNER;
-				for (int y = yStart; y < yEnd - 1; y++)
-					walls[z][y][xStart] = WALL_WEST;
-				for (int x = xStart + 1; x < xEnd; x++)
-					walls[z][yEnd - 1][x] = WALL_SOUTH;
-			}
-			return;
-		}
+    public void scroll(int dx, int dy) {
+        originX += dx * SCROLL_SPEED;
+        originY += dy * SCROLL_SPEED;
+        window.scroll(originX, originY);
+    }
 
-		// --- SE corner ---
-		if (ix == maxX && iy == maxY) {
-			for (int z = zStart; z < zEnd; z++) {
-				walls[z][yEnd - 1][xEnd - 1] = WALL_SE_CORNER;
-				for (int y = yStart; y < yEnd - 1; y++)
-					walls[z][y][xEnd - 1] = WALL_EAST;
-				for (int x = xStart; x < xEnd - 1; x++)
-					walls[z][yEnd - 1][x] = WALL_SOUTH;
-			}
-			return;
-		}
+    private void createCharacter(UUID id, ICharacter<?> character) {
+        characterById.put(id, character);
+        character.setTickAnimationTrigger(e -> onTick(id, e));
+        character.setBeginAnimationTrigger(this::onBegin);
+        character.setEndAnimationTrigger(this::onEnd);
+        character.setMidAnimationTrigger(this::onMid);
+        window.add(character);
+    }
 
-	}
+    public void createCrusader(UUID id) {
+        Crusader crusader = new Crusader(id);
+        crusader.setSpeed(Crusader.Mode.TURN_LEFT, 0.4f);
+        crusader.setSpeed(Crusader.Mode.TURN_RIGHT, 0.4f);
+        crusader.setSpeed(Crusader.Mode.JUMP, 0.1f);
+        createCharacter(id, crusader);
+    }
 
-	private void handleBorders(int[][][] walls, int ix, int iy, int iz,
-			int xStart, int xEnd,
-			int yStart, int yEnd,
-			int zStart, int zEnd,
-			int maxX, int maxY, int maxZ) {
-
-		// --- Bord Ouest ---
-		if (ix == 0 && iy > 0 && iy < maxY) { // pas sur un coin
-			for (int z = zStart; z < zEnd; z++)
-				for (int y = yStart; y < yEnd; y++)
-					walls[z][y][xStart] = WALL_WEST;
-			return;
-		}
-
-		// --- Bord Est ---
-		if (ix == maxX && iy > 0 && iy < maxY) { // pas sur un coin
-			for (int z = zStart; z < zEnd; z++)
-				for (int y = yStart; y < yEnd; y++)
-					walls[z][y][xEnd - 1] = WALL_EAST;
-			return;
-		}
-
-		// --- Bord Nord ---
-		if (iy == 0 && ix > 0 && ix < maxX) { // pas sur un coin
-			for (int z = zStart; z < zEnd; z++)
-				for (int x = xStart; x < xEnd; x++)
-					walls[z][yStart][x] = WALL_NORTH;
-			return;
-		}
-
-		// --- Bord Sud ---
-		if (iy == maxY && ix > 0 && ix < maxX) { // pas sur un coin
-			for (int z = zStart; z < zEnd; z++)
-				for (int x = xStart; x < xEnd; x++)
-					walls[z][yEnd - 1][x] = WALL_SOUTH;
-			return;
-		}
-	}
-
-	private void init() {
-		window.setTitle("Mon jeu à moi");
-		window.setSize(1800, 1169);
-		window.setResizable(true);
-		// window.setBackground(Color.WHITE);
-		window.setTileSize(130, 120);
-
-		//window.drawTile(Color.BLUE, 0, 0, 0);
-		//int[][][] grid = {{{12}}};
-		//window.add(grid);
-
-		//window.fillTilesBackground(12, -240, -240, 480, 480);
-		// window.fillCheckerboardBackground(-12, -12, 24, 24);
-		window.setFPS(40);
-
-		window.setVisible(true);
-
-	}
-
-	private void onMid(ICharacter<?> e) {
-		// TODO Auto-generated method stub
-	}
-
-	private void onEnd(ICharacter<?> e) {
-		if (animationListener != null) {
-			animationListener.updateMode(e);
-		}
-	}
-
-	private void onBegin(ICharacter<?> e) {
-	}
-
-	// La vue lit la position dans le modèle et se met à jour
-	private void onTick(UUID id, ICharacter<?> e) {
-		// System.err.printf("onTick %s:%s\n", id, e);
-		if (animationListener != null) {
-			animationListener.updatePosition(e);
-			animationListener.checkCollision(e);
-		}
-		// ICharacter<?> crusader = characterById.get(id);
-		// if (crusader != null)
-		// crusader.setPosition(model.getX(id), model.getY(id), model.getZ(id));
-	}
-
-	// Déplacements du plateau
-	public void scrollRight() {
-		originX += SCROLL_SPEED;
-		window.scroll(originX, originY);
-	}
-
-	public void scrollLeft() {
-		originX -= SCROLL_SPEED;
-		window.scroll(originX, originY);
-	}
-
-	public void scrollUp() {
-		originY -= SCROLL_SPEED;
-		window.scroll(originX, originY);
-	}
-
-	public void scrollDown() {
-		originY += SCROLL_SPEED;
-		window.scroll(originX, originY);
-	}
-
-	public void createCrusader(UUID id) {
-		ICharacter<?> crusader = new Crusader(id);
-		characterById.put(id, crusader);
-		crusader.setTickAnimationTrigger(e -> onTick(id, e));
-		crusader.setBeginAnimationTrigger(e -> onBegin(e));
-		crusader.setEndAnimationTrigger(e -> onEnd(e));
-		crusader.setMidAnimationTrigger(e -> onMid(e));
-		window.add(crusader);
-	}
-
-	public void createSpiders(Set<UUID> spiderIds) {
-		System.err.println(spiderIds);
-		for (UUID id : spiderIds) {
-			ICharacter<?> spider = new Spider(id);
-			characterById.put(id, spider);
-			spider.setTickAnimationTrigger(e -> onTick(id, e));
-			spider.setBeginAnimationTrigger(e -> onBegin(e));
-			spider.setEndAnimationTrigger(e -> onEnd(e));
-			spider.setMidAnimationTrigger(e -> onMid(e));
-			window.add(spider);
-		}
-	}
-
+    public void createSpiders(Set<UUID> spiderIds) {
+        spiderIds.forEach(id -> createCharacter(id, new Spider(id)));
+    }
 }

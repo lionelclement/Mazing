@@ -83,6 +83,16 @@ public interface ICharacter<S extends CharacterMode> {
     void setMode(String mode);
 
 
+    /**
+     * Définit la vitesse d'animation
+     * 
+     *
+     * @param mode
+     * @param speed vitesse
+     */
+    void setSpeed(S mode, float speed);
+
+
     // =========================
     // ⏱️ CALLBACKS D’ANIMATION
     // =========================

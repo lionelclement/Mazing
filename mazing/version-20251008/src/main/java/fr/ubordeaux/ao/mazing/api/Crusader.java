@@ -27,8 +27,8 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         FALL("death", 9, false),
         DEATH("death", 9, false),
         IDLE("idle", 16, true),
-        TURL_LEFT("idle", 16, true),
-        TURL_RIGHT("idle", 16, true);
+        TURN_LEFT("idle", 16, true),
+        TURN_RIGHT("idle", 16, true);
 
         private final String name;
         private final int numFrames;
@@ -84,7 +84,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         initSounds();
         this.scale = DEFAULT_SCALE;
         initAnimations(DEFAULT_SCALE);
-
     }
 
     private void initSounds() {
@@ -145,8 +144,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void initAnimations(float scale) {
         Mode[] modes = Mode.values();
-        Direction[] directions = Direction.values();
-
         for (Mode mode : modes) {
             switch (mode) {
                 case ATTACK:
@@ -158,7 +155,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 case RUN:
                 case WALK: {
                     int numFrames = mode.getNumFrames();
-                    for (Direction direction : directions) {
+                    for (Direction direction : Direction.values()) {
                         images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
                                 direction.ordinal(),
                                 String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
@@ -176,32 +173,32 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), this);
+                                mode.isLoop(), 1f, this);
 
                     }
                 }
 
                     break;
-                case TURL_LEFT: 
-                case TURL_RIGHT: {
+                case TURN_LEFT:
+                case TURN_RIGHT: {
                     int numFrames = mode.getNumFrames();
-                    for (Direction direction : directions) {
+                    for (Direction direction : Direction.values()) {
                         images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
                                 String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
-                                scale, mode == Mode.TURL_LEFT);
+                                scale, mode == Mode.TURN_LEFT);
 
                         shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
                                 String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
-                                scale, mode == Mode.TURL_LEFT);
+                                scale, mode == Mode.TURN_LEFT);
 
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), this);
+                                mode.isLoop(), 1f, this);
 
                     }
 
@@ -253,7 +250,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    protected void callTickTrigger(int frameIndex) {
+    protected void callTickTrigger(float frameIndex) {
         switch (currentMode) {
             case RUN, WALK -> {
                 if (frameIndex % 8 == 3) {
@@ -306,59 +303,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 break;
         }
         super.callEndTrigger();
-    }
-
-    @Override
-    public void setDirection(Direction newDirection) {
-        turnPlayer(newDirection, 125, () -> {
-            currentDirection = newDirection;
-
-            // Calculer la direction unitaire pour X et Y selon la direction
-            float dirX = 0, dirY = 0;
-            switch (newDirection) {
-                case NORTH -> {
-                    dirX = 0;
-                    dirY = -1;
-                }
-                case SOUTH -> {
-                    dirX = 0;
-                    dirY = 1;
-                }
-                case EAST -> {
-                    dirX = 1;
-                    dirY = 0;
-                }
-                case WEST -> {
-                    dirX = -1;
-                    dirY = 0;
-                }
-
-                case NORTHEAST -> {
-                    dirX = 1;
-                    dirY = -1;
-                }
-                case NORTHWEST -> {
-                    dirX = -1;
-                    dirY = -1;
-                }
-                case SOUTHEAST -> {
-                    dirX = 1;
-                    dirY = 1;
-                }
-                case SOUTHWEST -> {
-                    dirX = -1;
-                    dirY = 1;
-                }
-            }
-
-            // Normaliser si diagonale
-            if (dirX != 0 && dirY != 0) {
-                float invSqrt2 = 1 / (float) Math.sqrt(2);
-                dirX *= invSqrt2;
-                dirY *= invSqrt2;
-            }
-
-        });
     }
 
     @Override

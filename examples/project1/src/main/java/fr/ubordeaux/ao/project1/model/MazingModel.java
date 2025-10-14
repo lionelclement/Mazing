@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import fr.ubordeaux.ao.mazing.api.CharacterMode;
+import fr.ubordeaux.ao.mazing.api.Direction;
 
 public class MazingModel {
 
@@ -19,12 +20,12 @@ public class MazingModel {
 	private Maze maze;
 
 	public MazingModel() {
-		this.maze = new Maze(6, 6, 1);
+		this.maze = new Maze(6, 6, 4);
 		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, Direction.SOUTH, maze);
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 1; i++) {
 			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, 1 * i, 1 * i, 0,
 					Direction.SOUTH, maze);
 			System.err.println(characterModel);
@@ -55,16 +56,16 @@ public class MazingModel {
 	public void generateMaze() {
 		maze.generate();
 		if (this.modelListener != null) {
-			this.modelListener.onMazeChanged(maze);
+			this.modelListener.onMazeChanged(maze, crusader.getZ());
 		}
 	}
 
-    public void clearMaze() {
+	public void clearMaze() {
 		maze.clear();
 		if (this.modelListener != null) {
-			this.modelListener.onMazeChanged(maze);
+			this.modelListener.onMazeChanged(maze, crusader.getZ());
 		}
-    }
+	}
 
 	public CharacterModel getCharacterById(UUID id) {
 		return this.charactersById.get(id);
@@ -77,7 +78,7 @@ public class MazingModel {
 		}
 	}
 
-	public void setDirection(Direction direction) {
+	public void setDirectionCrusader(Direction direction) {
 		crusader.setDirection(direction);
 		if (this.modelListener != null) {
 			this.modelListener.onDirectionChanged(crusader.getId(), direction);
@@ -107,19 +108,31 @@ public class MazingModel {
 		}
 	}
 
-	public void setDirectionSpiders(Direction direction) {
+	public void setDirectionSpiders(Direction north) {
 		for (UUID id : spidersById.keySet()) {
 			CharacterModel spider = spidersById.get(id);
 
-			spider.setDirection(direction);
+			spider.setDirection(north);
 			if (this.modelListener != null) {
-				this.modelListener.onDirectionChanged(id, direction);
+				this.modelListener.onDirectionChanged(id, north);
 			}
 		}
 	}
 
 	public void printMaze() {
 		System.out.println(maze);
+	}
+
+	public void setRelativePositionCrusader(int x, int y, int z) {
+		crusader.setPosition(crusader.getX() + x, crusader.getY() + y, crusader.getZ() + z);
+		if (this.modelListener != null) {
+			this.modelListener.onMazeChanged(maze, crusader.getZ());
+		}
+
+	}
+
+	public void setSpeedCrusader(int x, int y, float z) {
+		crusader.setSpeed(x, y, z);
 	}
 
 }

@@ -1,6 +1,5 @@
 package fr.ubordeaux.ao.project1.model;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -31,11 +30,11 @@ public class Maze {
                 for (int x = 0; x < width; x++) {
                     grid[z][y][x] = new Cell(x, y, z);
                     // On ajoute des murs à l'exterieur
-                    for (Direction d : outerWalls(grid[z][y][x])) {
+                    for (Direction3D d : outerWalls(grid[z][y][x])) {
                         grid[z][y][x].putOnWalls(d, true);
                     }
                     // On ferme tous les chemins partout
-                    for (Direction d : Direction.values()) {
+                    for (Direction3D d : Direction3D.values()) {
                         grid[z][y][x].putOnPaths(d, false);
                     }
                 }
@@ -54,10 +53,10 @@ public class Maze {
         // Génération du labyrinthe avec DFS
         while (!stack.isEmpty()) {
             Cell current = stack.peek();
-            List<Direction> neighbors = unvisitedNeighbors(current);
+            List<Direction3D> neighbors = unvisitedNeighbors(current);
 
             if (!neighbors.isEmpty()) {
-                Direction dir = neighbors.get(rand.nextInt(neighbors.size()));
+                Direction3D dir = neighbors.get(rand.nextInt(neighbors.size()));
                 Cell next = getNeighbor(current, dir);
 
                 current.putOnPaths(dir, true);
@@ -76,9 +75,9 @@ public class Maze {
 
     }
 
-    private List<Direction> unvisitedNeighbors(Cell c) {
-        List<Direction> dirs = new ArrayList<>();
-        for (Direction d : Direction.values()) {
+    private List<Direction3D> unvisitedNeighbors(Cell c) {
+        List<Direction3D> dirs = new ArrayList<>();
+        for (Direction3D d : Direction3D.values()) {
             Cell n = getNeighbor(c, d);
             if (n != null && !n.isVisited())
                 dirs.add(d);
@@ -86,7 +85,7 @@ public class Maze {
         return dirs;
     }
 
-    private Cell getNeighbor(Cell c, Direction d) {
+    private Cell getNeighbor(Cell c, Direction3D d) {
         int nx = c.getX(), ny = c.getY(), nz = c.getZ();
         switch (d) {
             case NORTH -> ny--;
@@ -104,42 +103,38 @@ public class Maze {
         return grid[nz][ny][nx];
     }
 
-    private Direction opposite(Direction d) {
+    private Direction3D opposite(Direction3D d) {
         return switch (d) {
-            case EAST -> Direction.WEST;
-            case WEST -> Direction.EAST;
-            case NORTH -> Direction.SOUTH;
-            case SOUTH -> Direction.NORTH;
-            case UP -> Direction.DOWN;
-            case DOWN -> Direction.UP;
-            case NORTHEAST -> Direction.SOUTHWEST;
-            case NORTHWEST -> Direction.SOUTHEAST;
-            case SOUTHEAST -> Direction.NORTHWEST;
-            case SOUTHWEST -> Direction.NORTHEAST;
+            case EAST -> Direction3D.WEST;
+            case WEST -> Direction3D.EAST;
+            case NORTH -> Direction3D.SOUTH;
+            case SOUTH -> Direction3D.NORTH;
+            case UP -> Direction3D.DOWN;
+            case DOWN -> Direction3D.UP;
 
         };
     }
 
-    private List<Direction> outerWalls(Cell c) {
-        List<Direction> result = new ArrayList<>();
+    private List<Direction3D> outerWalls(Cell c) {
+        List<Direction3D> result = new ArrayList<>();
         int nx = c.getX(), ny = c.getY(), nz = c.getZ();
         if (nx == 0) {
-            result.add(Direction.WEST);
+            result.add(Direction3D.WEST);
         }
         if (nx >= width - 1) {
-            result.add(Direction.EAST);
+            result.add(Direction3D.EAST);
         }
         if (ny == 0) {
-            result.add(Direction.NORTH);
+            result.add(Direction3D.NORTH);
         }
         if (ny >= height - 1) {
-            result.add(Direction.SOUTH);
+            result.add(Direction3D.SOUTH);
         }
         if (nz == 0) {
-            result.add(Direction.DOWN);
+            result.add(Direction3D.DOWN);
         }
         if (nz >= depth - 1) {
-            result.add(Direction.UP);
+            result.add(Direction3D.UP);
         }
         return result;
     }
@@ -155,7 +150,7 @@ public class Maze {
                 // Ligne du haut de chaque cellule (mur NORTH)
                 for (int x = 0; x < width; x++) {
                     Cell c = grid[z][y][x];
-                    result.append(c.isPath(Direction.NORTH) ? "+   " : "+___");
+                    result.append(c.isPath(Direction3D.NORTH) ? "+   " : "+___");
                 }
                 result.append("+\n");
 
@@ -164,15 +159,15 @@ public class Maze {
                     Cell c = grid[z][y][x];
 
                     // mur OUEST à gauche, espace à l'intérieur
-                    result.append(c.isPath(Direction.WEST) ? " " : "|");
+                    result.append(c.isPath(Direction3D.WEST) ? " " : "|");
                     // symbole au centre de la cellule
                     String symbol = "   ";
                     if (c == begin){
                         symbol = " $ ";
                     }
                     else{
-                    boolean up = c.isPath(Direction.UP);
-                    boolean down = c.isPath(Direction.DOWN);
+                    boolean up = c.isPath(Direction3D.UP);
+                    boolean down = c.isPath(Direction3D.DOWN);
                     if (up && down)
                         symbol = " x ";
                     else if (up)
@@ -184,14 +179,14 @@ public class Maze {
                 }
                 // Mur EST de la dernière cellule
                 Cell last = grid[z][y][width - 1];
-                result.append(last.isPath(Direction.EAST) ? " " : "|");
+                result.append(last.isPath(Direction3D.EAST) ? " " : "|");
                 result.append("\n");
             }
 
             // Ligne du bas de la dernière rangée (mur SOUTH)
             for (int x = 0; x < width; x++) {
                 Cell c = grid[z][height - 1][x];
-                result.append(c.isPath(Direction.SOUTH) ? "+   " : "+___");
+                result.append(c.isPath(Direction3D.SOUTH) ? "+   " : "+___");
             }
             result.append("+\n\n");
         }
@@ -219,7 +214,7 @@ public class Maze {
      * Détermine s’il y a un obstacle à la position donnée dans la direction donnée.
      * Retourne true si un mur ou la limite du labyrinthe bloque le passage.
      */
-    public boolean isObstacleAt(float x, float y, float z, Direction direction) {
+    public boolean isObstacleAt(float x, float y, float z, Direction3D direction) {
         // Marges de sécurité autour des murs
         final float wallWidth = 0.20f;
         final float wallHeight = 0.20f;
@@ -281,8 +276,8 @@ public class Maze {
      * Vérifie si un personnage peut se déplacer dans une direction donnée.
      * Retourne false s’il y a un mur ou que le déplacement sortirait du labyrinthe.
      */
-    public boolean canMove(float cellX, float cellY, float cellZ, Direction direction) {
-        if (isObstacleAt(cellX, cellY, cellZ, direction))
+    public boolean canMove(float cellX, float cellY, float cellZ, String direction) {
+        if (isObstacleAt(cellX, cellY, cellZ, Direction3D.valueOf(direction)))
             return false;
         return true;
         // Cell next = getNeighbor(grid[(int) cellZ][(int) cellY][(int) cellX],
@@ -290,14 +285,14 @@ public class Maze {
         // return next != null; // on peut aller dedans
     }
 
-    public List<Direction> shortestPath(int startX, int startY, int startZ,
+    public List<Direction3D> shortestPath(int startX, int startY, int startZ,
             int endX, int endY, int endZ) {
 
         class Node {
             int x, y, z;
-            List<Direction> path;
+            List<Direction3D> path;
 
-            Node(int x, int y, int z, List<Direction> path) {
+            Node(int x, int y, int z, List<Direction3D> path) {
                 this.x = x;
                 this.y = y;
                 this.z = z;
@@ -321,8 +316,8 @@ public class Maze {
 
             Cell currentCell = grid[current.z][current.y][current.x];
 
-            // Explorer toutes les directions possibles
-            for (Direction dir : Direction.values()) {
+            // Explorer toutes les CellDirections possibles
+            for (Direction3D dir : Direction3D.values()) {
                 if (!currentCell.isPath(dir))
                     continue; // pas de passage dans cette direction
 
@@ -333,7 +328,7 @@ public class Maze {
                 if (!visited[next.getZ()][next.getY()][next.getX()]) {
                     visited[next.getZ()][next.getY()][next.getX()] = true;
 
-                    List<Direction> newPath = new ArrayList<>(current.path);
+                    List<Direction3D> newPath = new ArrayList<>(current.path);
                     newPath.add(dir);
 
                     queue.add(new Node(next.getX(), next.getY(), next.getZ(), newPath));

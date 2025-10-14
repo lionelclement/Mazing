@@ -34,7 +34,10 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	private boolean frozen;
 
 	/** Index de la frame courante */
-	private int frameIndex;
+	private float frameIndex;
+
+	/** Index de la frame courante */
+	private float speed;
 
 	/**
 	 * Constructeur d'une animation.
@@ -45,13 +48,14 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 * @param loop         indique si l'animation doit boucler
 	 * @param owner        personnage propriétaire de l'animation
 	 */
-	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop,
+	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop, float speed,
 			AbstractCharacter<CharacterMode> owner) {
 		this.images = frames;
 		this.shadows = shadows;
 		this.frameNumber = frames.length;
 		this.frameNumberMid = frames.length / 2;
 		this.loop = loop;
+		this.speed = speed;
 		this.frozen = false;
 		Random rand = new Random();
 		this.frameIndex = rand.nextInt(frames.length);
@@ -76,14 +80,15 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 			if (frameIndex == frameNumberMid) {
 				owner.callMidTrigger();
 			}
-			frameIndex++;
+			//System.out.printf("### speed: %f, frameIndex:%f\n", speed, frameIndex);
+			frameIndex += speed;
 		}
 		if (frameIndex >= frameNumber) {
 			if (loop) {
 				frameIndex = 0;
 				owner.callLoopTrigger();
 			} else {
-				frameIndex--;
+				frameIndex = frameNumber-1;
 				frozen = true;
 				owner.callEndTrigger();
 			}
@@ -97,7 +102,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public BufferedImage getCurrentFrame() {
-		return images[frameIndex];
+		return images[(int)frameIndex];
 	}
 
 	/**
@@ -107,7 +112,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public BufferedImage getCurrentShadow() {
-		return shadows[frameIndex];
+		return shadows[(int)frameIndex];
 	}
 
 	/**
@@ -126,6 +131,10 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	public void lastFrame() {
 		frameIndex = images.length - 1;
 		frozen = true;
+	}
+
+	public void setSpeed(float speed) {
+		this.speed = speed;
 	}
 
 }

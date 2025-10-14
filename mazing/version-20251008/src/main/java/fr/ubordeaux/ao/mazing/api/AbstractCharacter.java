@@ -19,9 +19,9 @@ import java.util.function.Consumer;
  */
  abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRenderable implements ICharacter<T> {
 
-    protected BufferedImage[][][] images; // [state][direction][frame]
-    protected BufferedImage[][][] shadow_images; // [state][direction][frame]
-    protected Animation<T>[][] animations; // [state][direction]
+    protected BufferedImage[][][] images; // [mode][direction][frame]
+    protected BufferedImage[][][] shadow_images; // [mode][direction][frame]
+    protected Animation<T>[][] animations; // [mode][direction]
 
     protected float x, y, z;
     protected Direction currentDirection;
@@ -43,12 +43,12 @@ import java.util.function.Consumer;
         currentDirection = Direction.SOUTH;
     }
 
-    Animation<T> getCurrentAnimation(int state) {
-        return animations[state][currentDirection.ordinal()];
+    Animation<T> getCurrentAnimation(int mode) {
+        return animations[mode][currentDirection.ordinal()];
     }
 
-    void render(Graphics g, int state) {
-        Animation<T> anim = getCurrentAnimation(state);
+    void render(Graphics g, int mode) {
+        Animation<T> anim = getCurrentAnimation(mode);
         BufferedImage image = anim.getCurrentFrame();
         TileMap.getInstance().drawImage(x, y, z, image, g, getRenderType(), 1.0f);
     }
@@ -112,13 +112,6 @@ import java.util.function.Consumer;
         rotationTimer.start();
     }
 
-    @Override
-    public void setDirection(Direction newDirection) {
-        turnPlayer(newDirection, 125, () -> {
-            currentDirection = newDirection;
-        });
-    }
-
     public void setX(float x) {
         this.x = x;
     }
@@ -135,7 +128,7 @@ import java.util.function.Consumer;
         return x + y + 0.5f;
     }
 
-    void callTickTrigger(int frameIndex) {
+    void callTickTrigger(float frameIndex) {
         if (tickAnimationTrigger != null) {
             tickAnimationTrigger.accept(this);
         }
@@ -219,5 +212,45 @@ import java.util.function.Consumer;
     public UUID getId(){
         return id;
     }
+
+        @Override
+    public void setSpeed(T mode, float speed) {
+        
+        for (Direction d : Direction.values()){
+            animations[mode.ordinal()][d.ordinal()].setSpeed(speed);
+        }
+    }
+
+    @Override
+public void setDirection(Direction newDirection) {
+    turnPlayer(newDirection, 125, () -> {
+        currentDirection = newDirection;
+
+        // Calculer la direction unitaire pour X, Y et Z selon la direction
+        float dirX = 0, dirY = 0;
+
+        switch (newDirection) {
+            case NORTH -> { dirX = 0; dirY = -1; }
+            case SOUTH -> { dirX = 0; dirY = 1; }
+            case EAST ->  { dirX = 1; dirY = 0; }
+            case WEST ->  { dirX = -1; dirY = 0; }
+
+            case NORTHEAST -> { dirX = 1; dirY = -1;  }
+            case NORTHWEST -> { dirX = -1; dirY = -1; }
+            case SOUTHEAST -> { dirX = 1; dirY = 1;  }
+            case SOUTHWEST -> { dirX = -1; dirY = 1;  }
+
+        }
+
+        // Normaliser si diagonale dans XY
+        if (dirX != 0 && dirY != 0) {
+            float invSqrt2 = 1 / (float) Math.sqrt(2);
+            dirX *= invSqrt2;
+            dirY *= invSqrt2;
+        }
+
+    });
+}
+
 
 }

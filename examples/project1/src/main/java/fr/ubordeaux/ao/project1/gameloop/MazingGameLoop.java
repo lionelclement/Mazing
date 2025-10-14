@@ -30,8 +30,7 @@ public class MazingGameLoop {
             @Override
             public void updatePosition(ICharacter<?> character) {
                 CharacterModel characterModel = model.getCharacterById(character.getId());
-                characterModel._updatePosition();
-                //model.printMaze();
+                characterModel.updatePosition();
             }
 
             @Override

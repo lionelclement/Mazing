@@ -6,8 +6,8 @@ import java.util.Map;
 public class Cell {
     private final int x, y, z;
     private boolean visited = false;
-    private final Map<Direction, Boolean> paths = new HashMap<>();
-    private final Map<Direction, Boolean> walls = new HashMap<>();
+    private final Map<Direction3D, Boolean> paths = new HashMap<>();
+    private final Map<Direction3D, Boolean> walls = new HashMap<>();
 
     public Cell(int x, int y, int z) {
         this.x = x;
@@ -27,21 +27,21 @@ public class Cell {
         return sb.toString();
     }
 
-    public boolean isWall(Direction d) {
+    public boolean isWall(Direction3D d) {
         Boolean b = walls.get(d);
         if (b != null)
             return b;
         return false;
     }
 
-    public boolean isPath(Direction d) {
+    public boolean isPath(Direction3D d) {
         Boolean b = paths.get(d);
         if (b != null)
             return b;
         return false;
     }
 
-    public void putOnPaths(Direction dir, boolean b) {
+    public void putOnPaths(Direction3D dir, boolean b) {
         paths.put(dir, b);
     }
 
@@ -49,7 +49,7 @@ public class Cell {
         this.visited = b;
     }
 
-    public void putOnWalls(Direction d, boolean b) {
+    public void putOnWalls(Direction3D d, boolean b) {
         this.walls.put(d, b);
     }
 

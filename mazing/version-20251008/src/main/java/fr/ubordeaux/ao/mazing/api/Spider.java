@@ -2,6 +2,7 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,7 +22,9 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         IDLE("walk", 1, true),
         ATTACK("attack", 8, false),
         FALL("death", 8, false),
-        DEATH("death", 8, false);
+        DEATH("death", 8, false),
+        TURN_LEFT("walk", 25, true),
+        TURN_RIGHT("walk", 25, true);
 
         private final String name;
         private final int numFrames;
@@ -69,7 +72,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         initSounds();
         this.scale = DEFAULT_SCALE;
         initAnimations(DEFAULT_SCALE);
-
     }
 
     private void initSounds() {
@@ -99,30 +101,69 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void initAnimations(float scale) {
         Mode[] modes = Mode.values();
-        Direction[] directions = Direction.values();
+        // Direction[] directions = Direction.values();
+        List<Direction> selectedDirections = List.of(
+                Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST, Direction.NORTH, Direction.NORTHWEST,
+                Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH
+
+        );
 
         for (Mode mode : modes) {
-            int numFrames = mode.getNumFrames();
-            for (Direction direction : directions) {
-                images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                        (direction.ordinal() + 6) % 8,
-                        String.format("/bw_spider/%s/%s-BW_Spider_",
-                                mode.getName(),
-                                mode.getName()),
-                        scale);
+            switch (mode) {
+                case ATTACK:
+                case DEATH:
+                case FALL:
+                case IDLE:
+                case WALK: {
 
-                shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                        (direction.ordinal() + 6) % 8,
-                        String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
-                                mode.getName(),
-                                mode.getName()),
-                        scale);
+                    int numFrames = mode.getNumFrames();
+                    for (Direction direction : selectedDirections) {
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
+                                (direction.ordinal() + 6) % 8,
+                                String.format("/bw_spider/%s/%s-BW_Spider_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale);
 
-                animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                        images[mode.ordinal()][direction.ordinal()],
-                        shadow_images[mode.ordinal()][direction.ordinal()],
-                        mode.isLoop(), this);
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
+                                (direction.ordinal() + 6) % 8,
+                                String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale);
 
+                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                                images[mode.ordinal()][direction.ordinal()],
+                                shadow_images[mode.ordinal()][direction.ordinal()],
+                                mode.isLoop(), 1f, this);
+
+                    }
+                }
+                    break;
+                case TURN_LEFT:
+                case TURN_RIGHT: {
+                    int numFrames = mode.getNumFrames();
+                    for (Direction direction : selectedDirections) {
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
+                                String.format("/bw_spider/%s/%s-BW_Spider_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale, mode == Mode.TURN_LEFT);
+
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
+                                String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
+                                        mode.getName(),
+                                        mode.getName()),
+                                scale, mode == Mode.TURN_LEFT);
+
+                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
+                                images[mode.ordinal()][direction.ordinal()],
+                                shadow_images[mode.ordinal()][direction.ordinal()],
+                                mode.isLoop(), 1f, this);
+
+                    }
+                }
+                    break;
             }
         }
     }
@@ -135,7 +176,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     @Override
     public void setMode(CharacterMode state) {
         Mode s = (Mode) state;
-        System.out.println("changeMode: " + currentMode + " -> " + s);
         previousMode = currentMode;
         currentMode = s;
         animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
@@ -192,59 +232,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void setDirection(Direction newDirection) {
-        turnPlayer(newDirection, 125, () -> {
-            currentDirection = newDirection;
-
-            // Calculer la direction unitaire pour X et Y selon la direction
-            float dirX = 0, dirY = 0;
-            switch (newDirection) {
-                case NORTH -> {
-                    dirX = 0;
-                    dirY = -1;
-                }
-                case SOUTH -> {
-                    dirX = 0;
-                    dirY = 1;
-                }
-                case EAST -> {
-                    dirX = 1;
-                    dirY = 0;
-                }
-                case WEST -> {
-                    dirX = -1;
-                    dirY = 0;
-                }
-
-                case NORTHEAST -> {
-                    dirX = 1;
-                    dirY = -1;
-                }
-                case NORTHWEST -> {
-                    dirX = -1;
-                    dirY = -1;
-                }
-                case SOUTHEAST -> {
-                    dirX = 1;
-                    dirY = 1;
-                }
-                case SOUTHWEST -> {
-                    dirX = -1;
-                    dirY = 1;
-                }
-            }
-
-            // Normaliser si diagonale
-            if (dirX != 0 && dirY != 0) {
-                float invSqrt2 = 1 / (float) Math.sqrt(2);
-                dirX *= invSqrt2;
-                dirY *= invSqrt2;
-            }
-
-        });
-    }
-
-    @Override
     public float getIsoDepth() {
         return x + y + 1.5f;
     }
@@ -254,12 +241,12 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         try {
             setMode(Mode.valueOf(mode));
         } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unexpected mode");
+            throw new IllegalStateException("Unexpected mode: " + mode);
         }
     }
 
     @Override
-    protected void callTickTrigger(int frameIndex) {
+    protected void callTickTrigger(float frameIndex) {
         super.callTickTrigger(frameIndex);
     }
 

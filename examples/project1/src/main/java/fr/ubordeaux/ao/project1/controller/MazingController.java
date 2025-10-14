@@ -4,8 +4,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.Spider;
-import fr.ubordeaux.ao.project1.model.Direction;
 import fr.ubordeaux.ao.project1.model.MazingModel;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
@@ -30,6 +30,13 @@ public class MazingController extends KeyAdapter {
 
 		// Actions liées aux lettres
 		switch (key) {
+			case 'h' -> {
+				model.setSpeedCrusader(0, 0, 0.01f);
+				model.setMode(Crusader.Mode.TURN_LEFT);
+			}
+
+			case 'H' -> model.setRelativePositionCrusader(0, 0, -1);
+
 			case 'm' -> model.generateMaze();
 			case 'M' -> model.clearMaze();
 			case 'w' -> model.setMode(Crusader.Mode.WALK);
@@ -37,6 +44,8 @@ public class MazingController extends KeyAdapter {
 			case 'a' -> model.setMode(Crusader.Mode.ATTACK);
 			case 'g' -> model.setMode(Crusader.Mode.GOTHIT);
 			case 'j' -> model.setMode(Crusader.Mode.JUMP);
+			case 't' -> model.setModeSpiders(Crusader.Mode.TURN_LEFT);
+			case 'T' -> model.setMode(Crusader.Mode.TURN_RIGHT);
 			case 'd' -> model.setMode(Crusader.Mode.DEATH);
 			case 's' -> model.setMode(Crusader.Mode.IDLE);
 			case 'W' -> model.setModeSpiders(Spider.Mode.WALK);
@@ -51,35 +60,43 @@ public class MazingController extends KeyAdapter {
 			}
 			case KeyEvent.VK_UP -> {
 				if (shiftDown)
-					view.scrollDown();
+					view.scroll(0, 1);
 				else if (altDown)
-				model.setDirectionSpiders(Direction.NORTH);
-				else
-					model.setDirection(Direction.NORTH);
+					model.setDirectionSpiders(Direction.NORTH);
+				else {
+					model.setDirectionCrusader(Direction.NORTH);
+					model.setMode(Crusader.Mode.WALK);
+				}
 			}
 			case KeyEvent.VK_DOWN -> {
 				if (shiftDown)
-					view.scrollUp();
+					view.scroll(0, -1);
 				else if (altDown)
-				model.setDirectionSpiders(Direction.SOUTH);
-				else
-					model.setDirection(Direction.SOUTH);
+					model.setDirectionSpiders(Direction.SOUTH);
+				else {
+					model.setDirectionCrusader(Direction.SOUTH);
+					model.setMode(Crusader.Mode.WALK);
+				}
 			}
 			case KeyEvent.VK_LEFT -> {
 				if (shiftDown)
-					view.scrollRight();
+					view.scroll(1, 0);
 				else if (altDown)
-				model.setDirectionSpiders(Direction.WEST);
-				else
-					model.setDirection(Direction.WEST);
+					model.setDirectionSpiders(Direction.WEST);
+				else {
+					model.setDirectionCrusader(Direction.WEST);
+					model.setMode(Crusader.Mode.WALK);
+				}
 			}
 			case KeyEvent.VK_RIGHT -> {
 				if (shiftDown)
-					view.scrollLeft();
+					view.scroll(-1, 0);
 				else if (altDown)
-				model.setDirectionSpiders(Direction.EAST);
-				else
-					model.setDirection(Direction.EAST);
+					model.setDirectionSpiders(Direction.EAST);
+				else {
+					model.setDirectionCrusader(Direction.EAST);
+					model.setMode(Crusader.Mode.WALK);
+				}
 			}
 			case KeyEvent.VK_Q -> System.exit(0);
 		}
