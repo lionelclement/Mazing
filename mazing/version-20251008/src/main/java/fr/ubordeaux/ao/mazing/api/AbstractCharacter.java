@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * @param <T> le type d'état du personnage, qui doit implémenter
  *            {@link CharacterMode}
  */
- abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRenderable implements ICharacter<T> {
+abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRenderable implements ICharacter<T> {
 
     protected BufferedImage[][][] images; // [mode][direction][frame]
     protected BufferedImage[][][] shadow_images; // [mode][direction][frame]
@@ -64,7 +64,7 @@ import java.util.function.Consumer;
 
     // Déplace le personnage vers une case et ajuste la direction progressivement
     abstract public void setPosition(float x, float y, float z);
-    
+
     void turnPlayer(Direction targetDirection, int delayMs, Runnable onFinished) {
 
         Direction direction = currentDirection;
@@ -84,7 +84,7 @@ import java.util.function.Consumer;
         javax.swing.Timer rotationTimer = new javax.swing.Timer(delayMs, null);
         final int[] stepCount = { 0 };
 
-        rotationTimer.addActionListener(_-> {
+        rotationTimer.addActionListener(_ -> {
             int newAngle = (currentAngle + stepSign * 45 * stepCount[0] + 360) % 360;
 
             // Choisir la direction la plus proche
@@ -183,7 +183,7 @@ import java.util.function.Consumer;
         loopAnimationTrigger = callback;
     }
 
-	abstract CharacterMode getCurrentMode();
+    abstract CharacterMode getCurrentMode();
 
     @Override
     public void setScale(float scale) {
@@ -206,51 +206,73 @@ import java.util.function.Consumer;
         return z;
     }
 
-
     protected abstract void initAnimations(float scale);
 
-    public UUID getId(){
+    public UUID getId() {
         return id;
     }
 
-        @Override
+    @Override
     public void setSpeed(T mode, float speed) {
-        
-        for (Direction d : Direction.values()){
+
+        for (Direction d : Direction.values()) {
             animations[mode.ordinal()][d.ordinal()].setSpeed(speed);
         }
     }
 
     @Override
-public void setDirection(Direction newDirection) {
-    turnPlayer(newDirection, 125, () -> {
-        currentDirection = newDirection;
+    public void setDirection(Direction newDirection) {
+        turnPlayer(newDirection, 125, () -> {
+            currentDirection = newDirection;
 
-        // Calculer la direction unitaire pour X, Y et Z selon la direction
-        float dirX = 0, dirY = 0;
+            // Calculer la direction unitaire pour X, Y et Z selon la direction
+            float dirX = 0, dirY = 0;
 
-        switch (newDirection) {
-            case NORTH -> { dirX = 0; dirY = -1; }
-            case SOUTH -> { dirX = 0; dirY = 1; }
-            case EAST ->  { dirX = 1; dirY = 0; }
-            case WEST ->  { dirX = -1; dirY = 0; }
+            switch (newDirection) {
+                case NORTH -> {
+                    dirX = 0;
+                    dirY = -1;
+                }
+                case SOUTH -> {
+                    dirX = 0;
+                    dirY = 1;
+                }
+                case EAST -> {
+                    dirX = 1;
+                    dirY = 0;
+                }
+                case WEST -> {
+                    dirX = -1;
+                    dirY = 0;
+                }
 
-            case NORTHEAST -> { dirX = 1; dirY = -1;  }
-            case NORTHWEST -> { dirX = -1; dirY = -1; }
-            case SOUTHEAST -> { dirX = 1; dirY = 1;  }
-            case SOUTHWEST -> { dirX = -1; dirY = 1;  }
+                case NORTHEAST -> {
+                    dirX = 1;
+                    dirY = -1;
+                }
+                case NORTHWEST -> {
+                    dirX = -1;
+                    dirY = -1;
+                }
+                case SOUTHEAST -> {
+                    dirX = 1;
+                    dirY = 1;
+                }
+                case SOUTHWEST -> {
+                    dirX = -1;
+                    dirY = 1;
+                }
 
-        }
+            }
 
-        // Normaliser si diagonale dans XY
-        if (dirX != 0 && dirY != 0) {
-            float invSqrt2 = 1 / (float) Math.sqrt(2);
-            dirX *= invSqrt2;
-            dirY *= invSqrt2;
-        }
+            // Normaliser si diagonale dans XY
+            if (dirX != 0 && dirY != 0) {
+                float invSqrt2 = 1 / (float) Math.sqrt(2);
+                dirX *= invSqrt2;
+                dirY *= invSqrt2;
+            }
 
-    });
-}
-
+        });
+    }
 
 }
