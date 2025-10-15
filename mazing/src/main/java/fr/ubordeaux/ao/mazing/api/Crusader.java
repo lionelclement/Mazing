@@ -28,7 +28,9 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         DEATH("death", 9, false),
         IDLE("idle", 16, true),
         TURN_LEFT("idle", 16, true),
-        TURN_RIGHT("idle", 16, true);
+        TURN_RIGHT("idle", 16, true),
+        WALK_LEFT("walk", 15, true),
+        WALK_RIGHT("walk", 15, true);
 
         private final String name;
         private final int numFrames;
@@ -180,20 +182,27 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
                     break;
                 case TURN_LEFT:
-                case TURN_RIGHT: {
+                case TURN_RIGHT: 
+                case WALK_LEFT:
+                case WALK_RIGHT: {
+                    boolean left = switch (mode) {
+                        case TURN_LEFT -> true;
+                        case WALK_LEFT -> true;
+                        default  -> false;
+                    };
                     int numFrames = mode.getNumFrames();
                     for (Direction direction : Direction.values()) {
                         images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
                                 String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
-                                scale, mode == Mode.TURN_LEFT);
+                                scale, left);
 
                         shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
                                 String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
-                                scale, mode == Mode.TURN_LEFT);
+                                scale, left);
 
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
@@ -253,7 +262,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     protected void callTickTrigger(float frameIndex) {
         switch (currentMode) {
             case RUN, WALK -> {
-                if (frameIndex % 8 == 3) {
+                if ((int)(frameIndex % 8) == 3) {
                     SoundManager.getInstance().stop(currentSound.name());
                     SoundManager.getInstance().play(currentSound.name());
                 }

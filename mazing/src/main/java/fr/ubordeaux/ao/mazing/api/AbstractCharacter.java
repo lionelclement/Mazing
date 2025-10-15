@@ -178,12 +178,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
         endLoopAnimationTrigger = callback;
     }
 
-    @Override
-    public void setLoopAnimationTrigger(Consumer<ICharacter<?>> callback) {
-        loopAnimationTrigger = callback;
-    }
-
-    abstract CharacterMode getCurrentMode();
+    //abstract CharacterMode getCurrentMode();
 
     @Override
     public void setScale(float scale) {
@@ -213,16 +208,21 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     }
 
     @Override
-    public void setSpeed(T mode, float speed) {
+    public void setFrameRate(T mode, float fps) {
 
         for (Direction d : Direction.values()) {
-            animations[mode.ordinal()][d.ordinal()].setSpeed(speed);
+            animations[mode.ordinal()][d.ordinal()].setFrameRate(fps);
         }
     }
 
     @Override
     public void setDirection(Direction newDirection) {
-        turnPlayer(newDirection, 125, () -> {
+            currentDirection = newDirection;
+        }
+
+    @Override
+    public void setDirection(Direction newDirection, int time) {
+        turnPlayer(newDirection, time, () -> {
             currentDirection = newDirection;
 
             // Calculer la direction unitaire pour X, Y et Z selon la direction
@@ -274,5 +274,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
 
         });
     }
+
+    abstract T getCurrentMode() ;
 
 }

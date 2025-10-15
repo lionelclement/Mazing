@@ -30,13 +30,7 @@ public class MazingController extends KeyAdapter {
 
 		// Actions liées aux lettres
 		switch (key) {
-			case 'h' -> {
-				model.setSpeedCrusader(0, 0, 0.01f);
-				model.setMode(Crusader.Mode.TURN_LEFT);
-			}
-
-			case 'H' -> model.setRelativePositionCrusader(0, 0, -1);
-
+			case 'h' -> model.crusaderClimbsTheStairs();
 			case 'm' -> model.generateMaze();
 			case 'M' -> model.clearMaze();
 			case 'w' -> model.setMode(Crusader.Mode.WALK);

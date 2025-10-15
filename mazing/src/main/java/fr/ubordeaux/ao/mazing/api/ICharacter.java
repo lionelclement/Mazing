@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * @param <S> Type représentant les modes possibles du personnage
  *            (par ex. {@link Crusader.Mode} ou {@link Spider.Mode})
  */
-public interface ICharacter<S extends CharacterMode> {
+public interface ICharacter<S extends ICharacterMode> {
 
     // =========================
     // 📍 POSITION ET DIRECTION
@@ -39,6 +39,14 @@ public interface ICharacter<S extends CharacterMode> {
      * @param z hauteur (niveau, pour effets de saut ou décalage vertical)
      */
     void setPosition(float x, float y, float z);
+
+    /**
+     * Définit la direction vers laquelle le personnage est orienté.
+     *
+     * @param targetDirection direction cible (ex. {@link Direction#NORTH})
+     * @param time durée de la rotation vers la direction en ms
+     */
+    void setDirection(Direction targetDirection, int time);
 
     /**
      * Définit la direction vers laquelle le personnage est orienté.
@@ -90,22 +98,12 @@ public interface ICharacter<S extends CharacterMode> {
      * @param mode
      * @param speed vitesse
      */
-    void setSpeed(S mode, float speed);
+    void setFrameRate(S mode, float fps);
 
 
     // =========================
     // ⏱️ CALLBACKS D’ANIMATION
     // =========================
-
-    /**
-     * Déclencheur appelé à la fin de chaque boucle complète d’animation.
-     * 
-     * Utile pour répéter des comportements périodiques (par ex. marche, vol, nage...).
-     * 
-     *
-     * @param callback fonction appelée à chaque fin de boucle d’animation
-     */
-    void setLoopAnimationTrigger(Consumer<ICharacter<?>> callback);
 
     /**
      * Déclencheur appelé au début de l’animation.

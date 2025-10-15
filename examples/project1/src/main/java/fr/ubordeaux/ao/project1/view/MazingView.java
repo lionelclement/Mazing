@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import fr.ubordeaux.ao.mazing.api.CharacterMode;
+import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
@@ -56,7 +56,7 @@ public class MazingView {
     public void attachModelListener(MazingModel model) {
         model.attachModelListener(new ModelListener() {
             @Override
-            public void onModeChanged(UUID id, CharacterMode mode) {
+            public void onModeChanged(UUID id, ICharacterMode mode) {
                 ICharacter<?> c = characterById.get(id);
                 if (c != null)
                     c.setMode(mode.name());
@@ -280,7 +280,7 @@ public class MazingView {
         window.scroll(originX, originY);
     }
 
-    private void createCharacter(UUID id, ICharacter<?> character) {
+    private void createCharacter(UUID id, ICharacter<? extends ICharacterMode> character) {
         characterById.put(id, character);
         character.setTickAnimationTrigger(e -> onTick(id, e));
         character.setBeginAnimationTrigger(this::onBegin);
@@ -291,9 +291,11 @@ public class MazingView {
 
     public void createCrusader(UUID id) {
         Crusader crusader = new Crusader(id);
-        crusader.setSpeed(Crusader.Mode.TURN_LEFT, 0.4f);
-        crusader.setSpeed(Crusader.Mode.TURN_RIGHT, 0.4f);
-        crusader.setSpeed(Crusader.Mode.JUMP, 0.1f);
+        crusader.setFrameRate(Crusader.Mode.TURN_LEFT, 0.4f);
+        crusader.setFrameRate(Crusader.Mode.TURN_RIGHT, 0.4f);
+        crusader.setFrameRate(Crusader.Mode.WALK_LEFT, 0.3f);
+        crusader.setFrameRate(Crusader.Mode.WALK_RIGHT, 0.3f);
+        crusader.setFrameRate(Crusader.Mode.JUMP, 0.1f);
         createCharacter(id, crusader);
     }
 

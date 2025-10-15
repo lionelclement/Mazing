@@ -413,9 +413,9 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * @param character personnage à ajouter
 	 */
 	@Override
-	public void add(ICharacter<? extends CharacterMode> character) {
+	public void add(ICharacter<? extends ICharacterMode> character) {
 		characters.add(character);
-		AbstractCharacter<? extends CharacterMode> ac = (AbstractCharacter<? extends CharacterMode>) character;
+		AbstractCharacter<? extends CharacterMode> ac = (AbstractCharacter<? extends ICharacterMode>) character;
 		sceneCharacters.add(ac);
 	}
 
@@ -426,19 +426,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	public void clear() {
 		sceneObjects.clear();
 		pointToSceneObjectsMap.clear();
-	}
-
-	/**
-	 * Retourne les codes des objets présents à une position donnée.
-	 * 
-	 * @param x coordonnée X
-	 * @param y coordonnée Y
-	 * @param z coordonnée Z
-	 * @return ensemble de codes
-	 */
-	@Override
-	public Set<Integer> getCodesFromPoint(int x, int y, int z) {
-		return pointToSceneObjectsMap.get(new DiscretePoint(x, y, z));
 	}
 
 	@Override
@@ -485,13 +472,11 @@ class BoardGame extends JPanel implements IWindowGame {
 
 	@Override
 	public void fillTilesBackground(int code, int x, int y, int width, int height) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'fillTilesBackground'");
 	}
 
 	@Override
 	public void add(int[][][] matrix) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'add'");
 	}
 

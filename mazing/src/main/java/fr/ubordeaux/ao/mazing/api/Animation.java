@@ -37,7 +37,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	private float frameIndex;
 
 	/** Index de la frame courante */
-	private float speed;
+	private float fps;
 
 	/**
 	 * Constructeur d'une animation.
@@ -48,14 +48,14 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 * @param loop         indique si l'animation doit boucler
 	 * @param owner        personnage propriétaire de l'animation
 	 */
-	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop, float speed,
+	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop, float fps,
 			AbstractCharacter<CharacterMode> owner) {
 		this.images = frames;
 		this.shadows = shadows;
 		this.frameNumber = frames.length;
 		this.frameNumberMid = frames.length / 2;
 		this.loop = loop;
-		this.speed = speed;
+		this.fps = fps;
 		this.frozen = false;
 		Random rand = new Random();
 		this.frameIndex = rand.nextInt(frames.length);
@@ -70,28 +70,49 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 *
 	 * @param owner personnage propriétaire de l'animation
 	 */
+
+	private int lastIntFrame = -1;
+
 	@Override
 	public void tick(AbstractCharacter<? extends CharacterMode> owner) {
-		owner.callTickTrigger(frameIndex);
 		if (!frozen) {
-			if (frameIndex == 0) {
+			int currentIntFrame = Math.round(frameIndex);
+
+			// callback tick sur frame entière
+			if (currentIntFrame != lastIntFrame) {
+				lastIntFrame = currentIntFrame;
+				owner.callTickTrigger(frameIndex);
+			}
+
+			// callback begin
+			if (currentIntFrame == 0) {
 				owner.callBeginTrigger();
 			}
-			if (frameIndex == frameNumberMid) {
+
+			// callback mid
+			if (currentIntFrame == frameNumberMid) {
 				owner.callMidTrigger();
 			}
-			//System.out.printf("### speed: %f, frameIndex:%f\n", speed, frameIndex);
-			frameIndex += speed;
-		}
-		if (frameIndex >= frameNumber) {
-			if (loop) {
-				frameIndex = 0;
-				owner.callLoopTrigger();
-			} else {
-				frameIndex = frameNumber-1;
-				frozen = true;
+
+			// callback end
+			if (currentIntFrame == frameNumber-1) {
 				owner.callEndTrigger();
 			}
+
+			frameIndex += fps;
+
+			// gestion fin ou loop
+			if (frameIndex >= frameNumber) {
+				if (loop) {
+					frameIndex = 0;
+					lastIntFrame = -1; // reset pour tick
+				} else {
+					frameIndex = frameNumber - 1;
+					frozen = true;
+				}
+			}
+
+
 		}
 	}
 
@@ -102,7 +123,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public BufferedImage getCurrentFrame() {
-		return images[(int)frameIndex];
+		return images[(int) frameIndex];
 	}
 
 	/**
@@ -112,7 +133,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public BufferedImage getCurrentShadow() {
-		return shadows[(int)frameIndex];
+		return shadows[(int) frameIndex];
 	}
 
 	/**
@@ -133,8 +154,8 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 		frozen = true;
 	}
 
-	public void setSpeed(float speed) {
-		this.speed = speed;
+	public void setFrameRate(float fps) {
+		this.fps = fps;
 	}
 
 }

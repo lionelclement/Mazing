@@ -2,7 +2,6 @@ package fr.ubordeaux.ao.mazing.api;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Set;
 
 /**
  * Fenêtre principale du jeu, gère le plateau isométrique.
@@ -95,7 +94,7 @@ public class WindowGame extends JFrame implements IWindowGame {
 	}
 
 	@Override
-	public void add(ICharacter<? extends CharacterMode> character) {
+	public void add(ICharacter<? extends ICharacterMode> character) {
 		boardGame.add(character);
 	}
 
@@ -123,11 +122,6 @@ public class WindowGame extends JFrame implements IWindowGame {
 	@Override
 	public void clear() {
 		boardGame.clear();
-	}
-
-	@Override
-	public Set<Integer> getCodesFromPoint(int x, int y, int z) {
-		return boardGame.getCodesFromPoint(x, y, z);
 	}
 
 	@Override

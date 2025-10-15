@@ -1,7 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Color;
-import java.util.Set;
 
 /**
  * Interface générique représentant une fenêtre de jeu (2D ou isométrique).
@@ -142,7 +141,7 @@ public interface IWindowGame {
      *
      * @param character l’objet personnage à ajouter
      */
-    void add(ICharacter<? extends CharacterMode> character);
+    void add(ICharacter<? extends ICharacterMode> character);
 
     /**
      * Ajoute un élément (tuile, décor, objet) à une position donnée avec transparence.
@@ -197,17 +196,4 @@ public interface IWindowGame {
     void drawTile(Color color, int x, int y, int z);
 
 
-    // =========================
-    // 🔍 INSPECTION
-    // =========================
-
-    /**
-     * Récupère l’ensemble des codes d’objets présents à un point donné de la scène.
-     *
-     * @param x coordonnée X sur la grille
-     * @param y coordonnée Y sur la grille
-     * @param z hauteur (niveau)
-     * @return un ensemble d’identifiants d’objets à cette position
-     */
-    Set<Integer> getCodesFromPoint(int x, int y, int z);
 }

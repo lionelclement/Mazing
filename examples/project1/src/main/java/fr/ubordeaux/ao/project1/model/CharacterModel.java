@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import javax.swing.Timer;
 
-import fr.ubordeaux.ao.mazing.api.CharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
@@ -15,7 +15,7 @@ public class CharacterModel {
 
 	private static final float WALK_SPEED = 0.03f;
 	private static final float RUN_SPEED = 0.08f;
-	private static final float TURN_LEFT_SPEED = 0.01f;
+	private static final float STAIR_CLIMB_SPEED = 0.01f;
 
 	public static enum Type {
 		CRUSADER,
@@ -28,7 +28,7 @@ public class CharacterModel {
 	public float speedX;
 	public float speedY;
 	private float speedZ;
-	private CharacterMode mode;
+	private ICharacterMode mode;
 	private Direction direction;
 	private boolean freeze;
 	private UUID id;
@@ -117,43 +117,37 @@ public class CharacterModel {
 		}
 	}
 
-private void updateVelocity() {
-    Map<Direction, Point3D> dirVectors = Map.of(
-        Direction.EAST,      new Point3D( 1,  0,  0),
-        Direction.WEST,      new Point3D(-1,  0,  0),
-        Direction.NORTH,     new Point3D( 0, -1,  0),
-        Direction.SOUTH,     new Point3D( 0,  1,  0),
-        Direction.NORTHEAST, new Point3D( 1, -1,  0),
-        Direction.NORTHWEST, new Point3D(-1, -1,  0),
-        Direction.SOUTHEAST, new Point3D( 1,  1,  0),
-        Direction.SOUTHWEST, new Point3D(-1,  1,  0)
-    );
+	private void updateVelocity() {
+		Map<Direction, Point3D> dirVectors = Map.of(
+				Direction.EAST, new Point3D(1, 0, 0),
+				Direction.WEST, new Point3D(-1, 0, 0),
+				Direction.NORTH, new Point3D(0, -1, 0),
+				Direction.SOUTH, new Point3D(0, 1, 0),
+				Direction.NORTHEAST, new Point3D(1, -1, 0),
+				Direction.NORTHWEST, new Point3D(-1, -1, 0),
+				Direction.SOUTHEAST, new Point3D(1, 1, 0),
+				Direction.SOUTHWEST, new Point3D(-1, 1, 0));
 
-    Point3D vector = dirVectors.get(direction);
-    if (vector == null) {
-        this.speedX = 0;
-        this.speedY = 0;
-        this.speedZ = 0;
-        return;
-    }
+		Point3D vector = dirVectors.get(direction);
+		
+		double speed = switch (mode.name()) {
+			case "WALK" -> WALK_SPEED;
+			case "RUN" -> RUN_SPEED;
+			case "IDLE", "GOTHIT" -> 0;
+			default -> Math.hypot(speedX, speedY);
+		};
 
-    double speed = switch (mode.name()) {
-        case "WALK" -> WALK_SPEED;
-        case "TURN_LEFT" -> TURN_LEFT_SPEED;
-        case "RUN" -> RUN_SPEED;
-        case "IDLE", "GOTHIT" -> 0;
-        default -> Math.hypot(speedX, speedY);
-    };
+		// Normaliser les diagonales (XY ou XYZ)
+		double norm = Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+		if (norm == 0)
+			norm = 1;
 
-    // Normaliser les diagonales (XY ou XYZ)
-    double norm = Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
-    if (norm == 0) norm = 1;
+		this.speedX = (float) (vector.x / norm * speed);
+		this.speedY = (float) (vector.y / norm * speed);
+		// this.speedZ = (float) (vector.z / norm * speed);
+	}
 
-    this.speedX = (float) (vector.x / norm * speed);
-    this.speedY = (float) (vector.y / norm * speed);
-    this.speedZ = (float) (vector.z / norm * speed);
-}
-	public void setMode(CharacterMode mode) {
+	public void setMode(ICharacterMode mode) {
 		// System.out.println("CharacterModel@setMode");
 		this.mode = mode;
 		updateVelocity();
@@ -182,7 +176,7 @@ private void updateVelocity() {
 			speedX = speedY = 0;
 	}
 
-	public CharacterMode getMode() {
+	public ICharacterMode getMode() {
 		return mode;
 	}
 
@@ -196,10 +190,15 @@ private void updateVelocity() {
 
 	}
 
-	public void setSpeed(int x, int y, float z) {
+	public void setSpeed(float x, float y, float z) {
 		speedX = x;
 		speedY = y;
 		speedZ = z;
 	}
+
+    public void climbsTheStairs() {
+		this.setMode(Crusader.Mode.WALK_LEFT);
+		this.setSpeed(0, 0, STAIR_CLIMB_SPEED);
+    }
 
 }

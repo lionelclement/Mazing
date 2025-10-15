@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import fr.ubordeaux.ao.mazing.api.CharacterMode;
 import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 
 public class MazingModel {
 
@@ -71,7 +71,7 @@ public class MazingModel {
 		return this.charactersById.get(id);
 	}
 
-	public void setMode(CharacterMode mode) {
+	public void setMode(ICharacterMode mode) {
 		crusader.setMode(mode);
 		if (this.modelListener != null) {
 			this.modelListener.onModeChanged(crusader.getId(), mode);
@@ -97,7 +97,7 @@ public class MazingModel {
 		return this.spidersById.keySet();
 	}
 
-	public void setModeSpiders(CharacterMode mode) {
+	public void setModeSpiders(ICharacterMode mode) {
 		for (UUID id : spidersById.keySet()) {
 			CharacterModel spider = spidersById.get(id);
 
@@ -131,8 +131,12 @@ public class MazingModel {
 
 	}
 
-	public void setSpeedCrusader(int x, int y, float z) {
+	public void setSpeedCrusader(float x, float y, float z) {
 		crusader.setSpeed(x, y, z);
+	}
+
+	public void crusaderClimbsTheStairs() {
+		crusader.climbsTheStairs();
 	}
 
 }

@@ -13,4 +13,5 @@ interface IAnimation<S extends CharacterMode> {
 	public void reset();
 
 	public void lastFrame();
+
 }
