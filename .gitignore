@@ -1,0 +1,17 @@
+# vscode
+**/.vscode/
+# intellij
+**/.idea/
+# eclipse
+**/.settings/
+**/.classpath
+**/.project
+**/bin/
+# gradle
+**/.gradle/
+**/build/
+# maven
+**/target/
+# other
+**/lib/
+**/doc/

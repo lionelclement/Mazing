@@ -1,6 +1,0 @@
-{
-    "java.project.outputPath": "bin",
-    "java.import.gradle.enabled": false,
-    "java.import.maven.enabled": false,
-    "java.configuration.updateBuildConfiguration": "disabled"
-}
