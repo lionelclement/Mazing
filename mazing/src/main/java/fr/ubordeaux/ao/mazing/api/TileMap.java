@@ -12,26 +12,28 @@ import java.awt.image.BufferedImage;
  * Permet de dessiner des tuiles, des images 3D et de gérer la position et la
  * profondeur iso du rendu.
  */
-public class TileMap {
-    private final int tileWidth;
-    private final int tileHeight;
-    private final int originX;
-    private final int originY;
+class TileMap {
+    static int tileWidth;
+    static int tileHeight;
+    static int originX;
+    static int originY;
     private static TileMap instance;
+    private static int scrollX;
+    private static int scrollY;
 
-    private TileMap(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols, int rows) {
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
-        originX = 0;
-        originY = windowHeight / 4;
+    private TileMap(int tileWidth, int tileHeight, int originX, int originY) {
+        TileMap.tileWidth = tileWidth;
+        TileMap.tileHeight = tileHeight;
+        TileMap.originX = originX;
+        TileMap.originY = originY;
     }
 
-    public static TileMap getInstance(int tileWidth, int tileHeight, int windowWidth, int windowHeight, int cols,
-            int rows) {
-        if (instance == null) {
-            instance = new TileMap(tileWidth, tileHeight, windowWidth, windowHeight, cols, rows);
-        }
-        return instance;
+    public static void initInstance(int tileWidth, int tileHeight, int originX, int originY) {
+        instance = new TileMap(tileWidth, tileHeight, originX, originY);
+    }
+
+    public static void initInstance(int tileWidth, int tileHeight) {
+        instance = new TileMap(tileWidth, tileHeight, originX, originY);
     }
 
     public static TileMap getInstance() {
@@ -41,30 +43,24 @@ public class TileMap {
         return instance;
     }
 
-    /**
-     * Convertit des coordonnées grille + hauteur en coordonnées écran isométriques.
-     * 
-     * @param col  colonne de la grille
-     * @param row  ligne de la grille
-     * @param step nombre de tuiles empilées (hauteur)
-     * @return point écran
-     */
-    public Point2D gridToScreen(float col, float row, float step, boolean origin) {
+    public static Point2D gridToScreen(float col, float row, float step) {
+        float x = col + scrollX;
+        float y = row + scrollY;
 
-        int _originX = origin ? this.originX : 0;
-        int _originY = origin ? this.originY : 0;
-
-        // Projection isométrique
-        // float isoX = originX + (col - row) * tileWidth / 2;
-        // float isoY = originY + (col + row) * tileHeight / 4 - step * tileHeight *
-        // 0.60f;
-        float isoX = _originX + (col - row) * (tileWidth / 2.0f);
-        float isoY = _originY + (col + row) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
-
+        float isoX = originX + scrollX + (x - y) * (tileWidth / 2.0f);
+        float isoY = originY + scrollY + (x + y) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
         return new Point2D.Float(isoX, isoY);
     }
 
-    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g, int offsetX, int offsetY,
+    public Point2D screenToGrid(float isoX, float isoY) {
+        float x = isoX;
+        float y = isoY;
+        float col = (x / (tileWidth / 2.0f) + y / (tileHeight / 4.0f)) / 2.0f;
+        float row = (y / (tileHeight / 4.0f) - x / (tileWidth / 2.0f)) / 2.0f;
+        return new Point2D.Float(col, row);
+    }
+
+    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
             RenderType renderType, float alpha) {
 
         // Projection isométrique
@@ -72,28 +68,30 @@ public class TileMap {
                 : tileHeight
                         / 2 - 8;
 
-        Point2D p = gridToScreen(x, y, z, true);
-        int screenX = (int) p.getX() + offsetX;
-        int screenY = (int) p.getY() + offsetY;
+        Point2D p = gridToScreen(x, y, z);
+        int screenX = (int) p.getX();
+        int screenY = (int) p.getY();
 
         // Cast Graphics en Graphics2D pour pouvoir gérer alpha
         Graphics2D g2d = (Graphics2D) g;
 
-        // Sauvegarder l'ancien composite
-        // Composite oldComposite = g2d.getComposite();
-
         // Définir l'alpha
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 
-        g.drawImage(image,
-                screenX - image.getWidth() / 2,
-                screenY - image.getHeight() + anchorY,
-                null);
+        int ix = screenX - image.getWidth() / 2;
+        int iy = screenY - image.getHeight() + anchorY;
+        int dx = ix - originX;
+        int dy = iy - originY;
+        // on prend une fenêtre pas plus large que width
+        if (Math.sqrt(dx*dx+dy*dy) < (2 * originX)) {
+            g.drawImage(image, ix, iy, null);
+        }
     }
 
+
     /** Dessine une tuile isométrique 3D */
-    public void drawTile(int col, int row, int step, Graphics g, Color color) {
-        Point2D p = gridToScreen(col, row, step, true);
+    public void drawTile(int x, int y, int z, Graphics g, Color color) {
+        Point2D p = gridToScreen(x, y, z);
 
         // isométrique
         int halfW = tileWidth / 2;
@@ -110,8 +108,8 @@ public class TileMap {
     }
 
     /** Dessine un point (utilisé pour le survol) */
-    public void drawPoint(int col, int row, int step, Graphics g, Color color) {
-        Point2D p = gridToScreen(col, row, step, true);
+    public void drawPoint(int x, int y, int z, Graphics g, Color color) {
+        Point2D p = gridToScreen(x, y, z);
         g.setColor(color);
         g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
     }
@@ -122,5 +120,17 @@ public class TileMap {
 
     public int getTileHeight() {
         return tileHeight;
+    }
+
+    public static void scroll(int scrollX, int scrollY) {
+        TileMap.scrollX = scrollX;
+        TileMap.scrollY = scrollY;
+    }
+
+    public static int distance(AbstractRenderable ar) {
+			    Point2D p = TileMap.gridToScreen(ar.getX(), ar.getY(), ar.getZ());
+			 		int dx = (int) (p.getX() - originX);
+        			int dy = (int) (p.getY() - originY);
+        			return  (int) Math.sqrt(dx*dx+dy*dy);
     }
 }

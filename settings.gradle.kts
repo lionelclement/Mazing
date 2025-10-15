@@ -13,7 +13,9 @@ plugins {
 rootProject.name = "Mazing"
 include("mazing")
 include("merge-tool")
+include("project0")
+project(":project0").projectDir = file("examples/project0")
+include("project00")
+project(":project00").projectDir = file("examples/project00")
 include("project1")
 project(":project1").projectDir = file("examples/project1")
-include("project2")
-project(":project2").projectDir = file("examples/project2")

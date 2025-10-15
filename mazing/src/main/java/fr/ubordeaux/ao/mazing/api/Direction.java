@@ -35,31 +35,15 @@ public enum Direction {
     /** Angle de la direction en degrés */
     private final int angle;
 
-    /**
-     * Constructeur de la direction.
-     * 
-     * @param value Index ordinal.
-     * @param angle Angle en degrés.
-     */
-    Direction(int value, int angle) {
+    private Direction(int value, int angle) {
         this.value = value;
         this.angle = angle;
     }
 
-    /**
-     * Retourne l'index ordinal de la direction.
-     * 
-     * @return Index de la direction.
-     */
     public int getValue() {
         return value;
     }
 
-    /**
-     * Retourne l'angle de la direction en degrés.
-     * 
-     * @return Angle en degrés.
-     */
     public int getAngle() {
         return angle;
     }

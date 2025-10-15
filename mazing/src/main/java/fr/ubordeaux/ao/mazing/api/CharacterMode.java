@@ -1,6 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
-interface CharacterMode {
+public interface CharacterMode {
 
     int getNumFrames();
 

@@ -29,5 +29,5 @@ tasks.named<Test>("test") {
 }
 
 application {
-    mainClass = "fr.ubordeaux.ao.project2.Main"
+    mainClass = "fr.ubordeaux.ao.project0.Main"
 }
