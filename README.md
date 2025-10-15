@@ -1,3 +1,15 @@
+# Avec Maven
+
+Compiler et packager en jar avec:
+```shell
+mvn clean package
+```
+
+Executer directement le jar avec java:
+```shell
+java -jar example/project0/target/project0-1.0-jar-with-dependencies.jar
+```
+
 # Avec Gradle
 
 Pour exécuter :

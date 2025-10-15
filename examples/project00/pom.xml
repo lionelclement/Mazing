@@ -5,15 +5,21 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.ubordeaux.ao.project0</groupId>
-    <artifactId>project0</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <parent>
+        <groupId>fr.ubordeaux.ao.mazing</groupId>
+        <artifactId>mazing-parent</artifactId>
+        <version>1.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <groupId>fr.ubordeaux.ao.project00</groupId>
+    <artifactId>project00</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>project0</name>
+    <name>project00</name>
 
     <dependencies>
-        <!-- Dépendance vers le JAR mazing installé localement -->
         <dependency>
             <groupId>fr.ubordeaux.ao.mazing</groupId>
             <artifactId>mazing</artifactId>
@@ -29,8 +35,33 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>fr.ubordeaux.ao.project0.Main</mainClass>
+                    <mainClass>fr.ubordeaux.ao.project00.Main</mainClass>
+                    <classpathScope>runtime</classpathScope>
                 </configuration>
+            </plugin>
+            <!-- fait un fat jar pour run facilement avec `java -jar` -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>fr.ubordeaux.ao.project00.Main</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
