@@ -22,7 +22,7 @@ public class MazingView {
 		windowGame.fillCheckerboardBackground(0, 0, 7, 7);
 
 		// Ajoute une tuile rouge
-		windowGame.addTile(Color.RED, 7, 7, 0);
+		windowGame.addTileBackground(Color.RED, 7, 7, 0);
 
 		// Remplit avec des objets (ici le sol 12 de la série 000)
 		windowGame.fillTilesBackground(12, 6, -9, 10, 10);

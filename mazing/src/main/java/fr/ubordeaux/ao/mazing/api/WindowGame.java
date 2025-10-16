@@ -1,7 +1,9 @@
 package fr.ubordeaux.ao.mazing.api;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * Fenêtre principale du jeu, gère le plateau isométrique.
@@ -9,129 +11,150 @@ import java.awt.*;
 public class WindowGame extends JFrame implements IWindowGame {
 
     private static final long serialVersionUID = 1L;
+
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = 665;
-	/** Largeur d’une tuile en pixels */
-	private final static int DEFAULT_TILE_WIDTH = 100;
-	/** Hauteur d’une tuile en pixels */
-	private final static int DEFAULT_TILE_HEIGHT = 100;
-	private static final int DEFAULT_FRAMES_PER_SECOND = 50;
+    private static final int DEFAULT_TILE_WIDTH = 100;
+    private static final int DEFAULT_TILE_HEIGHT = 100;
+    private static final int DEFAULT_FPS = 50;
 
     private final BoardGame boardGame;
 
+    /**
+     * Crée et affiche la fenêtre principale du jeu.
+     * Toujours appelée sur l'Event Dispatch Thread via SwingUtilities.
+     */
     public WindowGame() {
         super("Isometric 3D Game");
 
-        // Création du plateau
-        boardGame = new BoardGame(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TILE_WIDTH, DEFAULT_TILE_HEIGHT, DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4, DEFAULT_FRAMES_PER_SECOND);
+        // Création du panneau principal du jeu
+        boardGame = new BoardGame(
+            DEFAULT_WIDTH, DEFAULT_HEIGHT,
+            DEFAULT_TILE_WIDTH, DEFAULT_TILE_HEIGHT,
+            DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4,
+            DEFAULT_FPS
+        );
 
-        // Ajouter le plateau au content pane
+        // Définir le content pane
         setContentPane(boardGame);
 
-        // Définir la taille exacte de la zone de dessin
-        super.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-        pack(); // Ajuste la JFrame à la taille du contentPane
-
+        // Paramètres de la fenêtre
+        setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); 
+        setLocationRelativeTo(null);
+        setResizable(true);
+        setVisible(true);
     }
-    
+
+    /**
+     * Lance la fenêtre de jeu sur le thread graphique Swing.
+     */
+    public static void launch() {
+        SwingUtilities.invokeLater(WindowGame::new);
+    }
+
+    // =============================
+    //  Implémentation IWindowGame
+    // =============================
 
     @Override
-    public void setTileSize(int tile_width, int tile_height) {
-		TileMap.init(tile_width, tile_height, TileMap.originX, TileMap.originY);
-		boardGame.initImagesSheet();
+    public void setTileSize(int tileWidth, int tileHeight) {
+        TileMap.init(tileWidth, tileHeight, TileMap.originX, TileMap.originY);
+        boardGame.initImagesSheet();
     }
-    
+
     @Override
     public void setFPS(int fps) {
-		boardGame.startGameLoop(fps);
+        boardGame.startGameLoop(fps);
     }
-    
+
     @Override
     public void setSize(int width, int height) {
-		boardGame.setSize(width, height);
-		super.setSize(width, height);
+        super.setSize(width, height);
+        boardGame.setSize(width, height);
     }
-    
+
     @Override
-    public void setTitle(String s) {
-    	super.setTitle(s);
+    public void setTitle(String title) {
+        super.setTitle(title);
     }
-    
+
     @Override
-    public void setBackground(Color c) {
-		if (boardGame != null)
-			boardGame.setBackground(c);
+    public void setBackground(Color color) {
+        if (boardGame != null)
+            boardGame.setBackground(color);
+        super.setBackground(color);
     }
-    
+
     @Override
-    public void setResizable(boolean b) {
-    	super.setResizable(b);
+    public void setResizable(boolean resizable) {
+        super.setResizable(resizable);
     }
-    
+
+    // =============================
+    //  Délégation au BoardGame
+    // =============================
+
     @Override
-    public void setVisible(boolean b) {
-    	super.setVisible(b);
+    public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha) {
+        boardGame.fillTilesBackground(code, x, y, width, height, alpha);
     }
-    
 
-	@Override
-	public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha){
-		boardGame.fillTilesBackground(code, x, y, width, height, alpha);
-	}
+    @Override
+    public void fillTilesBackground(int code, int x, int y, int width, int height) {
+        boardGame.fillTilesBackground(code, x, y, width, height, 1.0f);
+    }
 
-	@Override
-	public void fillTilesBackground(int code, int x, int y, int width, int height){
-		boardGame.fillTilesBackground(code, x, y, width, height, 1);
-	}
+    @Override
+    public void fillCheckerboardBackground(int x, int y, int width, int height) {
+        boardGame.fillCheckerboardBackground(x, y, width, height);
+    }
 
-	@Override
-	public void fillCheckerboardBackground(int x, int y, int width, int height) {
-		boardGame.fillCheckerboardBackground(x, y, width, height);
-	}
+    @Override
+    public void add(ICharacter<? extends ICharacterMode> character) {
+        boardGame.add(character);
+    }
 
-	@Override
-	public void add(ICharacter<? extends ICharacterMode> character) {
-		boardGame.add(character);
-	}
+    @Override
+    public void add(int code, int x, int y, int z, float alpha) {
+        boardGame.add(code, x, y, z, alpha);
+    }
 
-	@Override
-	public void add(int code, int x, int y, int z, float alpha) {
-		boardGame.add(code, x, y, z, alpha);
-	}
+    @Override
+    public void add(int code, int x, int y, int z) {
+        boardGame.add(code, x, y, z, 1.0f);
+    }
 
-	@Override
-	public void add(int code, int x, int y, int z) {
-		boardGame.add(code, x, y, z, 1);
-	}
+    @Override
+    public void add(int[][][] matrix) {
+        boardGame.add(matrix, 1.0f);
+    }
 
-	@Override
-	public void add(int[][][] matrix) {
-		boardGame.add(matrix, 1);
-	}
+    @Override
+    public void add(int[][][] matrix, float alpha) {
+        boardGame.add(matrix, alpha);
+    }
 
-	@Override
-	public void add(int[][][] matrix, float alpha) {
-		boardGame.add(matrix, alpha);
-	}
+    @Override
+    public void clear() {
+        boardGame.clear();
+    }
 
+    @Override
+    public void scroll(int x, int y) {
+        TileMap.scroll(x, y);
+    }
 
-	@Override
-	public void clear() {
-		boardGame.clear();
-	}
+    @Override
+    public void addTileBackground(Color color, int x, int y, int z) {
+        boardGame.addTileBackground(color, x, y, z);
+    }
 
-	@Override
-	public void scroll(int x, int y) {
-		TileMap.scroll(x, y);
-	}
-
-
-	@Override
-	public void addTile(Color color, int x, int y, int z) {
-		boardGame.addTile(color, x, y, z);
-	}
-
-
+    // =============================
+    //  Méthode main (facultative)
+    // =============================
+    public static void main(String[] args) {
+        WindowGame.launch();
+    }
 }

@@ -36,7 +36,7 @@ public interface IWindowGame {
      *
      * @param c la couleur de fond
      */
-    void setBackground(Color c);
+   void setBackground(Color c);
 
     /**
      * Définit si la fenêtre peut être redimensionnée par l’utilisateur.
@@ -193,7 +193,7 @@ public interface IWindowGame {
      * @param y     coordonnée Y sur la grille
      * @param z     hauteur (niveau)
      */
-    void addTile(Color color, int x, int y, int z);
+    void addTileBackground(Color color, int x, int y, int z);
 
 
 }

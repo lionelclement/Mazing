@@ -199,8 +199,15 @@ class BoardGame extends JPanel implements IWindowGame {
 	private void updateAnimations() {
 		for (ICharacter<CharacterMode> c : characters) {
 			AbstractCharacter<CharacterMode> ac = (AbstractCharacter<CharacterMode>) c;
-			Animation<CharacterMode> animation = ac.getCurrentAnimation(ac.getCurrentMode().ordinal());
-			animation.tick((AbstractCharacter<? extends CharacterMode>) ac);
+			CharacterMode mode = ac.getCurrentMode();
+
+			if (mode == null)
+				continue; // ou log.warn("Character sans mode courant")
+
+			Animation<CharacterMode> animation = ac.getCurrentAnimation(mode.ordinal());
+			if (animation != null) {
+				animation.tick((AbstractCharacter<? extends CharacterMode>) ac);
+			}
 		}
 		repaint();
 	}
@@ -225,31 +232,44 @@ class BoardGame extends JPanel implements IWindowGame {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// Dessine le fond pré-généré
 		if (background != null) {
 			g.drawImage(background, 0, 0, null);
 		}
 
 		List<AbstractRenderable> renderableScene = new ArrayList<>();
-		for (AbstractRenderable ar : grounds) {
-			if (TileMap.distance(ar) < 2 * width){
-				renderableScene.add(ar);
-			}
+
+		// Créer des copies locales pour éviter la ConcurrentModificationException
+		List<AbstractRenderable> groundsCopy;
+		List<AbstractRenderable> sceneObjectsCopy;
+		List<AbstractRenderable> sceneCharactersCopy;
+
+		synchronized (grounds) {
+			groundsCopy = new ArrayList<>(grounds);
 		}
-		for (AbstractRenderable ar : sceneObjects) {
-			if (TileMap.distance(ar) < 2 * width){
-				renderableScene.add(ar);
-			}
+		synchronized (sceneObjects) {
+			sceneObjectsCopy = new ArrayList<>(sceneObjects);
 		}
-		for (AbstractRenderable ar : sceneCharacters) {
-			if (TileMap.distance(ar) < 2 * width){
-				renderableScene.add(ar);
-			}
+		synchronized (sceneCharacters) {
+			sceneCharactersCopy = new ArrayList<>(sceneCharacters);
 		}
 
+		for (AbstractRenderable ar : groundsCopy) {
+			if (TileMap.distance(ar) < 2 * width) {
+				renderableScene.add(ar);
+			}
+		}
+		for (AbstractRenderable ar : sceneObjectsCopy) {
+			if (TileMap.distance(ar) < 2 * width) {
+				renderableScene.add(ar);
+			}
+		}
+		for (AbstractRenderable ar : sceneCharactersCopy) {
+			if (TileMap.distance(ar) < 2 * width) {
+				renderableScene.add(ar);
+			}
+		}
 
 		renderScene(g, renderableScene);
-
 	}
 
 	/**
@@ -366,7 +386,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * Ajoute une matrice complète de tuiles à la scène.
 	 * 
 	 * @param matrix matrice 3D de codes de tuiles
-	 * @param alpha transparence
+	 * @param alpha  transparence
 	 */
 	@Override
 	public void add(int[][][] matrix, float alpha) {
@@ -420,22 +440,12 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	@Override
-	public void setTitle(String s) {
-		throw new UnsupportedOperationException("Unimplemented method 'setTitle'");
-	}
-
-	@Override
-	public void setResizable(boolean b) {
-		throw new UnsupportedOperationException("Unimplemented method 'setResizable'");
-	}
-
-	@Override
 	public void scroll(int x, int y) {
 		throw new UnsupportedOperationException("Unimplemented method 'scroll'");
 	}
 
 	@Override
-	public void addTile(Color color, int x, int y, int z) {
+	public void addTileBackground(Color color, int x, int y, int z) {
 
 		// Réutilise l'image existante
 		Graphics2D g = background.createGraphics();
@@ -469,6 +479,18 @@ class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void add(int[][][] matrix) {
 		throw new UnsupportedOperationException("Unimplemented method 'add'");
+	}
+
+	@Override
+	public void setTitle(String s) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setTitle'");
+	}
+
+	@Override
+	public void setResizable(boolean b) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setResizable'");
 	}
 
 }
