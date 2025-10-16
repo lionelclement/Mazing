@@ -14,6 +14,7 @@
         <module>mazing</module>
         <module>examples/project00</module>
         <module>examples/project01</module>
+        <module>examples/project02</module>
         <module>examples/project0</module>
         <module>examples/project1</module>
     </modules>
