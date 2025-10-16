@@ -17,30 +17,14 @@ class TileMap {
     static int tileHeight;
     static int originX;
     static int originY;
-    private static TileMap instance;
     private static int scrollX;
     private static int scrollY;
 
-    private TileMap(int tileWidth, int tileHeight, int originX, int originY) {
+    public static void init(int tileWidth, int tileHeight, int originX, int originY) {
         TileMap.tileWidth = tileWidth;
         TileMap.tileHeight = tileHeight;
         TileMap.originX = originX;
         TileMap.originY = originY;
-    }
-
-    public static void initInstance(int tileWidth, int tileHeight, int originX, int originY) {
-        instance = new TileMap(tileWidth, tileHeight, originX, originY);
-    }
-
-    public static void initInstance(int tileWidth, int tileHeight) {
-        instance = new TileMap(tileWidth, tileHeight, originX, originY);
-    }
-
-    public static TileMap getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("TileMap instance not initialized");
-        }
-        return instance;
     }
 
     public static Point2D gridToScreen(float col, float row, float step) {
@@ -52,7 +36,7 @@ class TileMap {
         return new Point2D.Float(isoX, isoY);
     }
 
-    public Point2D screenToGrid(float isoX, float isoY) {
+    public static Point2D screenToGrid(float isoX, float isoY) {
         float x = isoX;
         float y = isoY;
         float col = (x / (tileWidth / 2.0f) + y / (tileHeight / 4.0f)) / 2.0f;
@@ -60,7 +44,7 @@ class TileMap {
         return new Point2D.Float(col, row);
     }
 
-    public void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
+    public static void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
             RenderType renderType, float alpha) {
 
         // Projection isométrique
@@ -88,9 +72,8 @@ class TileMap {
         }
     }
 
-
     /** Dessine une tuile isométrique 3D */
-    public void drawTile(int x, int y, int z, Graphics g, Color color) {
+    public static void drawTile(int x, int y, int z, Graphics g, Color color) {
         Point2D p = gridToScreen(x, y, z);
 
         // isométrique
@@ -108,17 +91,17 @@ class TileMap {
     }
 
     /** Dessine un point (utilisé pour le survol) */
-    public void drawPoint(int x, int y, int z, Graphics g, Color color) {
+    public static void drawPoint(int x, int y, int z, Graphics g, Color color) {
         Point2D p = gridToScreen(x, y, z);
         g.setColor(color);
         g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
     }
 
-    public int getTileWidth() {
+    public static int getTileWidth() {
         return tileWidth;
     }
 
-    public int getTileHeight() {
+    public static int getTileHeight() {
         return tileHeight;
     }
 

@@ -86,7 +86,7 @@ class BoardGame extends JPanel implements IWindowGame {
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		// Initialisation du TileMap pour le rendu
-		TileMap.initInstance(tile_width, tile_height, originX, originY);
+		TileMap.init(tile_width, tile_height, originX, originY);
 		characters = new ArrayList<>();
 		codeToImageMap = new HashMap<>();
 
@@ -122,16 +122,12 @@ class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
-		TileMap.getInstance();
 		TileMap.originX = width / 2;
-		TileMap.getInstance();
 		TileMap.originY = height / 4;
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	}
 
 	void initImagesSheet() {
-
-		// codeToImageMap.clear();
 
 		// Chargement et découpe des spritesheets
 		BufferedImage imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
@@ -174,10 +170,8 @@ class BoardGame extends JPanel implements IWindowGame {
 		for (int i = 0; i < maxSize; i++) {
 			BufferedImage sub = sheet.getSubimage(col * width, row * height, width, height);
 
-			TileMap.getInstance();
 			// Calcul des dimensions après scale
 			int scaledWidth = (int) (TileMap.tileWidth * scale);
-			TileMap.getInstance();
 			int scaledHeight = (int) (TileMap.tileHeight * 2 * scale);
 
 			// Créer l'image redimensionnée
@@ -269,16 +263,13 @@ class BoardGame extends JPanel implements IWindowGame {
 		// background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = background.createGraphics();
 
-		// centrer l'origine comme dans paintComponent
-		// g.translate(width / 2, tile_height);
-
 		// dessiner la grille à partir des codes (exemple avec CODEBG = 72)
 		for (int _y = y; _y < y + height; _y++) {
 			for (int _x = x; _x < x + width; _x++) {
 				if ((Math.abs(_x) + Math.abs(_y)) % 2 == 0) {
-					TileMap.getInstance().drawTile(_x, _y, 0, g, Color.BLACK);
+					TileMap.drawTile(_x, _y, 0, g, Color.BLACK);
 				} else {
-					TileMap.getInstance().drawTile(_x, _y, 0, g, Color.WHITE);
+					TileMap.drawTile(_x, _y, 0, g, Color.WHITE);
 				}
 			}
 		}
@@ -444,13 +435,13 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	@Override
-	public void drawTile(Color color, int x, int y, int z) {
+	public void addTile(Color color, int x, int y, int z) {
 
 		// Réutilise l'image existante
 		Graphics2D g = background.createGraphics();
 
 		// Dessine la tuile sur l'image actuelle
-		TileMap.getInstance().drawTile(x, y, z, g, color);
+		TileMap.drawTile(x, y, z, g, color);
 
 		g.dispose();
 	}

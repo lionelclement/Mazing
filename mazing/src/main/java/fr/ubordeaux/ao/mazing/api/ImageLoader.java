@@ -62,7 +62,7 @@ class ImageLoader {
 
 	}
 
-		/**
+	/**
 	 * Charge une série d'images selon le pattern :
 	 * crusader_run_x00Y.png
 	 * x = 1,3,5,7 (directions)

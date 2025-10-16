@@ -39,9 +39,7 @@ public class WindowGame extends JFrame implements IWindowGame {
 
     @Override
     public void setTileSize(int tile_width, int tile_height) {
-		TileMap.getInstance();
-		TileMap.getInstance();
-		TileMap.initInstance(tile_width, tile_height, TileMap.originX, TileMap.originY);
+		TileMap.init(tile_width, tile_height, TileMap.originX, TileMap.originY);
 		boardGame.initImagesSheet();
     }
     
@@ -131,8 +129,8 @@ public class WindowGame extends JFrame implements IWindowGame {
 
 
 	@Override
-	public void drawTile(Color color, int x, int y, int z) {
-		boardGame.drawTile(color, x, y, z);
+	public void addTile(Color color, int x, int y, int z) {
+		boardGame.addTile(color, x, y, z);
 	}
 
 

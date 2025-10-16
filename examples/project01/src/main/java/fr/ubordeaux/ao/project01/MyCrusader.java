@@ -2,17 +2,19 @@ package fr.ubordeaux.ao.project01;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 
+// Classe qui étend fr.ubordeaux.ao.mazing.api.Crusader
+// pour connaître le mode courant
 public class MyCrusader extends Crusader {
 
-    private Mode mode;
+    private Mode currentMode;
 
-    public Mode getMode() {
-        return mode;
+    public Mode getCurrentMode() {
+        return currentMode;
     }
 
-    public void setMode(Mode mode){
+    public void setCurrentMode(Mode mode){
         super.setMode(mode);
-        this.mode = mode;
+        this.currentMode = mode;
     }
 
 }

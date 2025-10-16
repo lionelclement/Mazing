@@ -249,8 +249,8 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.getInstance().drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1.0f);
-        TileMap.getInstance().drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1.0f);
+        TileMap.drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1.0f);
         super.render(g, currentMode.ordinal());
     }
 

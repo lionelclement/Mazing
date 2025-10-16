@@ -1,61 +1,69 @@
 package fr.ubordeaux.ao.project01;
 
-import java.awt.Color;
-
 import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.ICharacterMode;
-import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.mazing.api.WindowGame;
 
 public class Main {
 
-	static WindowGame window;
+	static WindowGame windowGame;
 
 	public static void main(String[] args) {
 
-		window = new WindowGame();
+		windowGame = new WindowGame();
 		init();
 
 	}
 
 	private static void init() {
-		window.setTitle("Mon jeu à moi");
-		//window.setSize(1800, 1169);
-		//window.setTileSize(64, 64);
-		//window.fillCheckerboardBackground(-12, -12, 48, 48);
-		//window.drawTile(Color.RED, 0, 0, 0);
-		window.setFPS(65);
 		
-		  int[][][] items = { {
+		windowGame.setTitle("Mon jeu à moi");
+		// Définit la vitesse de rafraichissement des animations à 65 frames per second 
+		windowGame.setFPS(65);
+		
+		// Matrice z, y, x d'objets à mettre dans windowGame
+		// Voir le tableau 500 des images 
+		// (mazing/src/main/resources/Dungeon-Pack/Isometric/objects/all_500.png)
+		// 520 : tableau 500, 3e ligne, 1e colonne
+		// 542 : tableau 500, 5e ligne, 3e colonne
+		
+		int[][][] items = { {
 		  { -1, -1, -1, -1, -1, -1, -1 },
 		  { -1, -1, -1, -1, -1, -1, -1 },
 		  { -1, -1, -1, -1, -1, -1, -1 },
-		  { -1, -1, -1, 520, -1, -1, 540 },
+		  { -1, -1, -1, 520, -1, -1, 542 },
 		  { -1, -1, -1, -1, -1, -1, -1 },
 		  { -1, -1, -1, -1, -1, -1, -1 },
 		  { -1, -1, -1, -1, -1, -1, -1 },
 		  } };
 		  
-		  window.add(items);
-		 
+		  windowGame.add(items);
+		
+		// Un nouveau personnage
 		MyCrusader crusader = new MyCrusader();
-		//crusader.setScale(2.0f);
-		//crusader.setPosition(0, 0, 0);
-		crusader.setFrameRate(Crusader.Mode.RUN, 0.8f);
-		crusader.setFrameRate(Crusader.Mode.ATTACK, 0.3f);
-		window.add(crusader);
-		crusader.setMode(Crusader.Mode.RUN);
-		window.setVisible(true);
 
+		// définit la vitesse d'animation du mode Crusader.Mode.RUN
+		crusader.setFrameRate(Crusader.Mode.RUN, 0.8f);
+		
+		// définit la vitesse d'animation du mode Crusader.Mode.ATTACK
+		crusader.setFrameRate(Crusader.Mode.ATTACK, 0.2f);
+		
+		// Ajoute le personnage à la scène
+		windowGame.add(crusader);
+		
+		// Définit le mode courant du personnage
+		crusader.setCurrentMode(Crusader.Mode.RUN);
+
+		// Définit la méthode envoyée lors des "ticks" des animations
 		crusader.setTickAnimationTrigger(new RoundCrusader());
+
+		// Définit la méthode envoyée au début des animations
 		crusader.setEndAnimationTrigger(new ContinueCrusader());
 
+		// Affiche la windowGame
+		windowGame.setVisible(true);
 
-		// Spider spider = new Spider();
-		// spider.setPosition(6, 6, 0);
-		// spider.setScale(3.5f);
-		// window.add(spider);
+
+
 
 	}
 

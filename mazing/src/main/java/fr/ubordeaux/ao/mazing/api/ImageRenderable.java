@@ -41,7 +41,7 @@ class ImageRenderable extends AbstractRenderable {
     }
 
     void render(Graphics g) {
-        TileMap.getInstance().drawImage(x, y, z, bufferedImage, g, renderType, alpha);
+        TileMap.drawImage(x, y, z, bufferedImage, g, renderType, alpha);
     }
 
     int getRank() {

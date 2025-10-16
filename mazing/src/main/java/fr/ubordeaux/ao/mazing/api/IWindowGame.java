@@ -193,7 +193,7 @@ public interface IWindowGame {
      * @param y     coordonnée Y sur la grille
      * @param z     hauteur (niveau)
      */
-    void drawTile(Color color, int x, int y, int z);
+    void addTile(Color color, int x, int y, int z);
 
 
 }
