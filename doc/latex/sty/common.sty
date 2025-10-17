@@ -1,0 +1,70 @@
+%% Pour les macros qui reviendront partout
+\usepackage[utf8]{inputenc}      % Encodage UTF-8
+\usepackage[T1]{fontenc}         % Encodage de police T1 pour le français
+\usepackage[french]{babel}       % Langue du document (français)
+\usepackage{amsmath, amsthm, amsfonts, amssymb} % Maths
+\usepackage{hyperref}            % Liens hypertextes
+\usepackage{url}                 % Pour les URL
+\usepackage{listings}            % Pour afficher du code source
+\usepackage{color}               % Pour les couleurs
+\usepackage[tikz]{bclogo}        % Pour les boîtes logo
+\usepackage{tcolorbox}           % Pour créer des cadres
+\usepackage{fancyhdr}            % Pour les en-têtes et pieds de page
+\usepackage{geometry}            % Pour ajuster les marges
+\usepackage{graphicx}
+\usepackage{alltt} % Pour une meilleure gestion des caractères spéciaux
+
+% Paramètres pour le listing de code source
+\lstset{
+  language=java,                 % Langage du code (ici Java)
+  escapeinside={@*}{*@},           % Pour échapper du texte
+  basicstyle=\ttfamily            % Police typewriter pour le code (tt)
+  }
+
+% Commande pour afficher du code inline
+\newcommand{\code}[1]{\lstinline{#1}}
+
+% Configuration des marges
+\geometry{a4paper, margin=1in}
+
+% Définir une commande pour le numéro du TD
+\newcommand{\TDNum}{}
+
+% Personnalisation de l'en-tête et du pied de page
+\fancyhf{}
+\fancyhead[L]{Université de Bordeaux -- Département Informatique -- Master}
+\fancyhead[R]{4TIN706U Approche Objet}
+\fancyfoot[C]{\thepage}
+
+% Commande pour l'encadré du TD (avec paramètres : titre du TD et numéro du TD)
+\newcommand{\CMheader}[1]{
+    \begin{tcolorbox}[colback=gray!10!white, colframe=gray!80!black, width=\textwidth, sharp corners]
+        \centering
+        \vspace{0.2cm}
+        \textbf{#1}
+    \end{tcolorbox}
+}
+
+% Commande pour l'encadré du TD (avec paramètres : titre du TD et numéro du TD)
+\newcommand{\TDheader}[2]{
+    \renewcommand{\TDNum}{#2}  % Mise à jour du numéro du TD pour l'en-tête
+    \begin{tcolorbox}[colback=gray!10!white, colframe=gray!80!black, width=\textwidth, sharp corners]
+        \centering
+        \vspace{0.2cm}
+        \textbf{\Large TD N\textsuperscript{o}#2} \\
+        \textbf{#1}
+    \end{tcolorbox}
+}
+
+% Commande pour l'encadré du TD (avec paramètres : titre du TD et numéro du TD)
+\newcommand{\PROJECTheader}[1]{
+    \begin{tcolorbox}[colback=gray!10!white, colframe=gray!80!black, width=\textwidth, sharp corners]
+        \centering
+        \vspace{0.2cm}
+        \textbf{\Large Projet} \\
+        \textbf{#1}
+    \end{tcolorbox}
+}
+
+% Appliquer l'en-tête et pied de page
+\pagestyle{fancy}
