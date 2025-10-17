@@ -32,7 +32,7 @@ public class Main {
         JPanel panel = (JPanel) frame.getContentPane();
         JLabel label = new JLabel("Un Label !");
         JButton button = new JButton("Un Bouton !");
-        button.addActionListener(e -> {
+        button.addActionListener(_ -> {
             label.setText("Tu as appuyé !");
             crusader.setMode(Mode.ATTACK);
         });
