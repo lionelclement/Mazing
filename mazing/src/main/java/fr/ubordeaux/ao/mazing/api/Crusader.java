@@ -70,7 +70,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private Sound savedSound;
 
     public Crusader(UUID id) {
-        super(id, Mode.values().length);
+        super(id, Mode.values().length, OFFSETX, OFFSETY);
         init();
     }
 
@@ -175,7 +175,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), 1f, this);
+                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
                 }
@@ -207,7 +207,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), 1f, this);
+                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
 
@@ -315,29 +315,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public float getIsoDepth() {
-        return x + y + 1.0f;
-    }
-
-    @Override
-    public void setMode(String mode) {
-        try {
-            setMode(Mode.valueOf(mode));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unexpected mode");
-        }
-    }
-
-    @Override
-    public void setDirection(String newDirection) {
-        try {
-            setDirection(Direction.valueOf(newDirection));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unexpected direction");
-        }
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(id);
     }
@@ -356,7 +333,13 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void setPosition(float x, float y, float z) {
-        setPosition(x, y, z, OFFSETX, OFFSETY);
+        setPosition(x, y, z, offsetX, offsetY);
     }
 
+    @Override
+    public String toString() {
+        return "Crusader [z=" + z + ", getIsoDepth()=" + getIsoDepth() + "]";
+    }
+
+    
 }

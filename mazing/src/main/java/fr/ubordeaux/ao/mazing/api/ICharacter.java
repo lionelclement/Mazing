@@ -55,17 +55,6 @@ public interface ICharacter<S extends ICharacterMode> {
      */
     void setDirection(Direction targetDirection);
 
-    /**
-     * Définit la direction à partir d’un nom de direction.
-     * 
-     * Exemple : "SOUTH", "NORTHWEST", "EAST"...
-     * 
-     *
-     * @param targetDirection nom de la direction (insensible à la casse)
-     */
-    void setDirection(String targetDirection);
-
-
     // =========================
     // 🎬 MODES / ANIMATIONS
     // =========================
@@ -79,17 +68,6 @@ public interface ICharacter<S extends ICharacterMode> {
      * @param mode mode du personnage
      */
     void setMode(S mode);
-
-    /**
-     * Définit le mode actuel à partir de son nom.
-     * 
-     * Exemple : "IDLE", "WALK", "RUN", "JUMP", "DEATH"...
-     * 
-     *
-     * @param mode nom du mode (insensible à la casse)
-     */
-    void setMode(String mode);
-
 
     /**
      * Définit la vitesse d'animation
@@ -159,6 +137,14 @@ public interface ICharacter<S extends ICharacterMode> {
      * @param scale facteur d’échelle (> 0)
      */
     void setScale(float scale);
+
+    /**
+     * Définit la position du personnage.
+     * 
+     * @param x
+     * @param y
+     */
+    void setOffset(float x, float y);
 
     UUID getId();
 

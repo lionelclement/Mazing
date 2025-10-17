@@ -19,6 +19,8 @@ import java.util.function.Consumer;
  */
 abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRenderable implements ICharacter<T> {
 
+    protected static float DEFAULT_FPS = 1f;
+
     protected BufferedImage[][][] images; // [mode][direction][frame]
     protected BufferedImage[][][] shadow_images; // [mode][direction][frame]
     protected Animation<T>[][] animations; // [mode][direction]
@@ -27,6 +29,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected Direction currentDirection;
     protected float scale;
     protected UUID id;
+    protected float offsetX, offsetY;
 
     private Consumer<ICharacter<?>> loopAnimationTrigger;
     private Consumer<ICharacter<?>> beginLoopAnimationTrigger;
@@ -35,8 +38,10 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     private Consumer<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
-    AbstractCharacter(UUID id, int numberStates) {
+    AbstractCharacter(UUID id, int numberStates, float offsetX, float offsetY) {
         this.id = id;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
         images = new BufferedImage[numberStates][Direction.values().length][];
         shadow_images = new BufferedImage[numberStates][Direction.values().length][];
         animations = new Animation[numberStates][Direction.values().length];
@@ -125,7 +130,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     }
 
     float getIsoDepth() {
-        return x + y + 0.5f;
+        return x - offsetX + y - offsetY;
     }
 
     void callTickTrigger(float frameIndex) {
@@ -272,6 +277,13 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
 
         });
     }
+
+    @Override
+    public void setOffset(float x, float y){
+        this.offsetX = x;
+        this.offsetY = y;
+    }
+
 
     abstract T getCurrentMode() ;
 

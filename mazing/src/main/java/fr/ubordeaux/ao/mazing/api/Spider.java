@@ -14,8 +14,8 @@ import java.util.UUID;
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 2.5f;
-    private static final float OFFSETX = -0.8f;
-    private static final float OFFSETY = -0.8f;
+    private static final float OFFSETX = 0.2f;
+    private static final float OFFSETY = 0.2f;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 25, true),
@@ -57,7 +57,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
 
     public Spider(UUID id) {
-        super(id, Mode.values().length);
+        super(id, Mode.values().length, OFFSETX, OFFSETY);
         init();
     }
 
@@ -135,7 +135,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), 1f, this);
+                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
                 }
@@ -159,7 +159,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), 1f, this);
+                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
                 }
@@ -223,29 +223,6 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void setDirection(String newDirection) {
-        try {
-            setDirection(Direction.valueOf(newDirection));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unexpected direction");
-        }
-    }
-
-    @Override
-    public float getIsoDepth() {
-        return x + y + 1.5f;
-    }
-
-    @Override
-    public void setMode(String mode) {
-        try {
-            setMode(Mode.valueOf(mode));
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Unexpected mode: " + mode);
-        }
-    }
-
-    @Override
     protected void callTickTrigger(float frameIndex) {
         super.callTickTrigger(frameIndex);
     }
@@ -274,7 +251,7 @@ public class Spider extends AbstractCharacter<CharacterMode> {
 
     @Override
     public void setPosition(float x, float y, float z) {
-        setPosition(x, y, z, OFFSETX, OFFSETY);
+        setPosition(x, y, z, offsetX, offsetY);
     }
 
 }

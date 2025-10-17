@@ -228,6 +228,8 @@ class BoardGame extends JPanel implements IWindowGame {
 						.thenComparing(o -> ((AbstractRenderable) o).getIsoDepth()))
 				.toList();
 
+
+
 		for (AbstractRenderable obj : sorted) {
 			obj.render(g);
 		}
