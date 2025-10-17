@@ -2,6 +2,8 @@ package fr.ubordeaux.ao.project0.view;
 
 import java.util.Random;
 
+import javax.swing.JFrame;
+
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Crusader.Mode;
 import fr.ubordeaux.ao.mazing.api.Direction;
@@ -56,11 +58,12 @@ public class MazingView {
 
     
 	private void init() {
-		window.setTitle("Mon jeu à moi");
-		window.setSize(1800, 1169);
-		window.setResizable(true);
-		//window.setBackground(Color.WHITE);
-		//window.setTileSize(130, 120);
+		((JFrame)window).setTitle("Mon jeu à moi");
+		((JFrame)window).setSize(1800, 1169);
+		((JFrame)window).setResizable(true);
+		//((JFrame)window).setBackground(Color.WHITE);
+		
+		window.setTileSize(130, 120);
 		
 		window.fillTilesBackground(12, -240, -240, 480, 480);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);

@@ -18,13 +18,29 @@ public class MazingView {
 
 	private void init() {
 
-		// Ajoute un damier noir et blanc (pour déboguer)
+		// Dessine un damier noir et blanc (pour déboguer)
 		windowGame.fillCheckerboardBackground(0, 0, 7, 7);
 
-		// Ajoute une tuile rouge
+		// Dessine une tuile rouge
 		windowGame.addTileBackground(Color.RED, 7, 7, 0);
 
-		// Remplit avec des objets (ici le sol 12 de la série 000)
+		// Dessine des cubes avec alternance de couleur
+		for (int i = 0; i <= 3; i++) {
+			for (int j = 7; j <= 10; j++) {
+				for (int k = 0; k <= 3; k++) {
+					Color color;
+					// Alternance entre deux couleurs
+					if ((i + j + k) % 2 == 0) {
+						color = Color.BLUE;
+					} else {
+						color = Color.CYAN;
+					}
+					windowGame.addCubeBackground(color, i, j, k);
+				}
+			}
+		}
+
+		// Ajoute des objets (ici le sol 12 de la série 000)
 		windowGame.fillTilesBackground(12, 6, -9, 10, 10);
 
 		// Ajoute un objet (le sol 20 de la série 000)

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.JFrame;
+
 import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Direction;
@@ -59,14 +61,14 @@ public class MazingView {
             public void onModeChanged(UUID id, ICharacterMode mode) {
                 ICharacter<?> c = characterById.get(id);
                 if (c != null)
-                    c.setMode(mode.name());
+                    c.setMode(mode);
             }
 
             @Override
             public void onDirectionChanged(UUID id, Direction direction) {
                 ICharacter<?> c = characterById.get(id);
                 if (c != null)
-                    c.setDirection(direction.name());
+                    c.setDirection(direction);
             }
 
             @Override
@@ -248,9 +250,9 @@ public class MazingView {
     }
 
     private void init() {
-        window.setTitle("Mon jeu à moi");
-        window.setSize(1800, 1169);
-        window.setResizable(true);
+        ((JFrame)window).setTitle("Mon jeu à moi");
+        ((JFrame)window).setSize(1800, 1169);
+        ((JFrame)window).setResizable(true);
         window.setTileSize(130, 120);
         window.setFPS(40);
         window.setVisible(true);
