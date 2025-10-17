@@ -166,5 +166,15 @@ public interface IWindowGame {
      */
     void addTileBackground(Color color, int x, int y, int z);
 
+    /**
+     * Dessine un cube de la taille d'une tuile uni d’une certaine couleur aux coordonnées indiquées.
+     *
+     * @param color couleur à dessiner
+     * @param x     coordonnée X sur la grille
+     * @param y     coordonnée Y sur la grille
+     * @param z     hauteur (niveau)
+     */
+    void addCubeBackground(Color color, int x, int y, int z);
+
 
 }

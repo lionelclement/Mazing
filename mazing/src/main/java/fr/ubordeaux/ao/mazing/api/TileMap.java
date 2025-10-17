@@ -97,7 +97,55 @@ class TileMap {
         g.fillOval((int) p.getX() - 2, (int) p.getY() - 2, 4, 4);
     }
 
-    public static int getTileWidth() {
+    /** Dessine un cube isométrique de la taille d'une tuile */
+/** Dessine un cube isométrique de la taille d'une tuile */
+public static void drawCube(int x, int y, int z, Graphics g, Color color) {
+    Graphics2D g2d = (Graphics2D) g;
+
+    int halfW = tileWidth / 2;
+    int quarterH = tileHeight / 4;
+
+    // Sommet haut du cube
+    Point2D top = gridToScreen(x, y, z + 1);
+
+    // Base du cube (au niveau de la tuile)
+    Point2D base = gridToScreen(x, y, z);
+
+    int topX = (int) top.getX();
+    int topY = (int) top.getY();
+    int baseX = (int) base.getX();
+    int baseY = (int) base.getY();
+
+    // Face du dessus
+    int[] topFaceX = { topX, topX + halfW, topX, topX - halfW };
+    int[] topFaceY = { topY, topY + quarterH, topY + 2 * quarterH, topY + quarterH };
+
+    // Face gauche
+    int[] leftFaceX = { topX - halfW, topX, baseX, baseX - halfW };
+    int[] leftFaceY = { topY + quarterH, topY + 2 * quarterH, baseY + 2 * quarterH, baseY + quarterH };
+
+    // Face droite
+    int[] rightFaceX = { topX, topX + halfW, baseX + halfW, baseX };
+    int[] rightFaceY = { topY + 2 * quarterH, topY + quarterH, baseY + quarterH, baseY + 2 * quarterH };
+
+    // Dessiner les faces
+    g2d.setColor(color.brighter());
+    g2d.fillPolygon(topFaceX, topFaceY, 4);
+
+    g2d.setColor(color.darker());
+    g2d.fillPolygon(leftFaceX, leftFaceY, 4);
+
+    g2d.setColor(color);
+    g2d.fillPolygon(rightFaceX, rightFaceY, 4);
+
+    // Contours
+    g2d.setColor(Color.BLACK);
+    g2d.drawPolygon(topFaceX, topFaceY, 4);
+    g2d.drawPolygon(leftFaceX, leftFaceY, 4);
+    g2d.drawPolygon(rightFaceX, rightFaceY, 4);
+}
+
+public static int getTileWidth() {
         return tileWidth;
     }
 

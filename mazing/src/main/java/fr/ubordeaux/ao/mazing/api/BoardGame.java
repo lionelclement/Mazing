@@ -196,12 +196,14 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * Met à jour toutes les animations des personnages.
 	 */
 	private void updateAnimations() {
+		@SuppressWarnings("rawtypes")
 		List<ICharacter> charactersCopy;
 		synchronized (characters) {
 			charactersCopy = new ArrayList<>(characters);
 		}
 
 		for (Object c : charactersCopy) {
+			@SuppressWarnings("unchecked")
 			AbstractCharacter<CharacterMode> ac = (AbstractCharacter<CharacterMode>) c;
 			CharacterMode mode = ac.getCurrentMode();
 			if (mode == null)
@@ -455,6 +457,18 @@ class BoardGame extends JPanel implements IWindowGame {
 
 		// Dessine la tuile sur l'image actuelle
 		TileMap.drawTile(x, y, z, g, color);
+
+		g.dispose();
+	}
+
+	@Override
+	public void addCubeBackground(Color color, int x, int y, int z) {
+
+		// Réutilise l'image existante
+		Graphics2D g = background.createGraphics();
+
+		// Dessine la tuile sur l'image actuelle
+		TileMap.drawCube(x, y, z, g, color);
 
 		g.dispose();
 	}

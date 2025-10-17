@@ -151,10 +151,15 @@ public class WindowGame extends JFrame implements IWindowGame {
         boardGame.addTileBackground(color, x, y, z);
     }
 
+    @Override
+    public void addCubeBackground(Color color, int x, int y, int z) {
+        boardGame.addCubeBackground(color, x, y, z);
+    }
     // =============================
     //  Méthode main (facultative)
     // =============================
-    public static void main(String[] args) {
-        WindowGame.launch();
-    }
+    //public static void main(String[] args) {
+    //    WindowGame.launch();
+    //}
+
 }
