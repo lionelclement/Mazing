@@ -31,21 +31,22 @@ public class MazingController extends KeyAdapter {
 		// Actions liées aux lettres
 		switch (key) {
 			case 'h' -> model.crusaderClimbsTheStairs();
+			case 'H' -> model.crusaderDescendsTheStairs();
 			case 'm' -> model.generateMaze();
 			case 'M' -> model.clearMaze();
-			case 'w' -> model.setMode(Crusader.Mode.WALK);
-			case 'r' -> model.setMode(Crusader.Mode.RUN);
-			case 'a' -> model.setMode(Crusader.Mode.ATTACK);
-			case 'g' -> model.setMode(Crusader.Mode.GOTHIT);
-			case 'j' -> model.setMode(Crusader.Mode.JUMP);
-			case 't' -> model.setModeSpiders(Crusader.Mode.TURN_LEFT);
-			case 'T' -> model.setMode(Crusader.Mode.TURN_RIGHT);
-			case 'd' -> model.setMode(Crusader.Mode.DEATH);
-			case 's' -> model.setMode(Crusader.Mode.IDLE);
-			case 'W' -> model.setModeSpiders(Spider.Mode.WALK);
-			case 'A' -> model.setModeSpiders(Spider.Mode.ATTACK);
-			case 'D' -> model.setModeSpiders(Spider.Mode.DEATH);
-			case 'S' -> model.setModeSpiders(Spider.Mode.IDLE);
+			case 'w' -> model.setMode(Crusader.Mode.WALK.name());
+			case 'r' -> model.setMode(Crusader.Mode.RUN.name());
+			case 'a' -> model.setMode(Crusader.Mode.ATTACK.name());
+			case 'g' -> model.setMode(Crusader.Mode.GOTHIT.name());
+			case 'j' -> model.setMode(Crusader.Mode.JUMP.name());
+			case 't' -> model.setModeSpiders(Crusader.Mode.TURN_LEFT.name());
+			case 'T' -> model.setMode(Crusader.Mode.TURN_RIGHT.name());
+			case 'd' -> model.setMode(Crusader.Mode.DEATH.name());
+			case 's' -> model.setMode(Crusader.Mode.IDLE.name());
+			case 'W' -> model.setModeSpiders(Spider.Mode.WALK.name());
+			case 'A' -> model.setModeSpiders(Spider.Mode.ATTACK.name());
+			case 'D' -> model.setModeSpiders(Spider.Mode.DEATH.name());
+			case 'S' -> model.setModeSpiders(Spider.Mode.IDLE.name());
 		}
 
 		// Actions liées aux flèches et sortie
@@ -55,41 +56,41 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_UP -> {
 				if (shiftDown)
 					view.scroll(0, 1);
-				else if (altDown)
-					model.setDirectionSpiders(Direction.NORTH);
+				else if (!altDown)
+					model.setDirectionSpiders(Direction.NORTH.name());
 				else {
-					model.setDirectionCrusader(Direction.NORTH);
-					model.setMode(Crusader.Mode.WALK);
+					model.setDirectionCrusader(Direction.NORTH.name());
+					model.setMode(Crusader.Mode.WALK.name());
 				}
 			}
 			case KeyEvent.VK_DOWN -> {
 				if (shiftDown)
 					view.scroll(0, -1);
-				else if (altDown)
-					model.setDirectionSpiders(Direction.SOUTH);
+				else if (!altDown)
+					model.setDirectionSpiders(Direction.SOUTH.name());
 				else {
-					model.setDirectionCrusader(Direction.SOUTH);
-					model.setMode(Crusader.Mode.WALK);
+					model.setDirectionCrusader(Direction.SOUTH.name());
+					model.setMode(Crusader.Mode.WALK.name());
 				}
 			}
 			case KeyEvent.VK_LEFT -> {
 				if (shiftDown)
 					view.scroll(1, 0);
-				else if (altDown)
-					model.setDirectionSpiders(Direction.WEST);
+				else if (!altDown)
+					model.setDirectionSpiders(Direction.WEST.name());
 				else {
-					model.setDirectionCrusader(Direction.WEST);
-					model.setMode(Crusader.Mode.WALK);
+					model.setDirectionCrusader(Direction.WEST.name());
+					model.setMode(Crusader.Mode.WALK.name());
 				}
 			}
 			case KeyEvent.VK_RIGHT -> {
 				if (shiftDown)
 					view.scroll(-1, 0);
-				else if (altDown)
-					model.setDirectionSpiders(Direction.EAST);
+				else if (!altDown)
+					model.setDirectionSpiders(Direction.EAST.name());
 				else {
-					model.setDirectionCrusader(Direction.EAST);
-					model.setMode(Crusader.Mode.WALK);
+					model.setDirectionCrusader(Direction.EAST.name());
+					model.setMode(Crusader.Mode.WALK.name());
 				}
 			}
 			case KeyEvent.VK_Q -> System.exit(0);

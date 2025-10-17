@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
     	
     	WindowGame window = new WindowGame();
-
+		
     	MazingModel model = new MazingModel();
     	MazingView view = new MazingView(window);
     	MazingController controller = new MazingController(model, view);

@@ -14,8 +14,8 @@ import java.util.UUID;
 public class Spider extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 2.5f;
-    private static final float OFFSETX = 0.2f;
-    private static final float OFFSETY = 0.2f;
+    private static final float OFFSETX = -0.1f;
+    private static final float OFFSETY = 0.1f;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 25, true),

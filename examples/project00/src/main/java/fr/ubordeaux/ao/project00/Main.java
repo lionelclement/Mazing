@@ -21,14 +21,15 @@ public class Main {
         crusader.setOffset(1.2f, 1.2f);
         crusader.setPosition(0, 0, 0);
         crusader.setFrameRate(Crusader.Mode.GOTHIT, 0.5f);
-        window.add(108, 0, 0, 0);
+        //window.add(108, 0, 0, 0);
         //window.add(109, 0, 0, 0);
         //window.add(110, 0, 0, 0);
         //window.add(111, 0, 0, 0);
 
         // L'insère dans le windowGame
         window.add(crusader);
-
+        window.add(12, 0, 0, 0);
+        
         Spider spider = new Spider();
         spider.setPosition(1, 0, 0);
         spider.setDirection(Direction.WEST);

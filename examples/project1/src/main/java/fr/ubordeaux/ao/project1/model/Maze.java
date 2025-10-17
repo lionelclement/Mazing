@@ -213,6 +213,8 @@ public class Maze {
     /**
      * Détermine s’il y a un obstacle à la position donnée dans la direction donnée.
      * Retourne true si un mur ou la limite du labyrinthe bloque le passage.
+     * @param offsetX 
+     * @param offsetY 
      */
     public boolean isObstacleAt(float x, float y, float z, Direction3D direction) {
         // Marges de sécurité autour des murs
@@ -275,14 +277,13 @@ public class Maze {
     /**
      * Vérifie si un personnage peut se déplacer dans une direction donnée.
      * Retourne false s’il y a un mur ou que le déplacement sortirait du labyrinthe.
+     * @param offsetY 
+     * @param offsetX 
      */
-    public boolean canMove(float cellX, float cellY, float cellZ, String direction) {
-        if (isObstacleAt(cellX, cellY, cellZ, Direction3D.valueOf(direction)))
+    public boolean canMove(float cellX, float cellY, float cellZ, String direction, float offsetX, float offsetY) {
+        if (isObstacleAt(cellX + offsetX, cellY + offsetY, cellZ, Direction3D.valueOf(direction)))
             return false;
         return true;
-        // Cell next = getNeighbor(grid[(int) cellZ][(int) cellY][(int) cellX],
-        // direction);
-        // return next != null; // on peut aller dedans
     }
 
     public List<Direction3D> shortestPath(int startX, int startY, int startZ,

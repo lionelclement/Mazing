@@ -2,14 +2,11 @@ package fr.ubordeaux.ao.project1.model;
 
 import java.util.UUID;
 
-import fr.ubordeaux.ao.mazing.api.ICharacterMode;
-import fr.ubordeaux.ao.mazing.api.Direction;
-
 public interface ModelListener {
 
-	public void onDirectionChanged(UUID id, Direction direction) ;
+	public void onDirectionChanged(UUID id, String direction) ;
 
-    void onModeChanged(UUID id, ICharacterMode mode);
+    void onModeChanged(UUID id, String mode);
 
     void updatePosition(UUID id, float x, float y, float z);
 

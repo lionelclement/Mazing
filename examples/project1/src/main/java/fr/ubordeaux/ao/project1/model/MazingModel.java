@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.ICharacterMode;
+import fr.ubordeaux.ao.project1.view.MazingView;
 
 public class MazingModel {
 
@@ -21,13 +21,13 @@ public class MazingModel {
 
 	public MazingModel() {
 		this.maze = new Maze(6, 6, 4);
-		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, Direction.SOUTH, maze);
+		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, 0f, 0f, Direction.SOUTH.name(), maze);
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
 		for (int i = 1; i <= 1; i++) {
 			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, 1 * i, 1 * i, 0,
-					Direction.SOUTH, maze);
+					0.1f, 0.2f, Direction.SOUTH.name(), maze);
 			System.err.println(characterModel);
 			characterModel.speedX = 0.1f * i;
 			characterModel.speedY = 0.1f * i;
@@ -71,14 +71,14 @@ public class MazingModel {
 		return this.charactersById.get(id);
 	}
 
-	public void setMode(ICharacterMode mode) {
+	public void setMode(String mode) {
 		crusader.setMode(mode);
 		if (this.modelListener != null) {
 			this.modelListener.onModeChanged(crusader.getId(), mode);
 		}
 	}
 
-	public void setDirectionCrusader(Direction direction) {
+	public void setDirectionCrusader(String direction) {
 		crusader.setDirection(direction);
 		if (this.modelListener != null) {
 			this.modelListener.onDirectionChanged(crusader.getId(), direction);
@@ -97,7 +97,7 @@ public class MazingModel {
 		return this.spidersById.keySet();
 	}
 
-	public void setModeSpiders(ICharacterMode mode) {
+	public void setModeSpiders(String mode) {
 		for (UUID id : spidersById.keySet()) {
 			CharacterModel spider = spidersById.get(id);
 
@@ -108,7 +108,7 @@ public class MazingModel {
 		}
 	}
 
-	public void setDirectionSpiders(Direction north) {
+	public void setDirectionSpiders(String north) {
 		for (UUID id : spidersById.keySet()) {
 			CharacterModel spider = spidersById.get(id);
 
@@ -136,7 +136,27 @@ public class MazingModel {
 	}
 
 	public void crusaderClimbsTheStairs() {
-		crusader.climbsTheStairs();
+		int cellX = (int) (crusader.getX() / MazingView.CELL_WIDTH);
+		int cellY = (int) (crusader.getY() / MazingView.CELL_HEIGHT);
+		int cellZ = (int) (crusader.getZ() / MazingView.CELL_DEPTH);
+
+		Cell cell = maze.getCell(cellX, cellY, cellZ);
+
+		if (cell.isPath(Direction3D.UP)) {
+			crusader.climbsTheStairs();
+		}
+	}
+
+	public void crusaderDescendsTheStairs() {
+		int cellX = (int) (crusader.getX() / MazingView.CELL_WIDTH);
+		int cellY = (int) (crusader.getY() / MazingView.CELL_HEIGHT);
+		int cellZ = (int) (crusader.getZ() / MazingView.CELL_DEPTH);
+
+		Cell cell = maze.getCell(cellX, cellY, cellZ);
+
+		if (cell.isPath(Direction3D.DOWN)) {
+			crusader.crusaderDescendsTheStairs();
+		}
 	}
 
 }

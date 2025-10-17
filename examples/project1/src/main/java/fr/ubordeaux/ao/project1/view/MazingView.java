@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 
 import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
-import fr.ubordeaux.ao.mazing.api.Direction;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.Spider;
@@ -58,15 +57,18 @@ public class MazingView {
     public void attachModelListener(MazingModel model) {
         model.attachModelListener(new ModelListener() {
             @Override
-            public void onModeChanged(UUID id, ICharacterMode mode) {
+            public void onModeChanged(UUID id, String mode) {
                 @SuppressWarnings("unchecked")
                 ICharacter<ICharacterMode> c = (ICharacter<ICharacterMode>) characterById.get(id);
                 if (c != null)
-                    c.setMode(mode.name());
+                    c.setMode(mode);
+                    //if (mode == Crusader.Mode.WALK_LEFT){
+                    //    c.setTickAnimationTrigger(_ -> {System.out.println("OK");});
+                    //}
             }
 
             @Override
-            public void onDirectionChanged(UUID id, Direction direction) {
+            public void onDirectionChanged(UUID id, String direction) {
                 ICharacter<?> c = characterById.get(id);
                 if (c != null)
                     c.setDirection(direction);
@@ -84,6 +86,7 @@ public class MazingView {
                 if (c != null)
                     c.setPosition(x, y, z);
             }
+
         });
     }
 
@@ -255,7 +258,7 @@ public class MazingView {
         ((JFrame)window).setSize(1800, 1169);
         ((JFrame)window).setResizable(true);
         window.setTileSize(130);
-        window.setFPS(40);
+        window.setFPS(50);
         window.setVisible(true);
     }
 
@@ -294,10 +297,10 @@ public class MazingView {
 
     public void createCrusader(UUID id) {
         Crusader crusader = new Crusader(id);
-        crusader.setFrameRate(Crusader.Mode.TURN_LEFT, 0.4f);
-        crusader.setFrameRate(Crusader.Mode.TURN_RIGHT, 0.4f);
-        crusader.setFrameRate(Crusader.Mode.WALK_LEFT, 0.3f);
-        crusader.setFrameRate(Crusader.Mode.WALK_RIGHT, 0.3f);
+        crusader.setFrameRate(Crusader.Mode.TURN_LEFT, 0.3f);
+        crusader.setFrameRate(Crusader.Mode.TURN_RIGHT, 0.3f);
+        crusader.setFrameRate(Crusader.Mode.WALK_LEFT, 0.6f);
+        crusader.setFrameRate(Crusader.Mode.WALK_RIGHT, 0.6f);
         crusader.setFrameRate(Crusader.Mode.JUMP, 0.1f);
         createCharacter(id, crusader);
     }

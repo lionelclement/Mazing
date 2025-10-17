@@ -6,7 +6,6 @@ import fr.ubordeaux.ao.project1.view.MazingView;
 
 import java.util.UUID;
 
-import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.ICharacter;
 
@@ -37,10 +36,10 @@ public class MazingGameLoop {
             public void updateMode(ICharacter<?> e) {
                 UUID id = e.getId();
                 CharacterModel characterModel = model.getCharacterById(id);
-                ICharacterMode mode = characterModel.getMode();
+                String mode = characterModel.getMode();
                 switch (mode) {
-                    case Crusader.Mode.GOTHIT -> {
-                            characterModel.setMode(Crusader.Mode.IDLE);
+                    case "GOTHIT" -> {
+                            characterModel.setMode(Crusader.Mode.IDLE.name());
                     }
                     default -> {
                     }

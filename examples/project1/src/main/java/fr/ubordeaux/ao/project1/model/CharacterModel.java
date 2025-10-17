@@ -7,7 +7,6 @@ import javax.swing.Timer;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Direction;
-import fr.ubordeaux.ao.mazing.api.ICharacterMode;
 import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.project1.view.MazingView;
 
@@ -15,7 +14,7 @@ public class CharacterModel {
 
 	private static final float WALK_SPEED = 0.03f;
 	private static final float RUN_SPEED = 0.08f;
-	private static final float STAIR_CLIMB_SPEED = 0.01f;
+	private static final float STAIR_CLIMB_SPEED = 0.15f;
 
 	public static enum Type {
 		CRUSADER,
@@ -25,11 +24,12 @@ public class CharacterModel {
 	private ModelListener listener;
 
 	private float x, y, z;
+	private float offsetX, offsetY;
 	public float speedX;
 	public float speedY;
 	private float speedZ;
-	private ICharacterMode mode;
-	private Direction direction;
+	private String mode;
+	private String direction;
 	private boolean freeze;
 	private UUID id;
 	private final Maze maze;
@@ -37,15 +37,19 @@ public class CharacterModel {
 	private float oldy;
 	private float oldz;
 	private Type type;
+	private int currentFloor;
 
-	public CharacterModel(Type type, float x, float y, float z, Direction startDir, Maze maze) {
+	public CharacterModel(Type type, float x, float y, float z, float offsetX, float offsetY, String startDir, Maze maze) {
 		this.id = UUID.randomUUID();
 		this.type = type;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		currentFloor = (int) z;
 		this.maze = maze;
-		this.mode = Crusader.Mode.IDLE;
+		this.mode = Crusader.Mode.IDLE.name();
 		this.direction = startDir;
 	}
 
@@ -58,8 +62,8 @@ public class CharacterModel {
 	}
 
 	public void init() {
-		this.mode = Crusader.Mode.IDLE;
-		this.direction = Direction.SOUTH;
+		this.mode = Crusader.Mode.IDLE.name();
+		this.direction = Direction.SOUTH.name();
 		updateVelocity();
 		if (listener != null)
 			listener.onModeChanged(id, mode);
@@ -83,22 +87,40 @@ public class CharacterModel {
 		float cellX = x / MazingView.CELL_WIDTH;
 		float cellY = y / MazingView.CELL_HEIGHT;
 		float cellZ = z / MazingView.CELL_DEPTH;
-		if (!maze.canMove(cellX, cellY, cellZ, direction.name())) {
+
+		boolean changedFloor = false;
+		if (speedZ != 0) {
+			if (z > currentFloor + 1) {
+				z = ++currentFloor;
+				changedFloor = true;
+			} else if (z < currentFloor - 1) {
+				z = --currentFloor;
+				changedFloor = true;
+			}
+			if (changedFloor){
+			speedZ = 0;
+			setMode("IDLE");
+			if (listener != null) {
+					listener.onMazeChanged(maze, z);
+				}
+			}
+		}
+
+		if (!maze.canMove(cellX, cellY, cellZ, direction, offsetX, offsetY)) {
 			x = oldx;
 			y = oldy;
 			z = oldz;
 			switch (type) {
 				case CRUSADER:
-					this.setMode(Crusader.Mode.GOTHIT);
+					this.setMode(Crusader.Mode.GOTHIT.name());
 					break;
 				case SPIDER:
-					this.setMode(Spider.Mode.IDLE);
+					this.setMode(Spider.Mode.IDLE.name());
 					break;
 				default:
 					break;
 
 			}
-
 			speedX = speedY = speedZ = 0;
 		}
 	}
@@ -128,9 +150,9 @@ public class CharacterModel {
 				Direction.SOUTHEAST, new Point3D(1, 1, 0),
 				Direction.SOUTHWEST, new Point3D(-1, 1, 0));
 
-		Point3D vector = dirVectors.get(direction);
-		
-		double speed = switch (mode.name()) {
+		Point3D vector = dirVectors.get(Direction.valueOf(direction));
+
+		double speed = switch (mode) {
 			case "WALK" -> WALK_SPEED;
 			case "RUN" -> RUN_SPEED;
 			case "IDLE", "GOTHIT" -> 0;
@@ -144,10 +166,9 @@ public class CharacterModel {
 
 		this.speedX = (float) (vector.x / norm * speed);
 		this.speedY = (float) (vector.y / norm * speed);
-		// this.speedZ = (float) (vector.z / norm * speed);
 	}
 
-	public void setMode(ICharacterMode mode) {
+	public void setMode(String mode) {
 		// System.out.println("CharacterModel@setMode");
 		this.mode = mode;
 		updateVelocity();
@@ -156,7 +177,7 @@ public class CharacterModel {
 		}
 	}
 
-	public void setDirection(Direction direction) {
+	public void setDirection(String direction) {
 		// System.out.println("CharacterModel@setDirection");
 		freeze = true;
 		this.direction = direction;
@@ -170,13 +191,13 @@ public class CharacterModel {
 	}
 
 	public void updateCrusaderEnd() {
-		if (mode == Crusader.Mode.ATTACK)
-			setMode(Crusader.Mode.IDLE);
-		if (mode == Crusader.Mode.DEATH)
+		if (mode.equals(Crusader.Mode.ATTACK.name()))
+			setMode(Crusader.Mode.IDLE.name());
+		if (mode.equals(Crusader.Mode.DEATH.name()))
 			speedX = speedY = 0;
 	}
 
-	public ICharacterMode getMode() {
+	public String getMode() {
 		return mode;
 	}
 
@@ -187,7 +208,6 @@ public class CharacterModel {
 		if (listener != null) {
 			listener.updatePosition(id, x, y, z);
 		}
-
 	}
 
 	public void setSpeed(float x, float y, float z) {
@@ -196,9 +216,14 @@ public class CharacterModel {
 		speedZ = z;
 	}
 
-    public void climbsTheStairs() {
-		this.setMode(Crusader.Mode.WALK_LEFT);
+	public void climbsTheStairs() {
+		this.setMode(Crusader.Mode.WALK_LEFT.name());
 		this.setSpeed(0, 0, STAIR_CLIMB_SPEED);
-    }
+	}
+
+	public void crusaderDescendsTheStairs() {
+		this.setMode(Crusader.Mode.WALK_RIGHT.name());
+		this.setSpeed(0, 0, -STAIR_CLIMB_SPEED);
+	}
 
 }
