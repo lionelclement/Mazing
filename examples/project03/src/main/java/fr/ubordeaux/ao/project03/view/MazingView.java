@@ -1,15 +1,12 @@
 package fr.ubordeaux.ao.project03.view;
 
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
-import fr.ubordeaux.ao.mazing.api.ICharacter;
-import fr.ubordeaux.ao.mazing.api.Crusader;
 
 import java.awt.Color;
 
 public class MazingView {
 
 	private IWindowGame windowGame;
-	private ICharacter<?> crusader;
 
 	public MazingView(IWindowGame window) {
 		this.windowGame = window;

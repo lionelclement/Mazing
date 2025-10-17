@@ -1,7 +1,5 @@
 package fr.ubordeaux.ao.project0.view;
 
-import java.util.Random;
-
 import javax.swing.JFrame;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
@@ -55,7 +53,6 @@ public class MazingView {
 
         });
     }
-
     
 	private void init() {
 		((JFrame)window).setTitle("Mon jeu à moi");
@@ -63,7 +60,7 @@ public class MazingView {
 		((JFrame)window).setResizable(true);
 		//((JFrame)window).setBackground(Color.WHITE);
 		
-		window.setTileSize(130, 120);
+		window.setTileSize(130);
 		
 		window.fillTilesBackground(12, -240, -240, 480, 480);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);
@@ -121,22 +118,15 @@ public class MazingView {
 		
 		window.add(items);
 		
-		Random rand = new Random();
-
-		//window.add(matrix);
-		
     	crusader = new Crusader();
     	crusader.setTickAnimationTrigger(e -> onTick(e));
     	crusader.setBeginAnimationTrigger(e -> onBegin(e));
     	crusader.setEndAnimationTrigger(e -> onEnd(e));
     	crusader.setMidAnimationTrigger(e -> onMid(e));
-    	//crusader.setScale(2.8f);
-    	//crusader.setOffset(0, 6);
     	window.add(crusader);
     	
     	Spider spider = new Spider();
     	spider.setPosition(7, 7, 0);
-    	//spider.setScale(2.5f);
     	spider.setTickAnimationTrigger(e -> onTick(e));
     	window.add(spider);
 		

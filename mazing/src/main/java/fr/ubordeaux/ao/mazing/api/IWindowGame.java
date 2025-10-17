@@ -37,7 +37,7 @@ public interface IWindowGame {
      * @param tile_width  largeur d’une tuile (en pixels)
      * @param tile_height hauteur d’une tuile (en pixels)
      */
-    void setTileSize(int tile_width, int tile_height);
+    void setTileSize(int tileSize);
 
     /**
      * Définit le nombre d’images par seconde (FPS) pour les animations.

@@ -20,9 +20,9 @@ class TileMap {
     private static int scrollX;
     private static int scrollY;
 
-    public static void init(int tileWidth, int tileHeight, int originX, int originY) {
-        TileMap.tileWidth = tileWidth;
-        TileMap.tileHeight = tileHeight;
+    public static void init(int tileSize, int originX, int originY) {
+        TileMap.tileWidth = tileSize;
+        TileMap.tileHeight = (int) (tileSize * Math.tan(Math.toRadians(26)) * 2);
         TileMap.originX = originX;
         TileMap.originY = originY;
     }
@@ -30,7 +30,6 @@ class TileMap {
     public static Point2D gridToScreen(float col, float row, float step) {
         float x = col + scrollX;
         float y = row + scrollY;
-
         float isoX = originX + scrollX + (x - y) * (tileWidth / 2.0f);
         float isoY = originY + scrollY + (x + y) * (tileHeight / 4.0f) - step * (tileWidth / 2.0f);
         return new Point2D.Float(isoX, isoY);

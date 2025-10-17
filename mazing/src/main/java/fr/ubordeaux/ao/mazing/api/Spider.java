@@ -181,6 +181,11 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         animations[currentMode.ordinal()][currentDirection.ordinal()].reset();
     }
 
+    @Override
+    public void setMode(String modeName) {
+        setMode(Mode.valueOf(modeName));
+    }
+
     RenderType getRenderType() {
         return RenderType.CONSTRUCTION;
     }

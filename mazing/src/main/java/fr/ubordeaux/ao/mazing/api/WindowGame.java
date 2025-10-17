@@ -14,8 +14,7 @@ public class WindowGame extends JFrame implements IWindowGame {
 
     private static final int DEFAULT_WIDTH = 1024;
     private static final int DEFAULT_HEIGHT = 665;
-    private static final int DEFAULT_TILE_WIDTH = 100;
-    private static final int DEFAULT_TILE_HEIGHT = 100;
+    private static final int DEFAULT_TILE_SIZE = 100;
     private static final int DEFAULT_FPS = 50;
 
     private final BoardGame boardGame;
@@ -30,7 +29,7 @@ public class WindowGame extends JFrame implements IWindowGame {
         // Création du panneau principal du jeu
         boardGame = new BoardGame(
             DEFAULT_WIDTH, DEFAULT_HEIGHT,
-            DEFAULT_TILE_WIDTH, DEFAULT_TILE_HEIGHT,
+            DEFAULT_TILE_SIZE,
             DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4,
             DEFAULT_FPS
         );
@@ -59,8 +58,8 @@ public class WindowGame extends JFrame implements IWindowGame {
     // =============================
 
     @Override
-    public void setTileSize(int tileWidth, int tileHeight) {
-        TileMap.init(tileWidth, tileHeight, TileMap.originX, TileMap.originY);
+    public void setTileSize(int tileSize) {
+        TileMap.init(tileSize, TileMap.originX, TileMap.originY);
         boardGame.initImagesSheet();
     }
 

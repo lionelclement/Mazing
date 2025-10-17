@@ -14,7 +14,6 @@ public class CharacterModel {
 	private float x, y, z;
 	private float speedX, speedY, speedZ;
 	private Mode mode;
-	private Mode savedMode;
 	private Direction direction;
 	private boolean freeze;
 	private ModelListener listener;
@@ -81,8 +80,6 @@ public class CharacterModel {
 	}
 
 	public void setMode(Mode mode) {
-		//System.out.println("CharacterModel@setMode");
-		savedMode = this.mode;
 		this.mode = mode;
 		updateVelocity();
 		if (listener != null) {
@@ -97,7 +94,7 @@ public class CharacterModel {
 		if (listener != null)
 			listener.onDirectionChanged(direction);
 
-		Timer t = new Timer(350, e -> freeze = false);
+		Timer t = new Timer(350, _ -> freeze = false);
 		t.setRepeats(false);
 		t.start();
 	}

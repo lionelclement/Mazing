@@ -59,9 +59,10 @@ public class MazingView {
         model.attachModelListener(new ModelListener() {
             @Override
             public void onModeChanged(UUID id, ICharacterMode mode) {
-                ICharacter<?> c = characterById.get(id);
+                @SuppressWarnings("unchecked")
+                ICharacter<ICharacterMode> c = (ICharacter<ICharacterMode>) characterById.get(id);
                 if (c != null)
-                    c.setMode(mode);
+                    c.setMode(mode.name());
             }
 
             @Override
@@ -253,7 +254,7 @@ public class MazingView {
         ((JFrame)window).setTitle("Mon jeu à moi");
         ((JFrame)window).setSize(1800, 1169);
         ((JFrame)window).setResizable(true);
-        window.setTileSize(130, 120);
+        window.setTileSize(130);
         window.setFPS(40);
         window.setVisible(true);
     }

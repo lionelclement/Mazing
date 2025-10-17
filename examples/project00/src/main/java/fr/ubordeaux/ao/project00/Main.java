@@ -1,7 +1,5 @@
 package fr.ubordeaux.ao.project00;
 
-import java.awt.Color;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;

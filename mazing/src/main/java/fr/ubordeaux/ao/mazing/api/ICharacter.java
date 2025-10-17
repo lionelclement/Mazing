@@ -51,9 +51,16 @@ public interface ICharacter<S extends ICharacterMode> {
     /**
      * Définit la direction vers laquelle le personnage est orienté.
      *
-     * @param targetDirection direction cible (ex. {@link Direction#NORTH})
+     * @param direction direction cible (ex. {@link Direction#NORTH})
      */
-    void setDirection(Direction targetDirection);
+    void setDirection(Direction direction);
+
+    /**
+     * Définit la direction vers laquelle le personnage est orienté.
+     *
+     * @param directionName nom de la direction cible
+     */
+    void setDirection(String directionName);
 
     // =========================
     // 🎬 MODES / ANIMATIONS
@@ -70,6 +77,16 @@ public interface ICharacter<S extends ICharacterMode> {
     void setMode(S mode);
 
     /**
+     * Définit le mode actuel du personnage.
+     * 
+     * Le mode détermine l’animation à jouer
+     * 
+     *
+     * @param modeName mode du personnage
+     */
+    void setMode(String modeName);
+
+    /**
      * Définit la vitesse d'animation
      * 
      *
@@ -77,7 +94,6 @@ public interface ICharacter<S extends ICharacterMode> {
      * @param speed vitesse
      */
     void setFrameRate(S mode, float fps);
-
 
     // =========================
     // ⏱️ CALLBACKS D’ANIMATION
@@ -122,7 +138,6 @@ public interface ICharacter<S extends ICharacterMode> {
      * @param callback fonction appelée à chaque tick d’animation
      */
     void setTickAnimationTrigger(Consumer<ICharacter<?>> callback);
-
 
     // =========================
     // 🧩 APPARENCE VISUELLE

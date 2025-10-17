@@ -224,6 +224,11 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
         }
 
     @Override
+    public void setDirection(String directinName) {
+            currentDirection = Direction.valueOf(directinName);
+        }
+
+    @Override
     public void setDirection(Direction newDirection, int time) {
         turnPlayer(newDirection, time, () -> {
             currentDirection = newDirection;

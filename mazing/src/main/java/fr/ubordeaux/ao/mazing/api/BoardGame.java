@@ -79,14 +79,14 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * @param width  largeur du plateau en pixels
 	 * @param height hauteur du plateau en pixels
 	 */
-	public BoardGame(int width, int height, int tile_width, int tile_height, int originX, int originY, int fps) {
+	public BoardGame(int width, int height, int tileSize, int originX, int originY, int fps) {
 		this.width = width;
 		this.height = height;
 
 		background = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		// Initialisation du TileMap pour le rendu
-		TileMap.init(tile_width, tile_height, originX, originY);
+		TileMap.init(tileSize, originX, originY);
 		characters = new ArrayList<>();
 		codeToImageMap = new HashMap<>();
 
@@ -486,7 +486,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	@Override
-	public void setTileSize(int tile_width, int tile_height) {
+	public void setTileSize(int tileSize) {
 		throw new UnsupportedOperationException("Unimplemented method 'setTileSize'");
 	}
 

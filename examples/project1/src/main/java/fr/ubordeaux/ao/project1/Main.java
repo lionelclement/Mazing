@@ -27,6 +27,7 @@ public class Main {
 		view.createSpiders(model.getSpidersIds());
     	
 		model.init();
+		model.generateMaze();
     	
     }
 
