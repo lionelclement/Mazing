@@ -195,18 +195,21 @@ class BoardGame extends JPanel implements IWindowGame {
 	/**
 	 * Met à jour toutes les animations des personnages.
 	 */
-	@SuppressWarnings("unchecked")
 	private void updateAnimations() {
-		for (ICharacter<CharacterMode> c : characters) {
+		List<ICharacter> charactersCopy;
+		synchronized (characters) {
+			charactersCopy = new ArrayList<>(characters);
+		}
+
+		for (Object c : charactersCopy) {
 			AbstractCharacter<CharacterMode> ac = (AbstractCharacter<CharacterMode>) c;
 			CharacterMode mode = ac.getCurrentMode();
-
 			if (mode == null)
-				continue; // ou log.warn("Character sans mode courant")
+				continue;
 
 			Animation<CharacterMode> animation = ac.getCurrentAnimation(mode.ordinal());
 			if (animation != null) {
-				animation.tick((AbstractCharacter<? extends CharacterMode>) ac);
+				animation.tick(ac);
 			}
 		}
 		repaint();
@@ -479,18 +482,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void add(int[][][] matrix) {
 		throw new UnsupportedOperationException("Unimplemented method 'add'");
-	}
-
-	@Override
-	public void setTitle(String s) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setTitle'");
-	}
-
-	@Override
-	public void setResizable(boolean b) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setResizable'");
 	}
 
 }

@@ -25,40 +25,11 @@ public interface IWindowGame {
     // =========================
 
     /**
-     * Définit le titre de la fenêtre du jeu.
-     *
-     * @param s le texte à afficher dans la barre de titre
-     */
-    void setTitle(String s);
-
-    /**
-     * Définit la couleur d’arrière-plan de la fenêtre.
-     *
-     * @param c la couleur de fond
-     */
-   void setBackground(Color c);
-
-    /**
-     * Définit si la fenêtre peut être redimensionnée par l’utilisateur.
-     *
-     * @param b true pour rendre la fenêtre redimensionnable, false sinon
-     */
-    void setResizable(boolean b);
-
-    /**
      * Définit si la fenêtre doit être visible à l’écran.
      *
      * @param b true pour afficher la fenêtre, false pour la masquer
      */
     void setVisible(boolean b);
-
-    /**
-     * Définit la taille de la fenêtre en pixels.
-     *
-     * @param width  largeur de la fenêtre
-     * @param height hauteur de la fenêtre
-     */
-    void setSize(int width, int height);
 
     /**
      * Définit la taille des tuiles utilisées pour le rendu.
