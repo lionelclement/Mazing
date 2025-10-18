@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.ArrayList;
@@ -310,7 +311,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * @param alpha transparence de la tuile
 	 */
 	@Override
-	public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha) {
+	public void fillArea(int code, int x, int y, int z, int width, int height, float alpha) {
 
 		Graphics2D g = background.createGraphics();
 
@@ -329,12 +330,12 @@ class BoardGame extends JPanel implements IWindowGame {
 						int rank = codeToRank(code);
 						if (image != null) {
 							ImageRenderable imageRendarable3D = new ImageRenderable(
-									image.getBufferedImage(), _x, _y, 0,
+									image.getBufferedImage(), _x, _y, z,
 									rank,
 									image.getRenderType(), image.getIso(), alpha);
 							grounds.add(imageRendarable3D);
 							pointToSceneObjectsMap
-									.computeIfAbsent(new DiscretePoint(_x, _y, 0), _ -> new HashSet<>())
+									.computeIfAbsent(new DiscretePoint(_x, _y, z), _ -> new HashSet<>())
 									.add(code);
 						}
 					}
@@ -491,13 +492,19 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	@Override
-	public void fillTilesBackground(int code, int x, int y, int width, int height) {
+	public void fillArea(int code, int x, int y, int z, int width, int height) {
 		throw new UnsupportedOperationException("Unimplemented method 'fillTilesBackground'");
 	}
 
 	@Override
 	public void add(int[][][] matrix) {
 		throw new UnsupportedOperationException("Unimplemented method 'add'");
+	}
+
+	@Override
+	public Point2D getIsoCoordinatesFromScreen(int x, int y) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getIsoCoordinatesFromScreen'");
 	}
 
 }

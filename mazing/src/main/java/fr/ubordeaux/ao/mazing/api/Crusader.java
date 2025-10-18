@@ -15,8 +15,8 @@ import java.util.UUID;
 public class Crusader extends AbstractCharacter<CharacterMode> {
 
     private static final float DEFAULT_SCALE = 3.0f;
-    private static final float OFFSETX = -0.6f;
-    private static final float OFFSETY = -0.6f;
+    private static final float OFFSETX = 0.0f;
+    private static final float OFFSETY = 0.0f;
 
     public enum Mode implements CharacterMode {
         WALK("walk", 15, true),

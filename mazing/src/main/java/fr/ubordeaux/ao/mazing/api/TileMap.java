@@ -17,8 +17,8 @@ class TileMap {
     static int tileHeight;
     static int originX;
     static int originY;
-    private static int scrollX;
-    private static int scrollY;
+    static int scrollX;
+    static int scrollY;
 
     public static void init(int tileSize, int originX, int originY) {
         TileMap.tileWidth = tileSize;
@@ -36,10 +36,12 @@ class TileMap {
     }
 
     public static Point2D screenToGrid(float isoX, float isoY) {
-        float x = isoX;
-        float y = isoY;
+        float x = isoX - originX - scrollX;
+        float y = isoY - originY - scrollY;
+
         float col = (x / (tileWidth / 2.0f) + y / (tileHeight / 4.0f)) / 2.0f;
         float row = (y / (tileHeight / 4.0f) - x / (tileWidth / 2.0f)) / 2.0f;
+
         return new Point2D.Float(col, row);
     }
 
@@ -66,7 +68,7 @@ class TileMap {
         int dx = ix - originX;
         int dy = iy - originY;
         // on prend une fenêtre pas plus large que width
-        if (Math.sqrt(dx*dx+dy*dy) < (2 * originX)) {
+        if (Math.sqrt(dx * dx + dy * dy) < (2 * originX)) {
             g.drawImage(image, ix, iy, null);
         }
     }
@@ -97,54 +99,54 @@ class TileMap {
     }
 
     /** Dessine un cube isométrique de la taille d'une tuile */
-/** Dessine un cube isométrique de la taille d'une tuile */
-public static void drawCube(int x, int y, int z, Graphics g, Color color) {
-    Graphics2D g2d = (Graphics2D) g;
+    /** Dessine un cube isométrique de la taille d'une tuile */
+    public static void drawCube(int x, int y, int z, Graphics g, Color color) {
+        Graphics2D g2d = (Graphics2D) g;
 
-    int halfW = tileWidth / 2;
-    int quarterH = tileHeight / 4;
+        int halfW = tileWidth / 2;
+        int quarterH = tileHeight / 4;
 
-    // Sommet haut du cube
-    Point2D top = gridToScreen(x, y, z + 1);
+        // Sommet haut du cube
+        Point2D top = gridToScreen(x, y, z + 1);
 
-    // Base du cube (au niveau de la tuile)
-    Point2D base = gridToScreen(x, y, z);
+        // Base du cube (au niveau de la tuile)
+        Point2D base = gridToScreen(x, y, z);
 
-    int topX = (int) top.getX();
-    int topY = (int) top.getY();
-    int baseX = (int) base.getX();
-    int baseY = (int) base.getY();
+        int topX = (int) top.getX();
+        int topY = (int) top.getY();
+        int baseX = (int) base.getX();
+        int baseY = (int) base.getY();
 
-    // Face du dessus
-    int[] topFaceX = { topX, topX + halfW, topX, topX - halfW };
-    int[] topFaceY = { topY, topY + quarterH, topY + 2 * quarterH, topY + quarterH };
+        // Face du dessus
+        int[] topFaceX = { topX, topX + halfW, topX, topX - halfW };
+        int[] topFaceY = { topY, topY + quarterH, topY + 2 * quarterH, topY + quarterH };
 
-    // Face gauche
-    int[] leftFaceX = { topX - halfW, topX, baseX, baseX - halfW };
-    int[] leftFaceY = { topY + quarterH, topY + 2 * quarterH, baseY + 2 * quarterH, baseY + quarterH };
+        // Face gauche
+        int[] leftFaceX = { topX - halfW, topX, baseX, baseX - halfW };
+        int[] leftFaceY = { topY + quarterH, topY + 2 * quarterH, baseY + 2 * quarterH, baseY + quarterH };
 
-    // Face droite
-    int[] rightFaceX = { topX, topX + halfW, baseX + halfW, baseX };
-    int[] rightFaceY = { topY + 2 * quarterH, topY + quarterH, baseY + quarterH, baseY + 2 * quarterH };
+        // Face droite
+        int[] rightFaceX = { topX, topX + halfW, baseX + halfW, baseX };
+        int[] rightFaceY = { topY + 2 * quarterH, topY + quarterH, baseY + quarterH, baseY + 2 * quarterH };
 
-    // Dessiner les faces
-    g2d.setColor(color.brighter());
-    g2d.fillPolygon(topFaceX, topFaceY, 4);
+        // Dessiner les faces
+        g2d.setColor(color.brighter());
+        g2d.fillPolygon(topFaceX, topFaceY, 4);
 
-    g2d.setColor(color.darker());
-    g2d.fillPolygon(leftFaceX, leftFaceY, 4);
+        g2d.setColor(color.darker());
+        g2d.fillPolygon(leftFaceX, leftFaceY, 4);
 
-    g2d.setColor(color);
-    g2d.fillPolygon(rightFaceX, rightFaceY, 4);
+        g2d.setColor(color);
+        g2d.fillPolygon(rightFaceX, rightFaceY, 4);
 
-    // Contours
-    g2d.setColor(Color.BLACK);
-    g2d.drawPolygon(topFaceX, topFaceY, 4);
-    g2d.drawPolygon(leftFaceX, leftFaceY, 4);
-    g2d.drawPolygon(rightFaceX, rightFaceY, 4);
-}
+        // Contours
+        g2d.setColor(Color.BLACK);
+        g2d.drawPolygon(topFaceX, topFaceY, 4);
+        g2d.drawPolygon(leftFaceX, leftFaceY, 4);
+        g2d.drawPolygon(rightFaceX, rightFaceY, 4);
+    }
 
-public static int getTileWidth() {
+    public static int getTileWidth() {
         return tileWidth;
     }
 
@@ -158,9 +160,9 @@ public static int getTileWidth() {
     }
 
     public static int distance(AbstractRenderable ar) {
-			    Point2D p = TileMap.gridToScreen(ar.getX(), ar.getY(), ar.getZ());
-			 		int dx = (int) (p.getX() - originX);
-        			int dy = (int) (p.getY() - originY);
-        			return  (int) Math.sqrt(dx*dx+dy*dy);
+        Point2D p = TileMap.gridToScreen(ar.getX(), ar.getY(), ar.getZ());
+        int dx = (int) (p.getX() - originX);
+        int dy = (int) (p.getY() - originY);
+        return (int) Math.sqrt(dx * dx + dy * dy);
     }
 }

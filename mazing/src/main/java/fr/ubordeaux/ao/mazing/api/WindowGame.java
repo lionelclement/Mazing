@@ -2,6 +2,8 @@ package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -96,13 +98,13 @@ public class WindowGame extends JFrame implements IWindowGame {
     // =============================
 
     @Override
-    public void fillTilesBackground(int code, int x, int y, int width, int height, float alpha) {
-        boardGame.fillTilesBackground(code, x, y, width, height, alpha);
+    public void fillArea(int code, int x, int y, int z, int width, int height, float alpha) {
+        boardGame.fillArea(code, x, y, z, width, height, alpha);
     }
 
     @Override
-    public void fillTilesBackground(int code, int x, int y, int width, int height) {
-        boardGame.fillTilesBackground(code, x, y, width, height, 1.0f);
+    public void fillArea(int code, int x, int y, int z, int width, int height) {
+        boardGame.fillArea(code, x, y, z, width, height, 1.0f);
     }
 
     @Override
@@ -160,5 +162,12 @@ public class WindowGame extends JFrame implements IWindowGame {
     //public static void main(String[] args) {
     //    WindowGame.launch();
     //}
+
+    @Override
+    public Point2D getIsoCoordinatesFromScreen(int x, int y) {
+        Point2D point = TileMap.screenToGrid(x, y);
+        point.setLocation(point.getX()+TileMap.scrollX, point.getY()+TileMap.scrollY);
+        return point;
+    }
 
 }

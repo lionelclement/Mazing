@@ -1,6 +1,7 @@
 package fr.ubordeaux.ao.mazing.api;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 /**
  * Interface générique représentant une fenêtre de jeu (2D ou isométrique).
@@ -8,10 +9,10 @@ import java.awt.Color;
  * 
  * Cette interface fournit un ensemble de méthodes pour :
  * 
- *   -configurer la fenêtre du jeu (titre, taille, fond...)</li>
- *   -afficher et manipuler des tuiles (tiles) ou objets</li>
- *   -ajouter des personnages animés</li>
- *   -gérer le défilement (scrolling) et le taux de rafraîchissement (FPS)</li>
+ * -configurer la fenêtre du jeu (titre, taille, fond...)</li>
+ * -afficher et manipuler des tuiles (tiles) ou objets</li>
+ * -ajouter des personnages animés</li>
+ * -gérer le défilement (scrolling) et le taux de rafraîchissement (FPS)</li>
  * 
  * 
  * Elle sert de contrat entre la logique du jeu (modèle/contrôleur)
@@ -46,7 +47,6 @@ public interface IWindowGame {
      */
     void setFPS(int fps);
 
-
     // =========================
     // 🧭 DÉPLACEMENT / SCROLL
     // =========================
@@ -58,7 +58,6 @@ public interface IWindowGame {
      * @param y déplacement vertical du point d’origine (positif = bas)
      */
     void scroll(int x, int y);
-
 
     // =========================
     // 🧱 GESTION DU PLATEAU
@@ -74,7 +73,7 @@ public interface IWindowGame {
      * @param height hauteur en nombre de tuiles
      * @param alpha  transparence (0.0 = transparent, 1.0 = opaque)
      */
-    void fillTilesBackground(int code, int x, int y, int width, int height, float alpha);
+    void fillArea(int code, int x, int y, int z, int width, int height, float alpha);
 
     /**
      * Remplit la scène avec un fond uniforme de tuiles (opaque).
@@ -85,7 +84,7 @@ public interface IWindowGame {
      * @param width  largeur en nombre de tuiles
      * @param height hauteur en nombre de tuiles
      */
-    void fillTilesBackground(int code, int x, int y, int width, int height);
+    void fillArea(int code, int x, int y, int z, int width, int height);
 
     /**
      * Remplit la scène avec un fond en damier.
@@ -102,7 +101,6 @@ public interface IWindowGame {
      */
     void clear();
 
-
     // =========================
     // 👾 AJOUT D’OBJETS / TUILES
     // =========================
@@ -115,7 +113,8 @@ public interface IWindowGame {
     void add(ICharacter<? extends ICharacterMode> character);
 
     /**
-     * Ajoute un élément (tuile, décor, objet) à une position donnée avec transparence.
+     * Ajoute un élément (tuile, décor, objet) à une position donnée avec
+     * transparence.
      *
      * @param code  identifiant de la tuile ou de l’objet
      * @param x     coordonnée X sur la grille
@@ -142,15 +141,13 @@ public interface IWindowGame {
      */
     void add(int[][][] matrix);
 
-
     /**
      * Ajoute un ensemble complet de tuiles (matrice 3D).
      *
      * @param matrix matrice [x][y][z] représentant le plateau
-     * @param alpha transparence (0.0 = invisible, 1.0 = opaque)
+     * @param alpha  transparence (0.0 = invisible, 1.0 = opaque)
      */
     void add(int[][][] matrix, float alpha);
-
 
     // =========================
     // ✏️ OUTILS DE DESSIN
@@ -167,7 +164,8 @@ public interface IWindowGame {
     void addTileBackground(Color color, int x, int y, int z);
 
     /**
-     * Dessine un cube de la taille d'une tuile uni d’une certaine couleur aux coordonnées indiquées.
+     * Dessine un cube de la taille d'une tuile uni d’une certaine couleur aux
+     * coordonnées indiquées.
      *
      * @param color couleur à dessiner
      * @param x     coordonnée X sur la grille
@@ -176,5 +174,18 @@ public interface IWindowGame {
      */
     void addCubeBackground(Color color, int x, int y, int z);
 
-
+    /**
+     * Convertit un point de la fenêtre (coordonnées écran) en coordonnées
+     * isométriques sur la carte.
+     *
+     * Cette méthode prend les coordonnées d’un point en pixels dans la fenêtre et
+     * calcule
+     * la position correspondante dans le repère de la grille isométrique du jeu.
+     *
+     * @param x La coordonnée horizontale (en pixels) dans la fenêtre.
+     * @param y La coordonnée verticale (en pixels) dans la fenêtre.
+     * @return Un objet {@link Point2D} représentant les coordonnées isométriques
+     *         (colonne, ligne) correspondantes.
+     */
+    Point2D getIsoCoordinatesFromScreen(int x, int y);
 }
