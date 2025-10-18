@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.project03.view;
+package fr.ubordeaux.ao.project00.view;
 
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
 

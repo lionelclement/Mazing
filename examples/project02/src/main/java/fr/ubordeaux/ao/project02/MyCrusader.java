@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.project01;
+package fr.ubordeaux.ao.project02;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 

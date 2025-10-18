@@ -1,4 +1,4 @@
-package fr.ubordeaux.ao.project01;
+package fr.ubordeaux.ao.project02;
 
 import java.util.function.Consumer;
 
