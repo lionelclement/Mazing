@@ -65,7 +65,7 @@ public class Main {
                 int x = (int)(point.getX() - 0.5f);
                 int y = (int)(point.getY() - 0.5f);
                 
-                window.addTileBackground(Color.WHITE, oldx, oldy, 0);
+                window.addTileBackground((x + y) % 2 == 0 ? Color.WHITE : Color.BLACK, oldx, oldy, 0);
                 window.addTileBackground(Color.CYAN, x, y, 0);
                 oldx = x;
                 oldy = y;

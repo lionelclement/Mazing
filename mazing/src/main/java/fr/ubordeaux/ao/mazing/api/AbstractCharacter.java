@@ -3,7 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Classe abstraite représentant un personnage dans le jeu.
@@ -31,11 +31,10 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected UUID id;
     protected float offsetX, offsetY;
 
-    private Consumer<ICharacter<?>> loopAnimationTrigger;
-    private Consumer<ICharacter<?>> beginLoopAnimationTrigger;
-    private Consumer<ICharacter<?>> midLoopAnimationTrigger;
-    private Consumer<ICharacter<?>> endLoopAnimationTrigger;
-    private Consumer<ICharacter<?>> tickAnimationTrigger;
+    private Predicate<ICharacter<?>> beginLoopAnimationTrigger;
+    private Predicate<ICharacter<?>> midLoopAnimationTrigger;
+    private Predicate<ICharacter<?>> endLoopAnimationTrigger;
+    private Predicate<ICharacter<?>> tickAnimationTrigger;
 
     @SuppressWarnings("unchecked")
     AbstractCharacter(UUID id, int numberStates, float offsetX, float offsetY) {
@@ -133,53 +132,51 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
         return x - offsetX + y - offsetY;
     }
 
-    void callTickTrigger(float frameIndex) {
+    boolean callTickTrigger(float frameIndex) {
         if (tickAnimationTrigger != null) {
-            tickAnimationTrigger.accept(this);
+            return tickAnimationTrigger.test(this);
         }
+        return true;
     }
 
-    void callBeginTrigger() {
+    boolean callBeginTrigger() {
         if (beginLoopAnimationTrigger != null) {
-            beginLoopAnimationTrigger.accept(this);
+            return beginLoopAnimationTrigger.test(this);
         }
+        return true;
     }
 
-    void callMidTrigger() {
+    boolean callMidTrigger() {
         if (midLoopAnimationTrigger != null) {
-            midLoopAnimationTrigger.accept(this);
+            return midLoopAnimationTrigger.test(this);
         }
+        return true;
     }
 
-    void callEndTrigger() {
+    boolean callEndTrigger() {
         if (endLoopAnimationTrigger != null) {
-            endLoopAnimationTrigger.accept(this);
+            return endLoopAnimationTrigger.test(this);
         }
-    }
-
-    void callLoopTrigger() {
-        if (loopAnimationTrigger != null) {
-            loopAnimationTrigger.accept(this);
-        }
+        return true;
     }
 
     @Override
-    public void setTickAnimationTrigger(Consumer<ICharacter<?>> callback) {
+    public void setTickAnimationTrigger(Predicate<ICharacter<?>> callback) {
         tickAnimationTrigger = callback;
     }
 
     @Override
-    public void setBeginAnimationTrigger(Consumer<ICharacter<?>> callback) {
+    public void setBeginAnimationTrigger(Predicate<ICharacter<?>> callback) {
         beginLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setMidAnimationTrigger(Consumer<ICharacter<?>> callback) {
+    public void setMidAnimationTrigger(Predicate<ICharacter<?>> callback) {
         midLoopAnimationTrigger = callback;
     }
 
     @Override
-    public void setEndAnimationTrigger(Consumer<ICharacter<?>> callback) {
+    public void setEndAnimationTrigger(Predicate<ICharacter<?>> callback) {
         endLoopAnimationTrigger = callback;
     }
 
@@ -220,13 +217,13 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
 
     @Override
     public void setDirection(Direction newDirection) {
-            currentDirection = newDirection;
-        }
+        currentDirection = newDirection;
+    }
 
     @Override
     public void setDirection(String directinName) {
-            currentDirection = Direction.valueOf(directinName);
-        }
+        currentDirection = Direction.valueOf(directinName);
+    }
 
     @Override
     public void setDirection(Direction newDirection, int time) {
@@ -284,12 +281,21 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     }
 
     @Override
-    public void setOffset(float x, float y){
+    public void setOffset(float x, float y) {
         this.offsetX = x;
         this.offsetY = y;
     }
 
+    public float getFrameIndex(int mode) {
+        Animation<T> anim = getCurrentAnimation(mode);
+        return anim.frameIndex;
+    }
 
-    abstract T getCurrentMode() ;
+    @Override
+    public float getFrameIndex() {
+        return getFrameIndex(getCurrentMode().ordinal());
+    }
+
+    abstract T getCurrentMode();
 
 }

@@ -1,7 +1,7 @@
 package fr.ubordeaux.ao.mazing.api;
 
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Interface générique représentant un personnage ou une entité animée dans le jeu.
@@ -107,7 +107,7 @@ public interface ICharacter<S extends ICharacterMode> {
      *
      * @param callback fonction appelée au début de l’animation
      */
-    void setBeginAnimationTrigger(Consumer<ICharacter<?>> callback);
+    void setBeginAnimationTrigger(Predicate<ICharacter<?>> callback);
 
     /**
      * Déclencheur appelé au milieu de l’animation.
@@ -117,7 +117,7 @@ public interface ICharacter<S extends ICharacterMode> {
      *
      * @param callback fonction appelée à la moitié de l’animation
      */
-    void setMidAnimationTrigger(Consumer<ICharacter<?>> callback);
+    void setMidAnimationTrigger(Predicate<ICharacter<?>> callback);
 
     /**
      * Déclencheur appelé à la fin de l’animation.
@@ -127,7 +127,7 @@ public interface ICharacter<S extends ICharacterMode> {
      *
      * @param callback fonction appelée à la fin de l’animation
      */
-    void setEndAnimationTrigger(Consumer<ICharacter<?>> callback);
+    void setEndAnimationTrigger(Predicate<ICharacter<?>> callback);
 
     /**
      * Déclencheur appelé à chaque "tick" d’animation (frame ou mise à jour du jeu).
@@ -137,7 +137,7 @@ public interface ICharacter<S extends ICharacterMode> {
      *
      * @param callback fonction appelée à chaque tick d’animation
      */
-    void setTickAnimationTrigger(Consumer<ICharacter<?>> callback);
+    void setTickAnimationTrigger(Predicate<ICharacter<?>> callback);
 
     // =========================
     // 🧩 APPARENCE VISUELLE
@@ -162,5 +162,7 @@ public interface ICharacter<S extends ICharacterMode> {
     void setOffset(float x, float y);
 
     UUID getId();
+
+    float getFrameIndex();
 
 }

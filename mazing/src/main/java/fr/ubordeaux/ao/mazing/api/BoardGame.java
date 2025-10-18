@@ -135,10 +135,10 @@ class BoardGame extends JPanel implements IWindowGame {
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR, -1.5f);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION, 0);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION, -0.5f);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION, 0);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION, -0.5f);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION, 0);
@@ -505,6 +505,18 @@ class BoardGame extends JPanel implements IWindowGame {
 	public Point2D getIsoCoordinatesFromScreen(int x, int y) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'getIsoCoordinatesFromScreen'");
+	}
+
+	@Override
+	public void playSound(String soundId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'playSound'");
+	}
+
+	@Override
+	public void playShortSound(String soundId, int millis) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'playShortSound'");
 	}
 
 }

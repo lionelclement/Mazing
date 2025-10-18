@@ -182,13 +182,13 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
 
                     break;
                 case TURN_LEFT:
-                case TURN_RIGHT: 
+                case TURN_RIGHT:
                 case WALK_LEFT:
                 case WALK_RIGHT: {
                     boolean left = switch (mode) {
                         case TURN_LEFT -> true;
                         case WALK_LEFT -> true;
-                        default  -> false;
+                        default -> false;
                     };
                     int numFrames = mode.getNumFrames();
                     for (Direction direction : Direction.values()) {
@@ -264,59 +264,70 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    protected void callTickTrigger(float frameIndex) {
-        switch (currentMode) {
-            case RUN, WALK -> {
-                if ((int)(frameIndex % 8) == 3) {
-                    SoundManager.getInstance().stop(currentSound.name());
-                    SoundManager.getInstance().play(currentSound.name());
+    protected boolean callTickTrigger(float frameIndex) {
+        if (super.callTickTrigger(frameIndex)) {
+
+            switch (currentMode) {
+                case RUN, WALK -> {
+                    if ((int) (frameIndex % 8) == 3) {
+                        SoundManager.getInstance().stop(currentSound.name());
+                        SoundManager.getInstance().play(currentSound.name());
+                    }
+                }
+                default -> {
                 }
             }
-            default -> {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean callBeginTrigger() {
+        if (super.callBeginTrigger()) {
+            switch (currentMode) {
+                case GOTHIT:
+                case JUMP:
+                    SoundManager.getInstance().play(currentSound.name());
+                default:
+                    break;
             }
+            return true;
+        } else {
+            return false;
         }
-        super.callTickTrigger(frameIndex);
     }
 
     @Override
-    public void callBeginTrigger() {
-        switch (currentMode) {
-            case GOTHIT:
-            case JUMP:
-                SoundManager.getInstance().play(currentSound.name());
-            default:
-                break;
-        }
-        super.callBeginTrigger();
+    public boolean callMidTrigger() {
+        return super.callMidTrigger();
     }
 
     @Override
-    public void callMidTrigger() {
-        super.callMidTrigger();
-    }
-
-    @Override
-    public void callEndTrigger() {
-        switch (currentMode) {
-            case ATTACK:
-            case GOTHIT:
-                SoundManager.getInstance().play(currentSound.name());
-                currentMode = savedMode;
-                currentSound = savedSound;
-                break;
-            case FALL:
-                currentMode = Mode.DEATH;
-                SoundManager.getInstance().play(currentSound.name());
-                animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
-                break;
-            case JUMP:
-                currentMode = savedMode;
-                SoundManager.getInstance().play(currentSound.name());
-                currentSound = savedSound;
-            default:
-                break;
+    public boolean callEndTrigger() {
+        if (super.callEndTrigger()) {
+            switch (currentMode) {
+                case ATTACK:
+                case GOTHIT:
+                    SoundManager.getInstance().play(currentSound.name());
+                    currentMode = savedMode;
+                    currentSound = savedSound;
+                    break;
+                case FALL:
+                    currentMode = Mode.DEATH;
+                    SoundManager.getInstance().play(currentSound.name());
+                    animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
+                    break;
+                case JUMP:
+                    currentMode = savedMode;
+                    SoundManager.getInstance().play(currentSound.name());
+                    currentSound = savedSound;
+                default:
+                    break;
+            }
+            return true;
         }
-        super.callEndTrigger();
+        return false;
     }
 
     @Override
@@ -346,5 +357,4 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         return "Crusader [z=" + z + ", getIsoDepth()=" + getIsoDepth() + "]";
     }
 
-    
 }

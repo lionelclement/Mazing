@@ -34,7 +34,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	private boolean frozen;
 
 	/** Index de la frame courante */
-	private float frameIndex;
+	float frameIndex;
 
 	/** Index de la frame courante */
 	private float fps;

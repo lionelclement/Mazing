@@ -1,6 +1,6 @@
 package fr.ubordeaux.ao.project02;
 
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.Direction;
@@ -8,7 +8,7 @@ import fr.ubordeaux.ao.mazing.api.ICharacter;
 
 // Implémentation d'une Functional Interface qui fait tourner le
 // personnage quand il est en mode RUN
-public class RoundCrusader implements Consumer<ICharacter<?>> {
+public class RoundCrusader implements Predicate<ICharacter<?>> {
 
     private float t;
     private float centerX = 4;
@@ -22,7 +22,7 @@ public class RoundCrusader implements Consumer<ICharacter<?>> {
     private float angle;
 
     @Override
-    public void accept(ICharacter<?> character) {
+    public boolean test(ICharacter<?> character) {
 
         if (((MyCrusader) character).getCurrentMode() == Crusader.Mode.RUN) {
             t += 0.005f;
@@ -76,8 +76,12 @@ public class RoundCrusader implements Consumer<ICharacter<?>> {
                 character.setDirection(dir);
             }
 
+            
             character.setPosition(targetX, targetY, 0);
+            return false;
         }
+					
+        return true;
     }
 
 }

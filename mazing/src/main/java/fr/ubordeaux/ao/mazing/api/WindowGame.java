@@ -45,6 +45,7 @@ public class WindowGame extends JFrame implements IWindowGame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(true);
+    
         setVisible(true);
     }
 
@@ -156,6 +157,17 @@ public class WindowGame extends JFrame implements IWindowGame {
     public void addCubeBackground(Color color, int x, int y, int z) {
         boardGame.addCubeBackground(color, x, y, z);
     }
+
+    @Override
+        public void playSound(String soundId) {
+        SoundManager.getInstance().play(soundId);
+    }
+
+    @Override
+        public void playShortSound(String soundId, int millis) {
+        SoundManager.getInstance().playShortSound(soundId, millis);
+    }
+
     // =============================
     //  Méthode main (facultative)
     // =============================

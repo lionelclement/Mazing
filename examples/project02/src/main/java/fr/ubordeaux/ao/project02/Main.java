@@ -57,7 +57,19 @@ public class Main {
 		crusader.setTickAnimationTrigger(new RoundCrusader());
 
 		// Définit la méthode envoyée au début des animations
-		crusader.setEndAnimationTrigger(new ContinueCrusader());
+		crusader.setEndAnimationTrigger(new ContinueCrusader(windowGame));
+
+		// Définit la méthode envoyée au début des animations
+		crusader.setBeginAnimationTrigger(c -> {
+			if (c instanceof Crusader) {
+				if (crusader.getCurrentMode() == Crusader.Mode.ATTACK){
+					windowGame.playSound("weapons/slash1");
+					return false;
+				}
+			}
+			return true;
+		});
+
 
 		// Affiche la windowGame
 		windowGame.setVisible(true);

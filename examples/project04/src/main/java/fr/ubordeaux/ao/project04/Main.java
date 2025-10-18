@@ -48,7 +48,7 @@ public class Main {
         button.addActionListener(_ -> {
             label.setText("Tu as appuyé !");
             spider.setMode(Spider.Mode.ATTACK);
-            crusader.setMode(Crusader.Mode.GOTHIT);
+            crusader.setMode(Crusader.Mode.ATTACK);
         });
         panel.add(label);
         panel.add(button);

@@ -205,12 +205,13 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    public void callBeginTrigger() {
-        super.callEndTrigger();
+    public boolean callBeginTrigger() {
+        return super.callEndTrigger();
     }
 
     @Override
-    public void callEndTrigger() {
+    public boolean callEndTrigger() {
+        if (super.callEndTrigger()) {
         switch (currentMode) {
             case ATTACK -> {
                 SoundManager.getInstance().play(currentMode.name());
@@ -224,12 +225,14 @@ public class Spider extends AbstractCharacter<CharacterMode> {
             default -> {
             }
         }
-        super.callEndTrigger();
+        return true;
+    }
+    return false;
     }
 
     @Override
-    protected void callTickTrigger(float frameIndex) {
-        super.callTickTrigger(frameIndex);
+    protected boolean callTickTrigger(float frameIndex) {
+        return super.callTickTrigger(frameIndex);
     }
 
     @Override

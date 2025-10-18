@@ -188,4 +188,25 @@ public interface IWindowGame {
      *         (colonne, ligne) correspondantes.
      */
     Point2D getIsoCoordinatesFromScreen(int x, int y);
+
+    /**
+     * Joue un son à partir de son identifiant (ex: "weapons/explosion").
+     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut "sounds/").
+     *
+     * Exemple :
+     * windowGame.playSound("weapons/explosion");
+     * -> joue "sounds/weapons/explosion.wav"
+     */
+    public void playSound(String soundId);
+    
+    /**
+     * Joue un son à partir de son identifiant (ex: "weapons/explosion").
+     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut "sounds/").
+     *
+     * Exemple :
+     * windowGame.playSound("weapons/explosion");
+     * -> joue "sounds/weapons/explosion.wav"
+     */
+    public void playShortSound(String soundId, int millis);
+    
 }
