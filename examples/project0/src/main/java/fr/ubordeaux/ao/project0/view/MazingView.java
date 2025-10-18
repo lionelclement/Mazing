@@ -62,7 +62,7 @@ public class MazingView {
 		
 		window.setTileSize(130);
 		
-		window.fillTilesBackground(12, -240, -240, 480, 480);
+		window.fillArea(12, -240, -240, 0, 480, 480);
 		//window.fillCheckerboardBackground(-12, -12, 24, 24);
 		window.setFPS(40);
 		

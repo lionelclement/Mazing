@@ -41,7 +41,7 @@ public class MazingView {
 		}
 
 		// Ajoute des objets (ici le sol 12 de la série 000)
-		windowGame.fillTilesBackground(12, 6, -9, 10, 10);
+		windowGame.fillArea(12, 6, -9, 0, 10, 10);
 
 		// Ajoute un objet (le sol 20 de la série 000)
 		windowGame.add(20, 6, 6, 0);
