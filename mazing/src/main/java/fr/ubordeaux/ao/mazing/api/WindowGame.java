@@ -99,13 +99,13 @@ public class WindowGame extends JFrame implements IWindowGame {
     // =============================
 
     @Override
-    public void fillArea(int code, int x, int y, int z, int width, int height, float alpha) {
-        boardGame.fillArea(code, x, y, z, width, height, alpha);
+    public void fillArea(int code, int x, int y, int z, int width, int height, float alpha, float brightness) {
+        boardGame.fillArea(code, x, y, z, width, height, alpha, brightness);
     }
 
     @Override
     public void fillArea(int code, int x, int y, int z, int width, int height) {
-        boardGame.fillArea(code, x, y, z, width, height, 1.0f);
+        boardGame.fillArea(code, x, y, z, width, height, 1f, 1f);
     }
 
     @Override
@@ -125,12 +125,12 @@ public class WindowGame extends JFrame implements IWindowGame {
 
     @Override
     public void add(int code, int x, int y, int z) {
-        boardGame.add(code, x, y, z, 1.0f);
+        boardGame.add(code, x, y, z, 1f);
     }
 
     @Override
     public void add(int[][][] matrix) {
-        boardGame.add(matrix, 1.0f);
+        boardGame.add(matrix, 1f);
     }
 
     @Override
@@ -168,18 +168,21 @@ public class WindowGame extends JFrame implements IWindowGame {
         SoundManager.getInstance().playShortSound(soundId, millis);
     }
 
-    // =============================
-    //  Méthode main (facultative)
-    // =============================
-    //public static void main(String[] args) {
-    //    WindowGame.launch();
-    //}
-
     @Override
     public Point2D getIsoCoordinatesFromScreen(int x, int y) {
         Point2D point = TileMap.screenToGrid(x, y);
         point.setLocation(point.getX()+TileMap.scrollX, point.getY()+TileMap.scrollY);
         return point;
+    }
+
+    @Override
+    public void remove(int code, int x, int y, int z) {
+        boardGame.remove(code, x, y, z);
+    }
+
+    @Override
+    public void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset) {
+        boardGame.initImagesSheet(path, width, height, scale, offsetX, offsetY, offset);
     }
 
 }

@@ -45,7 +45,7 @@ class TileMap {
         return new Point2D.Float(col, row);
     }
 
-    public static void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
+public static void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
             RenderType renderType, float alpha) {
 
         // Projection isométrique

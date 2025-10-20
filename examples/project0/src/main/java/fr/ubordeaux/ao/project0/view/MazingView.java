@@ -58,7 +58,6 @@ public class MazingView {
 		((JFrame)window).setTitle("Mon jeu à moi");
 		((JFrame)window).setSize(1800, 1169);
 		((JFrame)window).setResizable(true);
-		//((JFrame)window).setBackground(Color.WHITE);
 		
 		window.setTileSize(130);
 		
@@ -108,7 +107,7 @@ public class MazingView {
 		
 		int[][][] items = {{
 			{-1, -1, -1, -1, -1, -1, -1},
-			{-1, -1, -1, -1, -1, -1, -1},
+			{-1, 518, -1, -1, -1, -1, -1},
 			{-1, -1, -1, -1, -1, -1, -1},
 			{-1, -1, -1, 520, -1, -1, 540},
 			{-1, -1, -1, -1, -1, -1, -1},
@@ -117,42 +116,47 @@ public class MazingView {
 			}};
 		
 		window.add(items);
-		
-    	crusader = new Crusader();
-    	crusader.setTickAnimationTrigger(e -> onTick(e));
-    	crusader.setBeginAnimationTrigger(e -> onBegin(e));
-    	crusader.setEndAnimationTrigger(e -> onEnd(e));
-    	crusader.setMidAnimationTrigger(e -> onMid(e));
-    	window.add(crusader);
+	
+		window.initImagesSheet("all_600.png", 64, 128, 0.6f, 0, 30, 600);
+		window.add(72, 8, 8, 0);
+		window.add(665, 8, 8, 0);
+
+    	//crusader = new Crusader();
+    	//crusader.setTickAnimationTrigger(e -> onTick(e));
+    	//crusader.setBeginAnimationTrigger(e -> onBegin(e));
+    	//crusader.setEndAnimationTrigger(e -> onEnd(e));
+    	//crusader.setMidAnimationTrigger(e -> onMid(e));
+    	//window.add(crusader);
     	
-    	Spider spider = new Spider();
-    	spider.setPosition(7, 7, 0);
-    	spider.setTickAnimationTrigger(e -> onTick(e));
-    	window.add(spider);
+    	//Spider spider = new Spider();
+    	//spider.setPosition(7, 7, 0);
+    	//spider.setTickAnimationTrigger(e -> onTick(e));
+    	//window.add(spider);
 		
 		window.setVisible(true);
 		
 	}
 	
-	private void onMid(ICharacter<?> e) {
-		// TODO Auto-generated method stub
+	private boolean onMid(ICharacter<?> e) {
+		return false;
 	}
 
-	private void onEnd(ICharacter<?> e) {
-		// TODO Auto-generated method stub
+	private boolean onEnd(ICharacter<?> e) {
+		return false;
 	}
 
-	private void onBegin(ICharacter<?> e) {
-		// TODO Auto-generated method stub
+	private boolean onBegin(ICharacter<?> e) {
+		return false;
 	}
 
     // La vue lit la position dans le modèle et se met à jour 
-    private void onTick(ICharacter<?> character) {
+    private boolean onTick(ICharacter<?> character) {
     	if (animationListener != null) {
             animationListener.onTick(character);
         }
         if (character.equals(crusader))
 			character.setPosition(model.getX(), model.getY(), model.getZ());
+		return false;
 	}
 	
 	// Déplacements du plateau

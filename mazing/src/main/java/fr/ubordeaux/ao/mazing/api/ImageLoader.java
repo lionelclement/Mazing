@@ -3,6 +3,7 @@ package fr.ubordeaux.ao.mazing.api;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -23,11 +24,36 @@ class ImageLoader {
 
 	public static BufferedImage loadImage(String path) {
 		try {
-			return ImageIO.read(ImageLoader.class.getResource(path));
+			// 1️⃣ Essayer comme ressource du classpath
+			var resource = ImageLoader.class.getResource(path);
+			if (resource != null) {
+				return ImageIO.read(resource);
+			}
+
+			// 2️⃣ Sinon, essayer comme fichier sur disque
+			File file = new File(path);
+			if (file.exists()) {
+				return ImageIO.read(file);
+			}
+
+			System.err.println("❌ Image introuvable : " + path + " (ni dans resources, ni sur disque)");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static BufferedImage loadImageIfExists(String path) {
+		try {
+			java.net.URL resource = ImageLoader.class.getResource(path);
+			if (resource == null) {
+				return null; // le fichier n'existe pas
+			}
+			return ImageIO.read(resource);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**

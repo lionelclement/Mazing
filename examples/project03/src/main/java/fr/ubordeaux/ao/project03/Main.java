@@ -11,23 +11,26 @@ import fr.ubordeaux.ao.mazing.api.IWindowGame;
 import fr.ubordeaux.ao.mazing.api.WindowGame;
 
 public class Main {
+    static Integer x;
+    static Integer y;
+
     public static void main(String[] args) {
+
 
         IWindowGame window = new WindowGame();
 
-        ((JFrame)window).setBackground(Color.WHITE);
+        ((JFrame)window).setBackground(Color.BLACK);
 
-        window.fillCheckerboardBackground(-40, -40, 80, 80);
-
-        window.fillArea(72, 0, 0, 0, 5, 5);
+        window.fillArea(20072, 0, 0, 0, 5, 5, 1f, 0.3f);
 
         window.add(new int[][][] {{
-            {138, 110, 110, 110, 139},
-            {108, -1, -1, -1, 111},
-            {108, -1, -1, -1, 111},
-            {108, -1, -1, -1, 111},
-            {136, 109, 109, 109, 137},
-        }} );
+            {20138, 20110, 20110, 20110, 20139},
+            {20108, -1, -1, -1, 20111},
+            {20108, -1, -1, -1, 20111},
+            {20108, -1, -1, -1, 20111},
+            {20136, 20109, 20109, 20109, 20137},
+        }},
+        1f);
         
 
         Crusader crusader = new Crusader();
@@ -38,15 +41,19 @@ public class Main {
 
         JFrame frame = (JFrame) window;
         frame.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Clic détecté à : (" + e.getX() + ", " + e.getY() + ")");
                 Point2D point = window.getIsoCoordinatesFromScreen(e.getX(), e.getY());
 
-                int x = (int)(point.getX() - 0.5f);
-                int y = (int)(point.getY() - 0.5f);
+                if (x != null && y != null) {
+                    window.remove(72, x, y, 0);
+                }
+                x = (int)(point.getX() - 0.5f);
+                y = (int)(point.getY() - 0.5f);
 
                 crusader.setPosition(x, y, 0);
+                window.add(72, x, y, 0);
 
             }
         });
@@ -58,14 +65,12 @@ public class Main {
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                System.out.println("Souris déplacée à : (" + e.getX() + ", " + e.getY() + ")");
-
                 Point2D point = window.getIsoCoordinatesFromScreen(e.getX(), e.getY());
 
                 int x = (int)(point.getX() - 0.5f);
                 int y = (int)(point.getY() - 0.5f);
                 
-                window.addTileBackground((x + y) % 2 == 0 ? Color.WHITE : Color.BLACK, oldx, oldy, 0);
+                window.addTileBackground(Color.BLACK, oldx, oldy, 0);
                 window.addTileBackground(Color.CYAN, x, y, 0);
                 oldx = x;
                 oldy = y;

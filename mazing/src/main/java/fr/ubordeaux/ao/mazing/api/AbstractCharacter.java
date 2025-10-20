@@ -25,10 +25,10 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected BufferedImage[][][] shadow_images; // [mode][direction][frame]
     protected Animation<T>[][] animations; // [mode][direction]
 
-    protected float x, y, z;
     protected Direction currentDirection;
     protected float scale;
     protected UUID id;
+    protected float x, y, z;
     protected float offsetX, offsetY;
 
     private Predicate<ICharacter<?>> beginLoopAnimationTrigger;
@@ -54,7 +54,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     void render(Graphics g, int mode) {
         Animation<T> anim = getCurrentAnimation(mode);
         BufferedImage image = anim.getCurrentFrame();
-        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1.0f);
+        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1f);
     }
 
     abstract RenderType getRenderType();

@@ -6,6 +6,8 @@ import fr.ubordeaux.ao.mazing.api.Crusader;
 
 import java.awt.Color;
 
+import javax.swing.JFrame;
+
 public class MazingView {
 
 	private IWindowGame windowGame;
@@ -102,9 +104,9 @@ public class MazingView {
 						{ -1, -1, -1, -1, -1, -1, -1 },
 				},
 		},
-				// 1f: opaque
-				// 0f: transparent
-				0.5f);
+				0.5f, // 1f: opaque 0f: transparent
+				1f // 1f: clair 0f: noir
+				);
 
 		// Ajoute un nouveau personnage
 		crusader = new Crusader();

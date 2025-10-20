@@ -13,7 +13,9 @@ abstract class AbstractRenderable {
     abstract float getIsoDepth();
 
     protected abstract float getX();
+
     protected abstract float getY();
+
     protected abstract float getZ();
 
 }

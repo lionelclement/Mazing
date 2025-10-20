@@ -73,7 +73,7 @@ public interface IWindowGame {
      * @param height hauteur en nombre de tuiles
      * @param alpha  transparence (0.0 = transparent, 1.0 = opaque)
      */
-    void fillArea(int code, int x, int y, int z, int width, int height, float alpha);
+    void fillArea(int code, int x, int y, int z, int width, int height, float alpha, float brightness);
 
     /**
      * Remplit la scène avec un fond uniforme de tuiles (opaque).
@@ -133,6 +133,16 @@ public interface IWindowGame {
      * @param z    hauteur (niveau)
      */
     void add(int code, int x, int y, int z);
+
+    /**
+     * supprime (tuile, décor, objet) à une position donnée
+     *
+     * @param code  identifiant de la tuile ou de l’objet
+     * @param x     coordonnée X sur la grille
+     * @param y     coordonnée Y sur la grille
+     * @param z     hauteur (niveau)
+     */
+    void remove(int code, int x, int y, int z);
 
     /**
      * Ajoute un ensemble complet de tuiles (matrice 3D).
@@ -208,5 +218,7 @@ public interface IWindowGame {
      * -> joue "sounds/weapons/explosion.wav"
      */
     public void playShortSound(String soundId, int millis);
+
+    void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset);
     
 }

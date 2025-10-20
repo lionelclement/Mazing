@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -54,14 +55,10 @@ class BoardGame extends JPanel implements IWindowGame {
 	List<AbstractRenderable> grounds = new ArrayList<>();
 
 	/** Liste des objets 3D présents dans la scène */
-	List<AbstractRenderable> sceneObjects = new ArrayList<>();
+	Set<ImageSceneRenderable> sceneObjects = new HashSet<>();
 
 	/** Liste des personnages présents dans la scène */
 	List<AbstractCharacter<? extends CharacterMode>> sceneCharacters = new ArrayList<>();
-
-	/** Mapping des coordonnées vers les codes d’objets de scène */
-	// Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
-	Map<DiscretePoint, Set<Integer>> pointToSceneObjectsMap = new HashMap<>();
 
 	/** Liste des personnages du plateau */
 	@SuppressWarnings("rawtypes")
@@ -71,7 +68,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	private Timer gameLoop;
 
 	/** Mapping du code d’image vers l’objet Image correspondant */
-	private Map<Integer, ImageRenderable> codeToImageMap;
+	private Map<Integer, ImageSceneRenderable> codeToImageMap;
 
 	/** Référence vers le joueur */
 	/**
@@ -147,50 +144,161 @@ class BoardGame extends JPanel implements IWindowGame {
 		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION, 0);
 
 		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 20, RenderType.ITEM, 0);
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 36, RenderType.ITEM, 0);
+
+	}
+
+	@Override
+	public
+	void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset) {
+		BufferedImage imagesSheet = ImageLoader.loadImage(path);
+		crop(imagesSheet, width, height, 10, 100, offset, scale, offsetX, offsetY, RenderType.ITEM, 0);
+	}
+
+	private void crop(BufferedImage sheet, int width, int height, int colsPerRow,
+			int maxSize, int offset, double scale, int offsetX, int offsetY,
+			RenderType renderType, float iso) {
+
+		int maxCols = sheet.getWidth() / width;
+		int maxRows = sheet.getHeight() / height;
+		int totalImages = Math.min(maxSize, maxCols * maxRows);
+
+		for (int i = 0; i < totalImages; i++) {
+
+			int col = i % maxCols;
+			int row = i / maxCols;
+
+			int sx = col * width;
+			int sy = row * height;
+
+			// Taille réelle de la sous-image (pour les sprites plus petits)
+			int subWidth = Math.min(width, sheet.getWidth() - sx);
+			int subHeight = Math.min(height, sheet.getHeight() - sy);
+
+			if (subWidth <= 0 || subHeight <= 0)
+				continue;
+
+			BufferedImage sub = sheet.getSubimage(sx, sy, subWidth, subHeight);
+
+			// Image finale centrée dans la zone width x height + décalage offsetX/Y
+			BufferedImage fixed = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = fixed.createGraphics();
+			g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+					java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
+			// Décalage pour centrer + offset
+			int dx = (width - subWidth) / 2 + offsetX;
+			int dy = (height - subHeight) / 2 + offsetY;
+
+			g.drawImage(sub, dx, dy, subWidth, subHeight, null);
+			g.dispose();
+
+			// Dimensions après scale
+			int scaledWidth = (int) (TileMap.tileWidth * scale);
+			int scaledHeight = (int) (TileMap.tileHeight * 2 * scale);
+
+			BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = scaled.createGraphics();
+			g2d.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+					java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+			g2d.drawImage(fixed, 0, 0, scaledWidth, scaledHeight, null);
+			g2d.dispose();
+
+			// === 1️⃣ Image normale ===
+			codeToImageMap.put(i + offset, new ImageSceneRenderable(scaled, renderType, iso));
+
+			// === 2️⃣ Image sombre (50%) ===
+			BufferedImage dark50 = applyBrightness(scaled, 0.5f);
+			codeToImageMap.put(i + offset + 10000, new ImageSceneRenderable(dark50, renderType, iso));
+
+			// === 3️⃣ Image très sombre (20%) ===
+			BufferedImage dark20 = applyBrightness(scaled, 0.2f);
+			codeToImageMap.put(i + offset + 20000, new ImageSceneRenderable(dark20, renderType, iso));
+		}
 	}
 
 	/**
-	 * Découpe une spritesheet et enregistre les images dans codeToImageMap.
-	 * 
+	 * Découpe une spritesheet et enregistre les images (normales, sombres, très
+	 * sombres) dans codeToImageMap.
+	 *
+	 * Cette version est robuste : elle ne dépasse jamais la taille réelle de la
+	 * spritesheet et adapte automatiquement le nombre d'images à découper.
+	 *
 	 * @param sheet      spritesheet source
 	 * @param width      largeur d’une tuile
 	 * @param height     hauteur d’une tuile
-	 * @param colsPerRow nombre de colonnes par ligne dans la spritesheet
 	 * @param maxSize    nombre maximum d’images à découper
-	 * @param offset     code de départ pour l’image
+	 * @param offset     code de départ pour l’image (ex: 0, 10000, etc.)
 	 * @param scale      facteur de mise à l’échelle
 	 * @param offsetX    décalage X appliqué à l’image
 	 * @param offsetY    décalage Y appliqué à l’image
 	 * @param renderType type de rendu de l’image
+	 * @param iso        facteur isométrique
 	 */
-	private void crop(BufferedImage sheet, int width, int height, int colsPerRow,
-			int maxSize, int offset, double scale, int offsetX, int offsetY, RenderType renderType, float iso) {
+	private void _crop(BufferedImage sheet, int width, int height, int colsPerRow,
+			int maxSize, int offset, double scale, int offsetX, int offsetY,
+			RenderType renderType, float iso) {
+
+		// Calcul du nombre maximal de colonnes et lignes selon la taille réelle de la
+		// spritesheet
+		int maxCols = sheet.getWidth() / width;
+		int maxRows = sheet.getHeight() / height;
+		int totalImages = Math.min(maxSize, maxCols * maxRows);
+
 		int col = 0;
 		int row = 0;
-		for (int i = 0; i < maxSize; i++) {
-			BufferedImage sub = sheet.getSubimage(col * width, row * height, width, height);
 
-			// Calcul des dimensions après scale
+		for (int i = 0; i < totalImages; i++) {
+
+			col = i % maxCols;
+			row = i / maxCols;
+
+			int sx = col * width;
+			int sy = row * height;
+
+			// Sécurité supplémentaire : vérifier qu'on ne dépasse pas la spritesheet
+			if (sx + width > sheet.getWidth() || sy + height > sheet.getHeight()) {
+				break;
+			}
+
+			BufferedImage sub = sheet.getSubimage(sx, sy, width, height);
+
+			// Dimensions après scale
 			int scaledWidth = (int) (TileMap.tileWidth * scale);
 			int scaledHeight = (int) (TileMap.tileHeight * 2 * scale);
 
-			// Créer l'image redimensionnée
+			// Image redimensionnée
 			BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2d = scaled.createGraphics();
-
-			// Dessiner l'image en respectant le scale
 			g2d.drawImage(sub, 0, 0, scaledWidth, scaledHeight, null);
 			g2d.dispose();
 
-			codeToImageMap.put(i + offset, new ImageRenderable(scaled, offsetX, offsetY, renderType, iso));
+			System.out.println(i + offset);
+			// === 1️⃣ Image normale ===
+			codeToImageMap.put(i + offset, new ImageSceneRenderable(scaled, renderType, iso));
 
-			col++;
-			if (col == colsPerRow) {
-				col = 0;
-				row++;
-			}
+			// === 2️⃣ Image sombre (50%) ===
+			BufferedImage dark50 = applyBrightness(scaled, 0.5f);
+			codeToImageMap.put(i + offset + 10000, new ImageSceneRenderable(dark50, renderType, iso));
+
+			// === 3️⃣ Image très sombre (20%) ===
+			BufferedImage dark20 = applyBrightness(scaled, 0.2f);
+			codeToImageMap.put(i + offset + 20000, new ImageSceneRenderable(dark20, renderType, iso));
 		}
+	}
+
+	/**
+	 * Applique un facteur de luminosité à une image.
+	 * brightness = 1.0 → normal, 0.0 → noir
+	 */
+	private BufferedImage applyBrightness(BufferedImage src, float brightness) {
+		BufferedImage result = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		RescaleOp op = new RescaleOp(
+				new float[] { brightness, brightness, brightness, 1f }, // ne modifie pas alpha
+				new float[] { 0f, 0f, 0f, 0f },
+				null);
+		op.filter(src, result);
+		return result;
 	}
 
 	/**
@@ -228,8 +336,6 @@ class BoardGame extends JPanel implements IWindowGame {
 						.thenComparingInt(o -> ((AbstractRenderable) o).getRank())
 						.thenComparing(o -> ((AbstractRenderable) o).getIsoDepth()))
 				.toList();
-
-
 
 		for (AbstractRenderable obj : sorted) {
 			obj.render(g);
@@ -311,7 +417,7 @@ class BoardGame extends JPanel implements IWindowGame {
 	 * @param alpha transparence de la tuile
 	 */
 	@Override
-	public void fillArea(int code, int x, int y, int z, int width, int height, float alpha) {
+	public void fillArea(int code, int x, int y, int z, int width, int height, float alpha, float brightness) {
 
 		Graphics2D g = background.createGraphics();
 
@@ -320,23 +426,21 @@ class BoardGame extends JPanel implements IWindowGame {
 		int YMINBG = y;
 		int YMAXBG = y + height;
 
-		ImageRenderable tileImg = codeToImageMap.get(code);
+		ImageSceneRenderable tileImg = codeToImageMap.get(code);
 		if (tileImg != null) {
 			for (int _y = YMINBG; _y < YMAXBG; _y++) {
 				for (int _x = XMINBG; _x < XMAXBG; _x++) {
 
 					if (code != -1) {
-						ImageRenderable image = codeToImageMap.get(code);
+						ImageSceneRenderable image = codeToImageMap.get(code);
 						int rank = codeToRank(code);
 						if (image != null) {
-							ImageRenderable imageRendarable3D = new ImageRenderable(
-									image.getBufferedImage(), _x, _y, z,
+							ImageSceneRenderable imageRendarable3D = new ImageSceneRenderable(
+									code, _x, _y, z,
+									image.getBufferedImage(),
 									rank,
 									image.getRenderType(), image.getIso(), alpha);
 							grounds.add(imageRendarable3D);
-							pointToSceneObjectsMap
-									.computeIfAbsent(new DiscretePoint(_x, _y, z), _ -> new HashSet<>())
-									.add(code);
 						}
 					}
 				}
@@ -376,16 +480,14 @@ class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void add(int code, int x, int y, int z, float alpha) {
 		if (code != -1) {
-			ImageRenderable image = codeToImageMap.get(code);
+			ImageSceneRenderable image = codeToImageMap.get(code);
 			int rank = codeToRank(code);
 			if (image != null) {
-				ImageRenderable imageRendarable3D = new ImageRenderable(
-						image.getBufferedImage(), x, y, z, rank,
+				ImageSceneRenderable imageRendarable3D = new ImageSceneRenderable(
+						code, x, y, z,
+						image.getBufferedImage(), rank,
 						image.getRenderType(), image.getIso(), alpha);
 				sceneObjects.add(imageRendarable3D);
-				pointToSceneObjectsMap
-						.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
-						.add(code);
 			}
 		}
 	}
@@ -405,18 +507,15 @@ class BoardGame extends JPanel implements IWindowGame {
 					int code = matrix[z][y][x];
 
 					if (code != -1) {
-						ImageRenderable image = codeToImageMap.get(code);
+						ImageSceneRenderable image = codeToImageMap.get(code);
 						int rank = codeToRank(code);
 						if (image != null) {
-							ImageRenderable imageRendarable3D = new ImageRenderable(
-									image.getBufferedImage(), x, y, z, rank,
+							ImageSceneRenderable imageRendarable3D = new ImageSceneRenderable(
+									code, x, y, z,
+									image.getBufferedImage(), rank,
 									image.getRenderType(), image.getIso(), alpha);
 
 							sceneObjects.add(imageRendarable3D);
-							pointToSceneObjectsMap
-									.computeIfAbsent(new DiscretePoint(x, y, z), _ -> new HashSet<>())
-									.add(code);
-
 						}
 
 					}
@@ -444,7 +543,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	@Override
 	public void clear() {
 		sceneObjects.clear();
-		pointToSceneObjectsMap.clear();
 	}
 
 	@Override
@@ -478,7 +576,7 @@ class BoardGame extends JPanel implements IWindowGame {
 
 	@Override
 	public void add(int code, int x, int y, int z) {
-		add(code, x, y, z, 1);
+		add(code, x, y, z, 1f);
 	}
 
 	@Override
@@ -503,20 +601,22 @@ class BoardGame extends JPanel implements IWindowGame {
 
 	@Override
 	public Point2D getIsoCoordinatesFromScreen(int x, int y) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'getIsoCoordinatesFromScreen'");
 	}
 
 	@Override
 	public void playSound(String soundId) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'playSound'");
 	}
 
 	@Override
 	public void playShortSound(String soundId, int millis) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'playShortSound'");
+	}
+
+	@Override
+	public void remove(int code, int x, int y, int z) {
+		sceneObjects.remove(new ImageSceneRenderable(code, x, y, z));
 	}
 
 }
