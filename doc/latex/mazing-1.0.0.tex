@@ -151,7 +151,22 @@ L'API se charge d'afficher les éléments visibles en prenant compte de leur top
 
     \end{itemize}
 
-    \item Pour déboguer:
+    \item Pour gérer les sons:
+    \begin{itemize}
+
+    \item \code{void playSound(String soundId)}
+    
+    Joue un son à partir de son identifiant (ex: "weapons/explosion") joue le son qui se trouve dans sounds/weapons/explosion.wav.
+
+    \item \code{void playShortSound(String soundId, int millis)}
+    
+    Même chose, mais limite le son à millis ms.
+        
+    \item \code{Point2D getIsoCoordinatesFromScreen(int x, int y)}
+
+    \end{itemize}
+
+        \item Pour déboguer:
 
     \begin{itemize}
         \item \code{void add(Color color, int x, int y, int z)}
@@ -173,15 +188,7 @@ L'API se charge d'afficher les éléments visibles en prenant compte de leur top
 
 Les éléments du décor sont déjà dessinés (Dungeon Pack (2.3) Licence CCO) et sont identifés par des nombres codés.
 
-Les dessins se trouvent sur des planches 000, 100, 200, etc.\\
-
-Vous les trouverez dans l'archive:
-\begin{itemize}
-    \item \code{mazing/src/main/resources/Dungeon-Pack/Isometric/*/all_000.png}
-    \item \code{mazing/src/main/resources/Dungeon-Pack/Isometric/*/all_100.png}
-    \item \code{mazing/src/main/resources/Dungeon-Pack/Isometric/*/all_200.png}
-    \item \dots
-\end{itemize}
+Les dessins se trouvent sur des planches 000, 100, 200, etc. (voir annexe)\\
 
 Chaque planche est une planche d'au plus 100 dessins sur une grille de 10 lignes $\times$ 10 colonnes. 
 
@@ -262,14 +269,14 @@ Ces classes implémentent l'interface \code{ICharacter<S extends ICharacterMode>
         Définit la vitesse d'animation pour un mode donné en nombre d'images par unité d'animation du windowGame. 
         Fixé à 1f, il est inutile de le modifier dans un premier temps, mais vous pouvez produire un effet de ralenti en le modifiant.
 
-    \item \code{void setBeginAnimationTrigger(Consumer<ICharacter<?>> callback)}\\
-    \code{void setMidAnimationTrigger(Consumer<ICharacter<?>> callback)}\\
-    \code{void setEndAnimationTrigger(Consumer<ICharacter<?>> callback)}\\
-    \code{void setTickAnimationTrigger(Consumer<ICharacter<?>> callback)}
+    \item \code{void setBeginAnimationTrigger(Predicate<ICharacter<?>> callback)}\\
+    \code{void setMidAnimationTrigger(Predicate<ICharacter<?>> callback)}\\
+    \code{void setEndAnimationTrigger(Predicate<ICharacter<?>> callback)}\\
+    \code{void setTickAnimationTrigger(Predicate<ICharacter<?>> callback)}
 
         Définit un déclencheur appelé à chaque "tick" d'animation, ou au début de l'animation, etc.
-        Un déclencheur est une implémentation d'une interface fonctionnelle \\\code{Consumer<ICharacter<?>>}. 
-        C'est-à-dire une lambda expression \code{c -> \{\}} où \code{c} est le personnage animé.
+        Un déclencheur est une implémentation d'une interface fonctionnelle \\\code{Predicate<ICharacter<?>>}. 
+        C'est-à-dire une lambda expression \code{c -> \{\}} où \code{c} est le personnage animé et qui renvoie un booléen.
 
         Exemple d'utilisation:
 
@@ -278,9 +285,9 @@ Ces classes implémentent l'interface \code{ICharacter<S extends ICharacterMode>
         crusader.setBeginAnimationTrigger(
                 c -> {
                     System.out.printf("%s s'anime !\n", c);
+                    return true;
                     });
     \end{lstlisting}
-
 
     \item \code{void setScale(float scale)}
 
