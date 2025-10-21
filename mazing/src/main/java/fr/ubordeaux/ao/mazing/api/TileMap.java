@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 
 /**
  * Gestionnaire des tuiles du plateau de jeu en affichage isométrique.
@@ -45,31 +46,48 @@ class TileMap {
         return new Point2D.Float(col, row);
     }
 
-public static void drawImage(float x, float y, float z, BufferedImage image, Graphics g,
-            RenderType renderType, float alpha) {
-
+    public static void drawImage(
+            float x, float y, float z,
+            BufferedImage image, Graphics g,
+            RenderType renderType, float alpha,
+            float brightness // 0.0 (noir) → 1.0 (très lumineux)
+    ) {
         // Projection isométrique
-        int anchorY = (renderType == RenderType.FLOOR) ? tileHeight / 2
-                : tileHeight
-                        / 2 - 8;
+        int anchorY = (renderType == RenderType.FLOOR)
+                ? tileHeight / 2
+                : tileHeight / 2 - 8;
 
         Point2D p = gridToScreen(x, y, z);
         int screenX = (int) p.getX();
         int screenY = (int) p.getY();
 
-        // Cast Graphics en Graphics2D pour pouvoir gérer alpha
         Graphics2D g2d = (Graphics2D) g;
 
-        // Définir l'alpha
+        // Alpha principal
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
 
         int ix = screenX - image.getWidth() / 2;
         int iy = screenY - image.getHeight() + anchorY;
         int dx = ix - originX;
         int dy = iy - originY;
-        // on prend une fenêtre pas plus large que width
+
+        // Vérifie si dans la fenêtre visible
         if (Math.sqrt(dx * dx + dy * dy) < (2 * originX)) {
-            g.drawImage(image, ix, iy, null);
+            g2d.drawImage(image, ix, iy, null);
+
+            // --- Correction de luminosité simple via transparence ---
+            if (brightness != 0f) {
+
+                float factor = Math.max(0f, Math.min(brightness, 1f));
+                RescaleOp op = new RescaleOp(
+                        new float[] { factor, factor, factor, 1f }, // R,G,B,A
+                        new float[] { 0f, 0f, 0f, 0f }, // offset
+                        null);
+                BufferedImage brightImage = op.filter(image, null);
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+                g2d.drawImage(brightImage, ix, iy, null);
+
+            }
         }
     }
 

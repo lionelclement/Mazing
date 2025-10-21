@@ -165,4 +165,6 @@ public interface ICharacter<S extends ICharacterMode> {
 
     float getFrameIndex();
 
+    void setBrightness(float brightness);
+
 }

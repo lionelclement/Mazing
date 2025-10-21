@@ -21,14 +21,13 @@ public class MazingModel {
 
 	public MazingModel() {
 		this.maze = new Maze(6, 6, 4);
-		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, 0f, 0f, Direction.SOUTH.name(), maze);
+		crusader = new CharacterModel(CharacterModel.Type.CRUSADER, 1.0f, 5.0f, 0, 0.2f, 0.2f, Direction.SOUTH.name(), maze);
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
 		for (int i = 1; i <= 1; i++) {
 			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, 1 * i, 1 * i, 0,
-					0.1f, 0.2f, Direction.SOUTH.name(), maze);
-			System.err.println(characterModel);
+					0.3f, 0.2f, Direction.SOUTH.name(), maze);
 			characterModel.speedX = 0.1f * i;
 			characterModel.speedY = 0.1f * i;
 			characterModel.init();

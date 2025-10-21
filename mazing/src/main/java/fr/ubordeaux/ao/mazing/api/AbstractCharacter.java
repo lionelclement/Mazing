@@ -30,11 +30,13 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected UUID id;
     protected float x, y, z;
     protected float offsetX, offsetY;
+    protected float brightness;
 
     private Predicate<ICharacter<?>> beginLoopAnimationTrigger;
     private Predicate<ICharacter<?>> midLoopAnimationTrigger;
     private Predicate<ICharacter<?>> endLoopAnimationTrigger;
     private Predicate<ICharacter<?>> tickAnimationTrigger;
+
 
     @SuppressWarnings("unchecked")
     AbstractCharacter(UUID id, int numberStates, float offsetX, float offsetY) {
@@ -54,7 +56,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     void render(Graphics g, int mode) {
         Animation<T> anim = getCurrentAnimation(mode);
         BufferedImage image = anim.getCurrentFrame();
-        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1f);
+        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1f, brightness);
     }
 
     abstract RenderType getRenderType();
@@ -126,6 +128,10 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
 
     public void setZ(float z) {
         this.z = z;
+    }
+
+    public void setBrightness(float brightness) {
+        this.brightness = brightness;
     }
 
     float getIsoDepth() {

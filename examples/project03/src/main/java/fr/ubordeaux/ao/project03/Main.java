@@ -34,8 +34,11 @@ public class Main {
         
 
         Crusader crusader = new Crusader();
+        crusader.setBrightness(0.4f);
+        
         window.add(crusader);
         
+
         // Affiche le windowGame
         window.setVisible(true);
 
@@ -53,6 +56,7 @@ public class Main {
                 y = (int)(point.getY() - 0.5f);
 
                 crusader.setPosition(x, y, 0);
+                crusader.setBrightness(1f);
                 window.add(72, x, y, 0);
 
             }

@@ -262,22 +262,26 @@ public class MazingView {
         window.setVisible(true);
     }
 
-    private void onMid(ICharacter<?> e) {
+    private boolean onMid(ICharacter<?> e) {
+        return true;
     }
 
-    private void onBegin(ICharacter<?> e) {
+    private boolean onBegin(ICharacter<?> e) {
+        return true;
     }
 
-    private void onEnd(ICharacter<?> e) {
+    private boolean onEnd(ICharacter<?> e) {
         if (animationListener != null)
             animationListener.updateMode(e);
+        return true;
     }
 
-    private void onTick(UUID id, ICharacter<?> e) {
+    private boolean onTick(UUID id, ICharacter<?> e) {
         if (animationListener != null) {
             animationListener.updatePosition(e);
             animationListener.checkCollision(e);
         }
+        return true;
     }
 
     public void scroll(int dx, int dy) {

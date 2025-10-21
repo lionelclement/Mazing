@@ -42,7 +42,7 @@ class ImageSceneRenderable extends AbstractRenderable {
     }
 
     void render(Graphics g) {
-        TileMap.drawImage(x, y, z, bufferedImage, g, renderType, alpha);
+        TileMap.drawImage(x, y, z, bufferedImage, g, renderType, alpha, 0f);
     }
 
     int getRank() {
