@@ -1,6 +1,8 @@
 package fr.ubordeaux.ao.project00.view;
 
+import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
+import fr.ubordeaux.ao.mazing.api.Spider;
 
 import java.awt.Color;
 
@@ -18,7 +20,7 @@ public class MazingView {
 		// Dessine des cubes avec alternance de couleur
 		for (int i = 0; i <= 3; i++) {
 			for (int j = 0; j <= 3; j++) {
-				for (int k = -5; k <= -2; k++) {
+				for (int k = 0; k <= 3; k++) {
 					Color color;
 					// Alternance entre deux couleurs
 					if ((i + j + k) % 2 == 0) {
@@ -30,6 +32,17 @@ public class MazingView {
 				}
 			}
 		}
+
+		windowGame.add(12, 0, 0, 0);
+		windowGame.add(12, 5, 2, 0);
+
+		Crusader crusader = new Crusader();
+		windowGame.add(crusader);
+
+		Spider spider = new Spider();
+		spider.setPosition(5, 2, 0);
+		windowGame.add(spider);
+
 
 		windowGame.setVisible(true);
 
