@@ -104,8 +104,7 @@ public class MazingView {
 						{ -1, -1, -1, -1, -1, -1, -1 },
 				},
 		},
-				0.5f, // 1f: opaque 0f: transparent
-				1f // 1f: clair 0f: noir
+				0.5f // 1f: opaque 0f: transparent
 				);
 
 		// Ajoute un nouveau personnage

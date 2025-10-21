@@ -122,14 +122,6 @@ public class SoundManager {
     }
 
     /**
-     * Stop all instances of a sound currently playing (only preloaded clips).
-     */
-    public void stop(String key) {
-        // Cannot stop all overlapping clips created from byte array
-        System.err.println("Stop not implemented for overlapping clips. Use carefully.");
-    }
-
-    /**
      * Clears all cached sounds from memory.
      */
     public void clearCache() {

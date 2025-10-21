@@ -121,32 +121,33 @@ public class MazingView {
 		window.add(72, 8, 8, 0);
 		window.add(665, 8, 8, 0);
 
-    	//crusader = new Crusader();
-    	//crusader.setTickAnimationTrigger(e -> onTick(e));
-    	//crusader.setBeginAnimationTrigger(e -> onBegin(e));
-    	//crusader.setEndAnimationTrigger(e -> onEnd(e));
-    	//crusader.setMidAnimationTrigger(e -> onMid(e));
-    	//window.add(crusader);
+    	crusader = new Crusader();
+		crusader.setPosition(5, 5, 0);
+    	crusader.setTickAnimationTrigger(e -> onTick(e));
+    	crusader.setBeginAnimationTrigger(e -> onBegin(e));
+    	crusader.setEndAnimationTrigger(e -> onEnd(e));
+    	crusader.setMidAnimationTrigger(e -> onMid(e));
+    	window.add(crusader);
     	
-    	//Spider spider = new Spider();
-    	//spider.setPosition(7, 7, 0);
-    	//spider.setTickAnimationTrigger(e -> onTick(e));
-    	//window.add(spider);
+    	Spider spider = new Spider();
+    	spider.setPosition(7, 7, 0);
+    	spider.setTickAnimationTrigger(e -> onTick(e));
+    	window.add(spider);
 		
 		window.setVisible(true);
 		
 	}
 	
 	private boolean onMid(ICharacter<?> e) {
-		return false;
+		return true;
 	}
 
 	private boolean onEnd(ICharacter<?> e) {
-		return false;
+		return true;
 	}
 
 	private boolean onBegin(ICharacter<?> e) {
-		return false;
+		return true;
 	}
 
     // La vue lit la position dans le modèle et se met à jour 
@@ -156,7 +157,7 @@ public class MazingView {
         }
         if (character.equals(crusader))
 			character.setPosition(model.getX(), model.getY(), model.getZ());
-		return false;
+		return true;
 	}
 	
 	// Déplacements du plateau

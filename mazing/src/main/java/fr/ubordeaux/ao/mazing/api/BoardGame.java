@@ -45,6 +45,10 @@ class BoardGame extends JPanel implements IWindowGame {
 	/** Hauteur d'une image à découper dans la spritesheet */
 	private final static int CROP_HEIGHT = 512;
 
+	private static final int CROP_COLS_PER_ROW = 10;
+
+	private static final int CROP_MAXSIZE = 100;
+
 	/** Image de fond du plateau */
 	private BufferedImage background;
 
@@ -126,33 +130,46 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	void initImagesSheet() {
-
 		// Chargement et découpe des spritesheets
-		BufferedImage imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/grounds/all_0.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 0, 1, 0, 0, RenderType.FLOOR, -1.5f);
+		// Grounds
+		BufferedImage imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_000.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 0, 1, 0, 0, RenderType.FLOOR,
+				-1.5f);
 
-		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_100.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 100, 1, 0, 0, RenderType.CONSTRUCTION, -0.5f);
+		// Walls
+		imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_100.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 100, 1, 0, 0,
+				RenderType.CONSTRUCTION, -0.5f);
 
-		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/walls/all_200.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 200, 1, 0, 0, RenderType.CONSTRUCTION, -0.5f);
+		// Walls con't
+		imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_200.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 200, 1, 0, 0,
+				RenderType.CONSTRUCTION, -0.5f);
 
-		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/stairs/all_300.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 300, 1, 0, 0, RenderType.CONSTRUCTION, 0);
+		// Stairs
+		imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_300.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 300, 1, 0, 0,
+				RenderType.CONSTRUCTION, 0);
 
-		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/constructions/all_400.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 400, 1, 0, 0, RenderType.CONSTRUCTION, 0);
+		// Constructions
+		imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_400.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 400, 1, 0, 0,
+				RenderType.CONSTRUCTION, 0);
 
-		imagesSheet = ImageLoader.loadImage("/Dungeon-Pack/Isometric/objects/all_500.png");
-		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, 10, 100, 500, 1.4f, 0, 36, RenderType.ITEM, 0);
+		// Objects
+		imagesSheet = ImageLoader.loadImage("/isometric-tiles/all_500.png");
+		crop(imagesSheet, CROP_WIDTH, CROP_HEIGHT, CROP_COLS_PER_ROW, CROP_MAXSIZE, 500, 1.4f, 0, 36, RenderType.ITEM,
+				0);
 
 	}
 
 	@Override
-	public
-	void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset) {
+	public void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset) {
 		BufferedImage imagesSheet = ImageLoader.loadImage(path);
-		crop(imagesSheet, width, height, 10, 100, offset, scale, offsetX, offsetY, RenderType.ITEM, 0);
+		if (imagesSheet != null) {
+			crop(imagesSheet, width, height, CROP_COLS_PER_ROW, CROP_MAXSIZE, offset, scale, offsetX, offsetY,
+					RenderType.ITEM, 0);
+		}
 	}
 
 	private void crop(BufferedImage sheet, int width, int height, int colsPerRow,
@@ -204,76 +221,6 @@ class BoardGame extends JPanel implements IWindowGame {
 			g2d.drawImage(fixed, 0, 0, scaledWidth, scaledHeight, null);
 			g2d.dispose();
 
-			// === 1️⃣ Image normale ===
-			codeToImageMap.put(i + offset, new ImageSceneRenderable(scaled, renderType, iso));
-
-			// === 2️⃣ Image sombre (50%) ===
-			BufferedImage dark50 = applyBrightness(scaled, 0.5f);
-			codeToImageMap.put(i + offset + 10000, new ImageSceneRenderable(dark50, renderType, iso));
-
-			// === 3️⃣ Image très sombre (20%) ===
-			BufferedImage dark20 = applyBrightness(scaled, 0.2f);
-			codeToImageMap.put(i + offset + 20000, new ImageSceneRenderable(dark20, renderType, iso));
-		}
-	}
-
-	/**
-	 * Découpe une spritesheet et enregistre les images (normales, sombres, très
-	 * sombres) dans codeToImageMap.
-	 *
-	 * Cette version est robuste : elle ne dépasse jamais la taille réelle de la
-	 * spritesheet et adapte automatiquement le nombre d'images à découper.
-	 *
-	 * @param sheet      spritesheet source
-	 * @param width      largeur d’une tuile
-	 * @param height     hauteur d’une tuile
-	 * @param maxSize    nombre maximum d’images à découper
-	 * @param offset     code de départ pour l’image (ex: 0, 10000, etc.)
-	 * @param scale      facteur de mise à l’échelle
-	 * @param offsetX    décalage X appliqué à l’image
-	 * @param offsetY    décalage Y appliqué à l’image
-	 * @param renderType type de rendu de l’image
-	 * @param iso        facteur isométrique
-	 */
-	private void _crop(BufferedImage sheet, int width, int height, int colsPerRow,
-			int maxSize, int offset, double scale, int offsetX, int offsetY,
-			RenderType renderType, float iso) {
-
-		// Calcul du nombre maximal de colonnes et lignes selon la taille réelle de la
-		// spritesheet
-		int maxCols = sheet.getWidth() / width;
-		int maxRows = sheet.getHeight() / height;
-		int totalImages = Math.min(maxSize, maxCols * maxRows);
-
-		int col = 0;
-		int row = 0;
-
-		for (int i = 0; i < totalImages; i++) {
-
-			col = i % maxCols;
-			row = i / maxCols;
-
-			int sx = col * width;
-			int sy = row * height;
-
-			// Sécurité supplémentaire : vérifier qu'on ne dépasse pas la spritesheet
-			if (sx + width > sheet.getWidth() || sy + height > sheet.getHeight()) {
-				break;
-			}
-
-			BufferedImage sub = sheet.getSubimage(sx, sy, width, height);
-
-			// Dimensions après scale
-			int scaledWidth = (int) (TileMap.tileWidth * scale);
-			int scaledHeight = (int) (TileMap.tileHeight * 2 * scale);
-
-			// Image redimensionnée
-			BufferedImage scaled = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g2d = scaled.createGraphics();
-			g2d.drawImage(sub, 0, 0, scaledWidth, scaledHeight, null);
-			g2d.dispose();
-
-			System.out.println(i + offset);
 			// === 1️⃣ Image normale ===
 			codeToImageMap.put(i + offset, new ImageSceneRenderable(scaled, renderType, iso));
 

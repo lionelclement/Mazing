@@ -29,7 +29,7 @@ public class MergePng {
 
         // Lister et trier les fichiers PNG
         List<File> files = new ArrayList<>();
-        for (File f : dir.listFiles((d, name) -> name.toLowerCase().endsWith(".png"))) {
+        for (File f : dir.listFiles((_, name) -> name.toLowerCase().endsWith(".png"))) {
             files.add(f);
         }
         files.sort(Comparator.comparing(File::getName));

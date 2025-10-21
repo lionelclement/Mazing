@@ -15,7 +15,6 @@ public class MazingView {
 
 	private void init() {
 
-		/*
 		// Dessine des cubes avec alternance de couleur
 		for (int i = 0; i <= 3; i++) {
 			for (int j = 0; j <= 3; j++) {
@@ -31,11 +30,7 @@ public class MazingView {
 				}
 			}
 		}
-		*/
 
-		windowGame.addTileBackground(Color.GRAY, 0, 0, 0);
-		windowGame.add(711, 0, 0, 0);
-		// Affiche le windowGame
 		windowGame.setVisible(true);
 
 

@@ -269,7 +269,6 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             switch (currentMode) {
                 case RUN, WALK -> {
                     if ((int) (frameIndex % 8) == 3) {
-                        SoundManager.getInstance().stop(currentSound.name());
                         SoundManager.getInstance().play(currentSound.name());
                     }
                 }

@@ -137,10 +137,10 @@ public interface IWindowGame {
     /**
      * supprime (tuile, décor, objet) à une position donnée
      *
-     * @param code  identifiant de la tuile ou de l’objet
-     * @param x     coordonnée X sur la grille
-     * @param y     coordonnée Y sur la grille
-     * @param z     hauteur (niveau)
+     * @param code identifiant de la tuile ou de l’objet
+     * @param x    coordonnée X sur la grille
+     * @param y    coordonnée Y sur la grille
+     * @param z    hauteur (niveau)
      */
     void remove(int code, int x, int y, int z);
 
@@ -201,17 +201,19 @@ public interface IWindowGame {
 
     /**
      * Joue un son à partir de son identifiant (ex: "weapons/explosion").
-     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut "sounds/").
+     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut
+     * "sounds/").
      *
      * Exemple :
      * windowGame.playSound("weapons/explosion");
      * -> joue "sounds/weapons/explosion.wav"
      */
     public void playSound(String soundId);
-    
+
     /**
      * Joue un son à partir de son identifiant (ex: "weapons/explosion").
-     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut "sounds/").
+     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut
+     * "sounds/").
      *
      * Exemple :
      * windowGame.playSound("weapons/explosion");
@@ -219,6 +221,31 @@ public interface IWindowGame {
      */
     public void playShortSound(String soundId, int millis);
 
+    /**
+     * Initialise les images d'une spritesheet en découpant chaque tuile et en les
+     * enregistrant dans le mapping interne pour le rendu.
+     *
+     * Cette méthode :
+     * 
+     * Charge l'image depuis le chemin spécifié.
+     * Découpe la spritesheet en tuiles de dimensions {@code width} x
+     * {@code height}.
+     * Applique un facteur de mise à l’échelle {@code scale}.
+     * Décale chaque image de {@code offsetX} pixels horizontalement et
+     * {@code offsetY} pixels verticalement dans sa zone de rendu.
+     * Attribue un code de départ {@code offset} pour identifier les images
+     * dans le mapping interne.
+     * </ul>
+     *
+     * @param path    chemin vers le fichier de la spritesheet à charger
+     * @param width   largeur d'une tuile dans la spritesheet (en pixels)
+     * @param height  hauteur d'une tuile dans la spritesheet (en pixels)
+     * @param scale   facteur de mise à l’échelle appliqué à chaque tuile
+     * @param offsetX décalage horizontal (en pixels) à appliquer à chaque tuile
+     * @param offsetY décalage vertical (en pixels) à appliquer à chaque tuile
+     * @param offset  code de départ pour les images découpées, utilisé dans le
+     *                mapping interne
+     */
     void initImagesSheet(String path, int width, int height, float scale, int offsetX, int offsetY, int offset);
-    
+
 }

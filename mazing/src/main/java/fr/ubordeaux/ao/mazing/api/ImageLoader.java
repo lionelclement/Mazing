@@ -35,8 +35,8 @@ class ImageLoader {
 			if (file.exists()) {
 				return ImageIO.read(file);
 			}
+			System.err.println("Image not found: " + path + " (neither in resources nor on disk)");
 
-			System.err.println("❌ Image introuvable : " + path + " (ni dans resources, ni sur disque)");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
