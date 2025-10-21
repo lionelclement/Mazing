@@ -21,7 +21,7 @@ import javax.swing.Timer;
  * Représente le plateau de jeu isométrique et gère le rendu des tuiles, murs et
  * personnages.
  * 
- * Cette classe hérite de {@link JPanel} et implémente {@link IBoardGame}. Elle
+ * Cette classe hérite de {@link JPanel} et implémente {@link IWindowGame}. Elle
  * gère :
  * 
  * - Le rendu des objets 3D et des personnages.
@@ -335,8 +335,6 @@ class BoardGame extends JPanel implements IWindowGame {
 
 	/**
 	 * Remplit le plateau avec un fond en damier.
-	 * 
-	 * @param size taille du damier (nombre de tuiles par côté)
 	 */
 	@Override
 	public void fillCheckerboardBackground(int x, int y, int width, int height) {

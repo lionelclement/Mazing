@@ -92,7 +92,7 @@ public interface ICharacter<S extends ICharacterMode> {
      * 
      *
      * @param mode
-     * @param speed vitesse
+     * @param fps vitesse
      */
     void setFrameRate(S mode, float fps);
 

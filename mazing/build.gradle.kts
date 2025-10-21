@@ -7,6 +7,9 @@ repositories {
     mavenCentral()
 }
 
+group = "fr.ubordeaux.ao.mazing"
+version = "1.0.1"
+
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
@@ -19,7 +22,14 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(23)
     }
+    withJavadocJar()
+    withSourcesJar()
 }
+
+tasks.withType<Jar>().configureEach {
+    from("LICENSE") { into("") }
+}
+
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.

@@ -8,12 +8,12 @@ import java.awt.geom.Point2D;
  * 
  * 
  * Cette interface fournit un ensemble de méthodes pour :
- * 
- * -configurer la fenêtre du jeu (titre, taille, fond...)</li>
- * -afficher et manipuler des tuiles (tiles) ou objets</li>
- * -ajouter des personnages animés</li>
- * -gérer le défilement (scrolling) et le taux de rafraîchissement (FPS)</li>
- * 
+ * <ul>
+ * <li>configurer la fenêtre du jeu (titre, taille, fond...)</li>
+ * <li>afficher et manipuler des tuiles (tiles) ou objets</li>
+ * <li>ajouter des personnages animés</li>
+ * <li>gérer le défilement (scrolling) et le taux de rafraîchissement (FPS)</li>
+ * </ul>
  * 
  * Elle sert de contrat entre la logique du jeu (modèle/contrôleur)
  * et le moteur d’affichage graphique.
@@ -35,8 +35,7 @@ public interface IWindowGame {
     /**
      * Définit la taille des tuiles utilisées pour le rendu.
      *
-     * @param tile_width  largeur d’une tuile (en pixels)
-     * @param tile_height hauteur d’une tuile (en pixels)
+     * @param tileSize  taille d’une tuile (en pixels)
      */
     void setTileSize(int tileSize);
 
