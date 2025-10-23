@@ -8,7 +8,7 @@ if [ "${VERBOSE}" ]; then
   echo "copying examples to base-etudiant/"
 fi
 rm -r base-etudiant/examples/project*
-for n in "00" "01" "02" "03" "04"; do
+for n in "00" "01" "02" "03" "04" "05"; do
   mkdir "base-etudiant/examples/project${n}/"
   cp -r "examples/project${n}/src" "base-etudiant/examples/project${n}/"
   sed "s/XX/${n}/g" base-etudiant/examples/build.gradle.kts.template > "base-etudiant/examples/project${n}/build.gradle.kts"
