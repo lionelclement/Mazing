@@ -19,7 +19,7 @@ public class ContinueCrusader implements Predicate<ICharacter<?>> {
     @Override
     public boolean test(ICharacter<?> character) {
         if (((MyCrusader) character).getCurrentMode() == Crusader.Mode.RUN) {
-            windowGame.playShortSound("weapons/parry", 50);
+            windowGame.playSound("weapons/parry");
         }
 
         if (((MyCrusader) character).getCurrentMode() == Crusader.Mode.ATTACK) {

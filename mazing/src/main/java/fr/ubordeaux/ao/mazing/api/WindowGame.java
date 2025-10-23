@@ -157,10 +157,20 @@ public class WindowGame extends JFrame implements IWindowGame {
         boardGame.addCubeBackground(color, x, y, z);
     }
 
-    @Override
-    public void playSound(String soundId) {
-        SoundCache.playCached(soundId);
+@Override
+public void playSound(String soundId) {
+    // Vérifie si le son est dans le cache
+    if (!SoundCache.isCached(soundId)) {
+        // Déduire le chemin automatiquement, par convention
+        String path = "/sounds/" + soundId.toLowerCase() + ".wav";
+
+        // Charger et mettre en cache
+        SoundCache.loadIfAbsent(soundId, path, 1.0f); // volume par défaut
     }
+
+    // Jouer le son (qu'il ait été chargé ou déjà présent)
+    SoundCache.playCached(soundId);
+}
 
     @Override
     public Point2D getIsoCoordinatesFromScreen(int x, int y) {

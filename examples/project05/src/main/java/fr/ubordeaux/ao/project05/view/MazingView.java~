@@ -1,0 +1,182 @@
+package fr.ubordeaux.ao.project00.view;
+
+import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Direction;
+import fr.ubordeaux.ao.mazing.api.ICharacter;
+import fr.ubordeaux.ao.mazing.api.IWindowGame;
+import fr.ubordeaux.ao.mazing.api.Spider;
+
+import java.awt.Color;
+
+import javax.swing.JFrame;
+
+public class MazingView {
+
+	private static final int MAX = 40; // 1000 personnages
+	private IWindowGame windowGame;
+	private double[] vx = new double[MAX * MAX];
+	private double[] vy = new double[MAX * MAX];
+	private double[] px = new double[MAX * MAX];
+	private double[] py = new double[MAX * MAX];
+	ICharacter<?> character = null;
+
+	public MazingView(IWindowGame window) {
+		this.windowGame = window;
+		init();
+	}
+
+	// Définir la direction en fonction de vx et vy
+	private Direction getDirection(double vx, double vy) {
+		if (vx == 0 && vy == 0)
+			return Direction.SOUTH; // par défaut
+
+		double angle = Math.atan2(vy, vx); // angle en radians (-pi, pi)
+		double pi = Math.PI;
+
+		if (angle >= -pi / 8 && angle < pi / 8)
+			return Direction.EAST;
+		else if (angle >= pi / 8 && angle < 3 * pi / 8)
+			return Direction.SOUTHEAST;
+		else if (angle >= 3 * pi / 8 && angle < 5 * pi / 8)
+			return Direction.SOUTH;
+		else if (angle >= 5 * pi / 8 && angle < 7 * pi / 8)
+			return Direction.SOUTHWEST;
+		else if (angle >= 7 * pi / 8 || angle < -7 * pi / 8)
+			return Direction.WEST;
+		else if (angle >= -7 * pi / 8 && angle < -5 * pi / 8)
+			return Direction.NORTHWEST;
+		else if (angle >= -5 * pi / 8 && angle < -3 * pi / 8)
+			return Direction.NORTH;
+		else if (angle >= -3 * pi / 8 && angle < -pi / 8)
+			return Direction.NORTHEAST;
+
+		return Direction.SOUTH; // fallback
+	}
+
+	private void init() {
+
+		/*
+		 * // Dessine des cubes avec alternance de couleur
+		 * for (int i = 0; i <= 3; i++) {
+		 * for (int j = 0; j <= 3; j++) {
+		 * for (int k = 0; k <= 3; k++) {
+		 * Color color;
+		 * // Alternance entre deux couleurs
+		 * if ((i + j + k) % 2 == 0) {
+		 * color = Color.BLUE;
+		 * } else {
+		 * color = Color.CYAN;
+		 * }
+		 * windowGame.addCubeBackground(color, i, j, k);
+		 * }
+		 * }
+		 * }
+		 */
+
+		/*
+		 * windowGame.add(12, 0, 0, 0);
+		 * windowGame.add(12, 5, 2, 0);
+		 */
+
+		Color[] colors = {
+				Color.MAGENTA,
+				Color.RED,
+				Color.GREEN,
+				Color.BLUE,
+				Color.CYAN,
+				Color.ORANGE,
+				Color.PINK,
+				Color.YELLOW,
+				Color.LIGHT_GRAY
+		};
+		((JFrame) windowGame).setSize(1800, 1169);
+
+		windowGame.setTileSize(6);
+		double speed = 0.4; // vitesse fixe pour tous
+
+		for (int i = 0; i < MAX * MAX; i++) {
+			final int index = i; // pour les tableaux px/py/vx/vy
+			final ICharacter<?> c; // personnage local final
+
+			int x = i % MAX;
+			int y = i / MAX;
+
+			// angle aléatoire
+			double angle = Math.random() * 2 * Math.PI;
+			vx[i] = speed * Math.cos(angle);
+			vy[i] = speed * Math.sin(angle);
+
+			// initialisation de la position
+			px[i] = x;
+			py[i] = y;
+
+			if ((x + y) % 2 == 0) {
+				Spider spider = new Spider(7f);
+				spider.setPosition(x, y, 0);
+				spider.setMode(Spider.Mode.WALK);
+				c = spider;
+			} else {
+				Crusader crusader = new Crusader(4f);
+				crusader.setMode(Crusader.Mode.WALK);
+				crusader.setPosition(x, y, 0);
+				if (i == 1)
+					crusader.setColor(Color.RED);
+				if (i == 3)
+					crusader.setColor(Color.GREEN);
+				if (i == 5)
+					crusader.setColor(Color.YELLOW);
+				if (i == 7)
+					crusader.setColor(Color.ORANGE);
+				c = crusader;
+			}
+
+			// définir la direction initiale selon vx/vy
+			c.setDirection(getDirection(vx[i], vy[i]));
+
+			final int startX = x; // position d'origine
+			final int startY = y;
+
+			// tick lambda pour mouvement et mise à jour de direction
+			c.setTickAnimationTrigger(_ -> {
+				// mise à jour de la position
+				px[index] += vx[index];
+				py[index] += vy[index];
+
+				// calcul de la distance par rapport au point d'origine
+				double dx = px[index] - startX;
+				double dy = py[index] - startY;
+				double distance = Math.sqrt(dx * dx + dy * dy);
+
+				double maxDistance = 260.0; // distance maximale autorisée
+
+				// inverser la vitesse si on dépasse les limites
+				if (distance > maxDistance) {
+					vx[index] = -vx[index];
+					vy[index] = -vy[index];
+				}
+
+				// une fois sur 500 ticks, choisir un nouvel angle aléatoire
+				if (Math.random() < 0.005) { // ~1/1000
+					double a = Math.random() * 2 * Math.PI;
+					double s = Math.sqrt(vx[index] * vx[index] + vy[index] * vy[index]); // conserver la vitesse
+					vx[index] = s * Math.cos(a);
+					vy[index] = s * Math.sin(a);
+				}
+
+				// ajuster la direction selon vx/vy
+				c.setDirection(getDirection(vx[index], vy[index]));
+
+				// appliquer la position
+				c.setPosition((float) px[index], (float) py[index], 0);
+
+				return false;
+			});
+
+			windowGame.add(c);
+		}
+
+		windowGame.setVisible(true);
+
+	}
+
+}

@@ -36,7 +36,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     private Predicate<ICharacter<?>> beginLoopAnimationTrigger;
     private Predicate<ICharacter<?>> midLoopAnimationTrigger;
     private Predicate<ICharacter<?>> endLoopAnimationTrigger;
-    private Predicate<ICharacter< ?>> tickAnimationTrigger;
+    private Predicate<ICharacter<?>> tickAnimationTrigger;
 
     private Color color;
 
@@ -58,14 +58,13 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected void initAnimations(float scale) {
         if (getCachedImages() == null) {
             loadImages(scale);
-                setCachedImages(images);
-                setCachedShadow_images(shadow_images);
+            setCachedImages(images);
+            setCachedShadow_images(shadow_images);
+        } else {
+            images = getCachedImages();
+            shadow_images = getCachedShadow_images();
         }
-        else {
-          images = getCachedImages();
-          shadow_images = getCachedShadow_images();
-        }
-            loadAnimations();
+        loadAnimations();
     }
 
     protected abstract BufferedImage[][][] getCachedShadow_images();
@@ -333,12 +332,10 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
         this.color = color;
     }
 
-        @Override
+    @Override
     void render(Graphics g) {
         render(g, color);
     }
-
-
 
     abstract T getCurrentMode();
 

@@ -79,6 +79,10 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
         init(scale);
     }
 
+    public Crusader(UUID id) {
+        this(id, DEFAULT_SCALE);
+    }
+
     public Crusader(float scale) {
         this(UUID.randomUUID(), scale);
     }

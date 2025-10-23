@@ -65,6 +65,10 @@ public class Spider extends AbstractCharacter<CharacterMode> {
         init(scale);
     }
 
+    public Spider(UUID id) {
+        this(UUID.randomUUID(), DEFAULT_SCALE);
+    }
+
     public Spider(float scale) {
         this(UUID.randomUUID(), scale);
     }

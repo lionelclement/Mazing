@@ -1,6 +1,7 @@
 package fr.ubordeaux.ao.project02;
 
 import fr.ubordeaux.ao.mazing.api.Crusader;
+import fr.ubordeaux.ao.mazing.api.Spider;
 import fr.ubordeaux.ao.mazing.api.WindowGame;
 
 public class Main {
@@ -39,13 +40,19 @@ public class Main {
 		  windowGame.add(items);
 		
 		// Un nouveau personnage
+		Spider spider = new Spider(2f);
+
+		// Définit la position de ce personnage
+		spider.setPosition(6.59f, 5.5f, 0);
+
+		// Ajoute le personnage à la scène
+		windowGame.add(spider);
+
+		// Un nouveau personnage
 		MyCrusader crusader = new MyCrusader();
 
-		// définit la vitesse d'animation du mode Crusader.Mode.RUN
-		crusader.setFrameRate(Crusader.Mode.RUN, 0.8f);
-		
 		// définit la vitesse d'animation du mode Crusader.Mode.ATTACK
-		crusader.setFrameRate(Crusader.Mode.ATTACK, 0.2f);
+		crusader.setFrameRate(Crusader.Mode.ATTACK, 0.4f);
 		
 		// Ajoute le personnage à la scène
 		windowGame.add(crusader);

@@ -25,8 +25,10 @@ public class MazingModel {
 		crusadersById.put(crusader.getId(), crusader);
 		charactersById.put(crusader.getId(), crusader);
 
-		for (int i = 1; i <= 1; i++) {
-			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, 1 * i, 1 * i, 0,
+		for (int i = 1; i <= 100; i++) {
+			int x = i % 10;
+			int y = i / 10;
+			CharacterModel characterModel = new CharacterModel(CharacterModel.Type.SPIDER, x, y, 0,
 					0.3f, 0.2f, Direction.SOUTH.name(), maze);
 			characterModel.speedX = 0.1f * i;
 			characterModel.speedY = 0.1f * i;

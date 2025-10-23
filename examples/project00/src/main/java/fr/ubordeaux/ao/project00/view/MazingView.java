@@ -1,8 +1,6 @@
 package fr.ubordeaux.ao.project00.view;
 
-import fr.ubordeaux.ao.mazing.api.Crusader;
 import fr.ubordeaux.ao.mazing.api.IWindowGame;
-import fr.ubordeaux.ao.mazing.api.Spider;
 
 import java.awt.Color;
 
@@ -11,6 +9,7 @@ public class MazingView {
 	private IWindowGame windowGame;
 
 	public MazingView(IWindowGame window) {
+
 		this.windowGame = window;
 		init();
 	}
@@ -33,19 +32,7 @@ public class MazingView {
 			}
 		}
 
-		windowGame.add(12, 0, 0, 0);
-		windowGame.add(12, 5, 2, 0);
-
-		Crusader crusader = new Crusader();
-		windowGame.add(crusader);
-
-		Spider spider = new Spider();
-		spider.setPosition(5, 2, 0);
-		windowGame.add(spider);
-
-
 		windowGame.setVisible(true);
-
 
 	}
 

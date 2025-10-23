@@ -56,7 +56,7 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_UP -> {
 				if (shiftDown)
 					view.scroll(0, 1);
-				else if (!altDown)
+				else if (altDown)
 					model.setDirectionSpiders(Direction.NORTH.name());
 				else {
 					model.setDirectionCrusader(Direction.NORTH.name());
@@ -66,7 +66,7 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_DOWN -> {
 				if (shiftDown)
 					view.scroll(0, -1);
-				else if (!altDown)
+				else if (altDown)
 					model.setDirectionSpiders(Direction.SOUTH.name());
 				else {
 					model.setDirectionCrusader(Direction.SOUTH.name());
@@ -76,7 +76,7 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_LEFT -> {
 				if (shiftDown)
 					view.scroll(1, 0);
-				else if (!altDown)
+				else if (altDown)
 					model.setDirectionSpiders(Direction.WEST.name());
 				else {
 					model.setDirectionCrusader(Direction.WEST.name());
@@ -86,7 +86,7 @@ public class MazingController extends KeyAdapter {
 			case KeyEvent.VK_RIGHT -> {
 				if (shiftDown)
 					view.scroll(-1, 0);
-				else if (!altDown)
+				else if (altDown)
 					model.setDirectionSpiders(Direction.EAST.name());
 				else {
 					model.setDirectionCrusader(Direction.EAST.name());

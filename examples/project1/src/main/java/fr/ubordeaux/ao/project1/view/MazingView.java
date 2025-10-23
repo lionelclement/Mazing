@@ -276,7 +276,7 @@ public class MazingView {
         return true;
     }
 
-    private boolean onTick(UUID id, ICharacter<?> e) {
+    private boolean onTick(ICharacter<?> e) {
         if (animationListener != null) {
             animationListener.updatePosition(e);
             animationListener.checkCollision(e);
@@ -292,10 +292,10 @@ public class MazingView {
 
     private void createCharacter(UUID id, ICharacter<? extends ICharacterMode> character) {
         characterById.put(id, character);
-        character.setTickAnimationTrigger(e -> onTick(id, e));
-        character.setBeginAnimationTrigger(this::onBegin);
-        character.setEndAnimationTrigger(this::onEnd);
-        character.setMidAnimationTrigger(this::onMid);
+        character.setTickAnimationTrigger(e -> onTick(e));
+        character.setBeginAnimationTrigger(e -> onBegin(e));
+        character.setEndAnimationTrigger(e -> onEnd(e));
+        character.setMidAnimationTrigger(e -> onMid(e));
         window.add(character);
     }
 
@@ -310,6 +310,6 @@ public class MazingView {
     }
 
     public void createSpiders(Set<UUID> spiderIds) {
-        spiderIds.forEach(id -> createCharacter(id, new Spider(id)));
+        spiderIds.forEach(id -> createCharacter(id, new Spider(id, 5f)));
     }
 }
