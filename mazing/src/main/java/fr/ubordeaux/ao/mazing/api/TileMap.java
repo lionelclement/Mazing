@@ -50,8 +50,8 @@ class TileMap {
             float x, float y, float z,
             BufferedImage image, Graphics g,
             RenderType renderType, float alpha,
-            float brightness // 0.0 (noir) → 1.0 (très lumineux)
-    ) {
+            float brightness, // 0.0 (noir) → 1.0 (très lumineux)
+            Color color) {
         // Projection isométrique
         int anchorY = (renderType == RenderType.FLOOR)
                 ? tileHeight / 2
@@ -73,8 +73,7 @@ class TileMap {
 
         // Vérifie si dans la fenêtre visible
         if (Math.sqrt(dx * dx + dy * dy) < (2 * originX)) {
-            g2d.drawImage(image, ix, iy, null);
-
+            
             // --- Correction de luminosité simple via transparence ---
             if (brightness != 0f) {
 
@@ -85,11 +84,70 @@ class TileMap {
                         null);
                 BufferedImage brightImage = op.filter(image, null);
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                g2d.drawImage(brightImage, ix, iy, null);
+                //g2d.drawImage(brightImage, ix, iy, null);
+                image = brightImage;
 
             }
+
+            if (color != null) {
+
+                image = tintByLuminosity(image, color);
+
+            }
+
+            g2d.drawImage(image, ix, iy, null);
+
+
         }
     }
+
+    /**
+	 * Mélange une couleur sur tous les pixels opaques, proportionnellement à leur
+	 * luminosité.
+	 */
+	public static BufferedImage tintByLuminosity(BufferedImage img, Color targetColor) {
+		int width = img.getWidth();
+		int height = img.getHeight();
+		BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+		int rT = targetColor.getRed();
+		int gT = targetColor.getGreen();
+		int bT = targetColor.getBlue();
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int argb = img.getRGB(x, y);
+				int alpha = (argb >> 24) & 0xff;
+
+				// Ne jamais toucher les pixels totalement transparents
+				if (alpha == 0) {
+					result.setRGB(x, y, argb);
+					continue;
+				}
+
+				int red = (argb >> 16) & 0xff;
+				int green = (argb >> 8) & 0xff;
+				int blue = argb & 0xff;
+
+				// Luminosité relative
+				float lum = (0.299f * red + 0.587f * green + 0.114f * blue) / 255f;
+
+				// On applique la couleur proportionnellement à la luminosité
+				float factor = lum; // 0 (noir) -> 1 (blanc)
+				red = (int) (red * (1 - factor) + rT * factor);
+				green = (int) (green * (1 - factor) + gT * factor);
+				blue = (int) (blue * (1 - factor) + bT * factor);
+
+				red = Math.min(255, Math.max(0, red));
+				green = Math.min(255, Math.max(0, green));
+				blue = Math.min(255, Math.max(0, blue));
+
+				result.setRGB(x, y, (alpha << 24) | (red << 16) | (green << 8) | blue);
+			}
+		}
+
+		return result;
+	}
 
     /** Dessine une tuile isométrique 3D */
     public static void drawTile(int x, int y, int z, Graphics g, Color color) {

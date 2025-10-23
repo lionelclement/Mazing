@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 abstract class AbstractRenderable {
@@ -7,6 +8,8 @@ abstract class AbstractRenderable {
     abstract RenderType getRenderType();
 
     abstract void render(Graphics g);
+
+    abstract void render(Graphics g, Color color);
 
     abstract int getRank();
 

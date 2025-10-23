@@ -16,10 +16,10 @@ import java.util.Random;
 class Animation<S extends CharacterMode> implements IAnimation<S> {
 
 	/** Tableau des images de l'animation */
-	private final BufferedImage[] images;
+	private final BufferedImage[] frames; //
 
 	/** Tableau des ombres associées aux images */
-	private final BufferedImage[] shadows;
+	private final BufferedImage[] shadows; // 
 
 	/** Nombre total de frames */
 	private final int frameNumber;
@@ -42,23 +42,23 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	/**
 	 * Constructeur d'une animation.
 	 *
-	 * @param frames       tableaux des images de l'animation
+	 * @param _images       tableaux des images de l'animation
 	 * @param shadows      tableaux des images d'ombre correspondantes
 	 * @param frameDelayMs délai entre les frames (non utilisé directement ici)
 	 * @param loop         indique si l'animation doit boucler
 	 * @param owner        personnage propriétaire de l'animation
 	 */
-	public Animation(BufferedImage[] frames, BufferedImage[] shadows, boolean loop, float fps,
+	public Animation(BufferedImage[] images, BufferedImage[] shadows, boolean loop, float fps,
 			AbstractCharacter<CharacterMode> owner) {
-		this.images = frames;
+		this.frames = images;
 		this.shadows = shadows;
-		this.frameNumber = frames.length;
-		this.frameNumberMid = frames.length / 2;
+		this.frameNumber = images.length;
+		this.frameNumberMid = images.length / 2;
 		this.loop = loop;
 		this.fps = fps;
 		this.frozen = false;
 		Random rand = new Random();
-		this.frameIndex = rand.nextInt(frames.length);
+		this.frameIndex = rand.nextInt(images.length);
 	}
 
 	/**
@@ -123,7 +123,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public BufferedImage getCurrentFrame() {
-		return images[(int) frameIndex];
+		return frames[(int) frameIndex];
 	}
 
 	/**
@@ -150,7 +150,7 @@ class Animation<S extends CharacterMode> implements IAnimation<S> {
 	 */
 	@Override
 	public void lastFrame() {
-		frameIndex = images.length - 1;
+		frameIndex = frames.length - 1;
 		frozen = true;
 	}
 

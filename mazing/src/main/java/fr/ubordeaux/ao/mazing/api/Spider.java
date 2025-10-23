@@ -1,8 +1,8 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,6 +16,9 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private static final float DEFAULT_SCALE = 2.5f;
     private static final float OFFSETX = -0.1f;
     private static final float OFFSETY = 0.1f;
+
+    static protected BufferedImage[][][] cachedImages; // [mode][direction][frame]
+    static protected BufferedImage[][][] cachedShadow_images; // [mode][direction][frame]
 
     public enum Mode implements CharacterMode {
         WALK("walk", 25, true),
@@ -55,58 +58,58 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     private Mode currentMode;
     private Mode previousMode;
     protected float previousSpeedX, previousSpeedY, previousSpeedZ;
+    private boolean soundsInitialized;
 
-    public Spider(UUID id) {
+    public Spider(UUID id, float scale) {
         super(id, Mode.values().length, OFFSETX, OFFSETY);
-        init();
+        init(scale);
+    }
+
+    public Spider(float scale) {
+        this(UUID.randomUUID(), scale);
     }
 
     public Spider() {
-        this(UUID.randomUUID());
-        init();
+        this(UUID.randomUUID(), DEFAULT_SCALE);
     }
 
-    private void init() {
+    public BufferedImage[][][] getCachedImages() {
+        return cachedImages;
+    }
+
+    public BufferedImage[][][] getCachedShadow_images() {
+        return cachedShadow_images;
+    }
+
+    public void setCachedImages(BufferedImage[][][] cachedImages) {
+        Spider.cachedImages = cachedImages;
+    }
+
+    public void setCachedShadow_images(BufferedImage[][][] cachedShadow_images) {
+        Spider.cachedShadow_images = cachedShadow_images;
+    }
+
+    private void init(float scale) {
         currentMode = Mode.WALK;
         currentDirection = Direction.EAST;
         initSounds();
-        this.scale = DEFAULT_SCALE;
-        initAnimations(DEFAULT_SCALE);
+        this.scale = scale;
+        initAnimations(scale);
     }
 
-    private void initSounds() {
-        String name;
-        // String key = null;
-        for (Mode mode : Mode.values()) {
-            switch (mode) {
-                case Mode.ATTACK -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_snow_000.wav");
-                    SoundManager.getInstance().loadSound(mode.getName(), name);
-                    SoundManager.getInstance().setVolume(mode.getName(), 0.4f);
-                }
+private void initSounds() {
+        if (!soundsInitialized) {
+            // Sons spécifiques à Spider
+            SoundCache.loadIfAbsent("ATTACK", "/kenney_impact-sounds/Audio/footstep_snow_000.wav", 0.4f);
+            SoundCache.loadIfAbsent("DEATH", "/kenney_impact-sounds/Audio/impactSoft_heavy_000.wav", 0.4f);
 
-                case Mode.DEATH -> {
-                    name = String.format("/kenney_impact-sounds/Audio/impactSoft_heavy_000.wav");
-                    SoundManager.getInstance().loadSound(mode.getName(), name);
-                    SoundManager.getInstance().setVolume(mode.getName(), 0.4f);
-                }
-
-                default -> {
-                }
-            }
-
+            // Tu peux ajouter d’autres sons si besoin
+            soundsInitialized = true; // une seule fois pour toutes les instances
         }
     }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected void initAnimations(float scale) {
+    @Override
+    protected void loadImages(float scale2) {
         Mode[] modes = Mode.values();
-        List<Direction> selectedDirections = List.of(
-                Direction.SOUTHEAST, Direction.EAST, Direction.NORTHEAST, Direction.NORTH, Direction.NORTHWEST,
-                Direction.WEST, Direction.SOUTHWEST, Direction.SOUTH
-
-        );
-
         for (Mode mode : modes) {
             switch (mode) {
                 case ATTACK:
@@ -116,50 +119,73 @@ public class Spider extends AbstractCharacter<CharacterMode> {
                 case WALK: {
 
                     int numFrames = mode.getNumFrames();
-                    for (Direction direction : selectedDirections) {
-                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                                (direction.ordinal() + 6) % 8,
+                    for (Direction direction : Direction.values()) {
+                        int correctedDirection = (direction.ordinal() + 6) % 8;
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(
+                                numFrames,
+                                correctedDirection,
                                 String.format("/bw_spider/%s/%s-BW_Spider_",
                                         mode.getName(),
                                         mode.getName()),
                                 scale);
 
                         shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                                (direction.ordinal() + 6) % 8,
-                                String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
+                                correctedDirection,
+                                String.format("/bw_spider/%s/_shadows/%s-BW_Spider-shadow_",
                                         mode.getName(),
                                         mode.getName()),
                                 scale);
-
-                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                                images[mode.ordinal()][direction.ordinal()],
-                                shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
                 }
                     break;
                 case TURN_LEFT:
                 case TURN_RIGHT: {
+                    boolean left = switch (mode) {
+                        case TURN_LEFT -> true;
+                        default -> false;
+                    };
                     int numFrames = mode.getNumFrames();
-                    for (Direction direction : selectedDirections) {
-                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
-                                String.format("/bw_spider/%s/%s-BW_Spider_",
+                    for (Direction direction : Direction.values()) {
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader
+                                .loadTurnAnimations(numFrames,
+                                        String.format("/bw_spider/%s/%s-BW_Spider_",
+                                                mode.getName(),
+                                                mode.getName()),
+                                        scale, left);
+
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(
+                                numFrames,
+                                String.format("/bw_spider/%s/_shadows/%s-BW_Spider-shadow_",
                                         mode.getName(),
                                         mode.getName()),
-                                scale, mode == Mode.TURN_LEFT);
+                                scale, left);
 
-                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
-                                String.format("/bw_spider/%s/_shadow/%s-BW_Spider-shadow_",
-                                        mode.getName(),
-                                        mode.getName()),
-                                scale, mode == Mode.TURN_LEFT);
+                    }
+                }
+                    break;
+            }
+        }
+    }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    protected void loadAnimations() {
+        Mode[] modes = Mode.values();
+        for (Mode mode : modes) {
+            switch (mode) {
+                case ATTACK:
+                case DEATH:
+                case FALL:
+                case IDLE:
+                case WALK:
+                case TURN_LEFT:
+                case TURN_RIGHT: {
+                    for (Direction direction : Direction.values()) {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
                                 mode.isLoop(), DEFAULT_FPS, this);
-
                     }
                 }
                     break;
@@ -190,14 +216,14 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    void render(Graphics g) {
+    void render(Graphics g, Color color) {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1f, brightness);
-        TileMap.drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1f, brightness);
+        TileMap.drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1f, brightness, null);
+        TileMap.drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1f, brightness, color);
 
-        super.render(g, currentMode.ordinal());
+        super.render(g, currentMode.ordinal(), color);
     }
 
     int getRank() {
@@ -212,22 +238,22 @@ public class Spider extends AbstractCharacter<CharacterMode> {
     @Override
     public boolean callEndTrigger() {
         if (super.callEndTrigger()) {
-        switch (currentMode) {
-            case ATTACK -> {
-                SoundManager.getInstance().play(currentMode.name());
-                currentMode = previousMode;
+            switch (currentMode) {
+                case ATTACK -> {
+                    SoundCache.playCached(currentMode.name());
+                    currentMode = previousMode;
+                }
+                case FALL -> {
+                    currentMode = Mode.DEATH;
+                    SoundCache.playCached(currentMode.name());
+                    animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
+                }
+                default -> {
+                }
             }
-            case FALL -> {
-                currentMode = Mode.DEATH;
-                SoundManager.getInstance().play(currentMode.name());
-                animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
-            }
-            default -> {
-            }
+            return true;
         }
-        return true;
-    }
-    return false;
+        return false;
     }
 
     @Override

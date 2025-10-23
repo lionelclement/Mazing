@@ -7,17 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * SoundManager handles game sounds.
- * Supports preloading sounds, lazy loading, overlapping playback, short clips, and volume control.
+ * Gestionnaire central des sons : charge et prépare les sons en mémoire.
  */
 public class SoundManager {
 
-    private static final String BASEPATH = "/sounds/";
+    //private static final String BASEPATH = "/sounds/";
+    private static SoundManager instance;
 
     private final Map<String, byte[]> soundData = new HashMap<>();
     private final Map<String, AudioFormat> soundFormats = new HashMap<>();
     private final Map<String, FloatControl> volumeControls = new HashMap<>();
-    private static SoundManager instance;
 
     private SoundManager() {}
 
@@ -26,14 +25,10 @@ public class SoundManager {
         return instance;
     }
 
-    // -----------------------
-    // Public API
-    // -----------------------
-
     /**
-     * Preload a sound from the classpath and store it in memory.
+     * Charge un son en mémoire et prépare son contrôle de volume.
      */
-    public void loadSound(String key, String resourcePath) {
+    public void loadSound(String key, String resourcePath, float volume) {
         try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
             if (is == null) throw new RuntimeException("Resource not found: " + resourcePath);
 
@@ -45,11 +40,15 @@ public class SoundManager {
             soundData.put(key, data);
             soundFormats.put(key, format);
 
-            // Create a first clip to enable volume control
+            // Préparer un clip pour contrôle du volume
             Clip clip = AudioSystem.getClip();
             clip.open(format, data, 0, data.length);
             if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                volumeControls.put(key, (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN));
+                FloatControl gain = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                float dB = (float) (20.0 * Math.log10(volume));
+                dB = Math.max(gain.getMinimum(), Math.min(gain.getMaximum(), dB));
+                gain.setValue(dB);
+                volumeControls.put(key, gain);
             }
             clip.close();
 
@@ -59,96 +58,37 @@ public class SoundManager {
     }
 
     /**
-     * Play a sound by key. Will preload from classpath if necessary.
+     * Crée un Clip prêt à jouer depuis les données chargées.
      */
-    public void play(String key) {
+    public Clip createClip(String key) {
         try {
-            if (!soundData.containsKey(key)) {
-                loadSound(key, BASEPATH + key + ".wav");
-            }
-            playClipCopy(key);
-        } catch (Exception e) {
-            System.err.println("Error playing sound " + key + ": " + e.getMessage());
-        }
-    }
-
-    /**
-     * Play the first N milliseconds of a sound.
-     */
-    public void playShortSound(String key, int milliseconds) {
-        try {
-            if (!soundData.containsKey(key)) {
-                loadSound(key, BASEPATH + key + ".wav");
-            }
-
             byte[] data = soundData.get(key);
             AudioFormat format = soundFormats.get(key);
-
-            int frameSize = format.getFrameSize();
-            float frameRate = format.getFrameRate();
-            long framesToPlay = Math.min(data.length / frameSize,
-                    (long) (milliseconds / 1000.0 * frameRate));
-
-            int bytesToPlay = (int) (framesToPlay * frameSize);
+            if (data == null || format == null) return null;
 
             Clip clip = AudioSystem.getClip();
-            clip.open(format, data, 0, bytesToPlay);
-            clip.start();
-            clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) clip.close();
-            });
+            clip.open(format, data, 0, data.length);
+
+            // Appliquer le volume si présent
+            FloatControl gain = volumeControls.get(key);
+            if (gain != null && clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                FloatControl clipGain = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                clipGain.setValue(gain.getValue());
+            }
+
+            return clip;
 
         } catch (Exception e) {
-            System.err.println("Error playing short sound " + key + ": " + e.getMessage());
+            System.err.println("Error creating clip for " + key + ": " + e.getMessage());
+            return null;
         }
     }
 
-    /**
-     * Set volume of a preloaded sound.
-     * @param key logical key
-     * @param volume 0.0 = silent, 1.0 = full
-     */
-    public void setVolume(String key, float volume) {
-        FloatControl gainControl = volumeControls.get(key);
-        if (gainControl == null) return;
-
-        if (volume <= 0f) gainControl.setValue(gainControl.getMinimum());
-        else {
-            float dB = (float) (20.0 * Math.log10(volume));
-            if (dB < gainControl.getMinimum()) dB = gainControl.getMinimum();
-            if (dB > gainControl.getMaximum()) dB = gainControl.getMaximum();
-            gainControl.setValue(dB);
-        }
-    }
-
-    /**
-     * Clears all cached sounds from memory.
-     */
+    /** Supprime tous les sons chargés en mémoire */
     public void clearCache() {
         soundData.clear();
         soundFormats.clear();
         volumeControls.clear();
         System.out.println("Sound cache cleared.");
-    }
-
-    // -----------------------
-    // Internal
-    // -----------------------
-
-    /**
-     * Create a new Clip from cached byte[] and play it.
-     * Allows overlapping playback.
-     */
-    private void playClipCopy(String key) throws LineUnavailableException {
-        byte[] data = soundData.get(key);
-        AudioFormat format = soundFormats.get(key);
-        if (data == null || format == null) return;
-
-        Clip clip = AudioSystem.getClip();
-        clip.open(format, data, 0, data.length);
-        clip.start();
-        clip.addLineListener(event -> {
-            if (event.getType() == LineEvent.Type.STOP) clip.close();
-        });
     }
 }

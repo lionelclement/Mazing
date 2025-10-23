@@ -30,11 +30,10 @@ public class WindowGame extends JFrame implements IWindowGame {
 
         // Création du panneau principal du jeu
         boardGame = new BoardGame(
-            DEFAULT_WIDTH, DEFAULT_HEIGHT,
-            DEFAULT_TILE_SIZE,
-            DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4,
-            DEFAULT_FPS
-        );
+                DEFAULT_WIDTH, DEFAULT_HEIGHT,
+                DEFAULT_TILE_SIZE,
+                DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4,
+                DEFAULT_FPS);
 
         // Définir le content pane
         setContentPane(boardGame);
@@ -45,7 +44,7 @@ public class WindowGame extends JFrame implements IWindowGame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(true);
-    
+
         setVisible(true);
     }
 
@@ -57,7 +56,7 @@ public class WindowGame extends JFrame implements IWindowGame {
     }
 
     // =============================
-    //  Implémentation IWindowGame
+    // Implémentation IWindowGame
     // =============================
 
     @Override
@@ -95,7 +94,7 @@ public class WindowGame extends JFrame implements IWindowGame {
     }
 
     // =============================
-    //  Délégation au BoardGame
+    // Délégation au BoardGame
     // =============================
 
     @Override
@@ -159,19 +158,14 @@ public class WindowGame extends JFrame implements IWindowGame {
     }
 
     @Override
-        public void playSound(String soundId) {
-        SoundManager.getInstance().play(soundId);
-    }
-
-    @Override
-        public void playShortSound(String soundId, int millis) {
-        SoundManager.getInstance().playShortSound(soundId, millis);
+    public void playSound(String soundId) {
+        SoundCache.playCached(soundId);
     }
 
     @Override
     public Point2D getIsoCoordinatesFromScreen(int x, int y) {
         Point2D point = TileMap.screenToGrid(x, y);
-        point.setLocation(point.getX()+TileMap.scrollX, point.getY()+TileMap.scrollY);
+        point.setLocation(point.getX() + TileMap.scrollX, point.getY() + TileMap.scrollY);
         return point;
     }
 

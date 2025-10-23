@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.UUID;
@@ -35,17 +36,18 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     private Predicate<ICharacter<?>> beginLoopAnimationTrigger;
     private Predicate<ICharacter<?>> midLoopAnimationTrigger;
     private Predicate<ICharacter<?>> endLoopAnimationTrigger;
-    private Predicate<ICharacter<?>> tickAnimationTrigger;
+    private Predicate<ICharacter< ?>> tickAnimationTrigger;
 
+    private Color color;
 
     @SuppressWarnings("unchecked")
-    AbstractCharacter(UUID id, int numberStates, float offsetX, float offsetY) {
+    AbstractCharacter(UUID id, int numberModes, float offsetX, float offsetY) {
         this.id = id;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        images = new BufferedImage[numberStates][Direction.values().length][];
-        shadow_images = new BufferedImage[numberStates][Direction.values().length][];
-        animations = new Animation[numberStates][Direction.values().length];
+        images = new BufferedImage[numberModes][Direction.values().length][];
+        shadow_images = new BufferedImage[numberModes][Direction.values().length][];
+        animations = new Animation[numberModes][Direction.values().length];
         currentDirection = Direction.SOUTH;
     }
 
@@ -53,10 +55,35 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
         return animations[mode][currentDirection.ordinal()];
     }
 
-    void render(Graphics g, int mode) {
+    protected void initAnimations(float scale) {
+        if (getCachedImages() == null) {
+            loadImages(scale);
+                setCachedImages(images);
+                setCachedShadow_images(shadow_images);
+        }
+        else {
+          images = getCachedImages();
+          shadow_images = getCachedShadow_images();
+        }
+            loadAnimations();
+    }
+
+    protected abstract BufferedImage[][][] getCachedShadow_images();
+
+    protected abstract BufferedImage[][][] getCachedImages();
+
+    protected abstract void setCachedShadow_images(BufferedImage[][][] shadow_images);
+
+    protected abstract void setCachedImages(BufferedImage[][][] images);
+
+    protected abstract void loadAnimations();
+
+    protected abstract void loadImages(float scale);
+
+    void render(Graphics g, int mode, Color color) {
         Animation<T> anim = getCurrentAnimation(mode);
         BufferedImage image = anim.getCurrentFrame();
-        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1f, brightness);
+        TileMap.drawImage(x, y, z, image, g, getRenderType(), 1f, brightness, color);
     }
 
     abstract RenderType getRenderType();
@@ -189,6 +216,7 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     @Override
     public void setScale(float scale) {
         this.scale = scale;
+        loadImages(scale);
         initAnimations(scale);
     }
 
@@ -206,8 +234,6 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     protected float getZ() {
         return z;
     }
-
-    protected abstract void initAnimations(float scale);
 
     public UUID getId() {
         return id;
@@ -301,6 +327,18 @@ abstract class AbstractCharacter<T extends CharacterMode> extends AbstractRender
     public float getFrameIndex() {
         return getFrameIndex(getCurrentMode().ordinal());
     }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+        @Override
+    void render(Graphics g) {
+        render(g, color);
+    }
+
+
 
     abstract T getCurrentMode();
 

@@ -211,17 +211,6 @@ public interface IWindowGame {
     public void playSound(String soundId);
 
     /**
-     * Joue un son à partir de son identifiant (ex: "weapons/explosion").
-     * Le fichier doit exister dans le dossier défini par SoundManager (par défaut
-     * "sounds/").
-     *
-     * Exemple :
-     * windowGame.playSound("weapons/explosion");
-     * -> joue "sounds/weapons/explosion.wav"
-     */
-    public void playShortSound(String soundId, int millis);
-
-    /**
      * Initialise les images d'une spritesheet en découpant chaque tuile et en les
      * enregistrant dans le mapping interne pour le rendu.
      *

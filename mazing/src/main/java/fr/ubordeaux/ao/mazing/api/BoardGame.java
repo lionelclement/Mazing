@@ -557,11 +557,6 @@ class BoardGame extends JPanel implements IWindowGame {
 	}
 
 	@Override
-	public void playShortSound(String soundId, int millis) {
-		throw new UnsupportedOperationException("Unimplemented method 'playShortSound'");
-	}
-
-	@Override
 	public void remove(int code, int x, int y, int z) {
 		sceneObjects.remove(new ImageSceneRenderable(code, x, y, z));
 	}

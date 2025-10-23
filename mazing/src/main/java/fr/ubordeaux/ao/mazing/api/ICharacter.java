@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -161,10 +162,21 @@ public interface ICharacter<S extends ICharacterMode> {
      */
     void setOffset(float x, float y);
 
+    /**
+     * Donne l'identificateur du personnage.
+     * 
+     */
     UUID getId();
 
     float getFrameIndex();
-
+    
+    /**
+     * Définit la luminosité du personnage.
+     * 
+     * @param brightness : 0f < brightness < 1f sombre à clair
+     */
     void setBrightness(float brightness);
+
+    void setColor(Color color);
 
 }

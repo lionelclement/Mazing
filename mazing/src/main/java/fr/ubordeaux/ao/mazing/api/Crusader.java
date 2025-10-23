@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
@@ -18,8 +19,12 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     private static final float OFFSETX = 0.0f;
     private static final float OFFSETY = 0.0f;
 
+    static protected BufferedImage[][][] cachedImages; // [mode][direction][frame]
+    static protected BufferedImage[][][] cachedShadow_images; // [mode][direction][frame]
+
     public enum Mode implements CharacterMode {
         WALK("walk", 15, true),
+        // BLOCK("bloc", 16, false),
         RUN("run", 17, true),
         JUMP("jump", 16, false),
         GOTHIT("gothit", 13, false),
@@ -61,89 +66,68 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     public enum Sound {
         CARPET, CARPET_SOFT,
         WOOD, WOOD_SOFT, JUMP, GOTHIT, ATTACK, DEATH;
-
     }
 
     private Mode currentMode;
     private Sound currentSound;
     private Mode savedMode;
     private Sound savedSound;
+    private boolean soundsInitialized;
 
-    public Crusader(UUID id) {
+    public Crusader(UUID id, float scale) {
         super(id, Mode.values().length, OFFSETX, OFFSETY);
-        init();
+        init(scale);
+    }
+
+    public Crusader(float scale) {
+        this(UUID.randomUUID(), scale);
     }
 
     public Crusader() {
-        this(UUID.randomUUID());
-        init();
+        this(UUID.randomUUID(), DEFAULT_SCALE);
     }
 
-    private void init() {
+    public BufferedImage[][][] getCachedImages() {
+        return cachedImages;
+    }
+
+    public BufferedImage[][][] getCachedShadow_images() {
+        return cachedShadow_images;
+    }
+
+    public void setCachedImages(BufferedImage[][][] cachedImages) {
+        Crusader.cachedImages = cachedImages;
+    }
+
+    public void setCachedShadow_images(BufferedImage[][][] cachedShadow_images) {
+        Crusader.cachedShadow_images = cachedShadow_images;
+    }
+
+    private void init(float scale) {
         savedMode = currentMode = Mode.IDLE;
         currentSound = Sound.CARPET_SOFT;
         currentDirection = Direction.EAST;
         initSounds();
-        this.scale = DEFAULT_SCALE;
-        initAnimations(DEFAULT_SCALE);
+        this.scale = scale;
+        initAnimations(scale);
     }
 
     private void initSounds() {
-        String name;
-        for (Sound footstepSound : Sound.values()) {
-            switch (footstepSound) {
-                case Sound.CARPET -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.CARPET.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.CARPET.name(), 0.8f);
-                }
-                case Sound.CARPET_SOFT -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.CARPET_SOFT.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.CARPET_SOFT.name(), 0.2f);
-                }
-                case Sound.WOOD -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.WOOD.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.WOOD.name(), 0.8f);
-                }
-                case Sound.WOOD_SOFT -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_wood_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.WOOD_SOFT.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.WOOD_SOFT.name(), 0.2f);
-                }
-                case Sound.JUMP -> {
-                    name = String.format("/kenney_impact-sounds/Audio/footstep_carpet_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.JUMP.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.JUMP.name(), 0.8f);
-                }
+        if (!soundsInitialized) {
+            SoundCache.loadIfAbsent("CARPET", "/kenney_impact-sounds/Audio/footstep_carpet_000.wav", 0.8f);
+            SoundCache.loadIfAbsent("CARPET_SOFT", "/kenney_impact-sounds/Audio/footstep_carpet_000.wav", 0.2f);
+            SoundCache.loadIfAbsent("WOOD", "/kenney_impact-sounds/Audio/footstep_wood_000.wav", 0.8f);
+            SoundCache.loadIfAbsent("WOOD_SOFT", "/kenney_impact-sounds/Audio/footstep_wood_000.wav", 0.2f);
+            SoundCache.loadIfAbsent("JUMP", "/kenney_impact-sounds/Audio/footstep_carpet_000.wav", 0.8f);
+            SoundCache.loadIfAbsent("GOTHIT", "/kenney_impact-sounds/Audio/impactTin_medium_000.wav", 0.8f);
+            SoundCache.loadIfAbsent("ATTACK", "/kenney_impact-sounds/Audio/impactPlate_heavy_000.wav", 0.8f);
+            SoundCache.loadIfAbsent("DEATH", "/kenney_impact-sounds/Audio/impactWood_heavy_000.wav", 0.8f);
 
-                case Sound.GOTHIT -> {
-                    name = String.format("/kenney_impact-sounds/Audio/impactTin_medium_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.GOTHIT.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.GOTHIT.name(), 0.8f);
-                }
-
-                case Sound.ATTACK -> {
-                    name = String.format("/kenney_impact-sounds/Audio/impactPlate_heavy_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.ATTACK.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.ATTACK.name(), 0.8f);
-                }
-
-                case Sound.DEATH -> {
-                    name = String.format("/kenney_impact-sounds/Audio/impactWood_heavy_000.wav");
-                    SoundManager.getInstance().loadSound(Sound.DEATH.name(), name);
-                    SoundManager.getInstance().setVolume(Sound.DEATH.name(), 0.8f);
-                }
-
-                default -> {
-                }
-            }
+            soundsInitialized = true; // pour éviter de recharger à chaque Crusader
         }
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected void initAnimations(float scale) {
+    protected void loadImages(float scale) {
         Mode[] modes = Mode.values();
         for (Mode mode : modes) {
             switch (mode) {
@@ -154,27 +138,30 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                 case IDLE:
                 case JUMP:
                 case RUN:
-                case WALK: {
+                case WALK:
+                // case BLOCK:
+                {
                     int numFrames = mode.getNumFrames();
                     for (Direction direction : Direction.values()) {
-                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
-                                direction.ordinal(),
-                                String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
-                                        mode.getName(),
-                                        mode.getName()),
-                                scale);
 
-                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(numFrames,
+                        BufferedImage[] frames = ImageLoader
+                                .loadAnimations(
+                                        numFrames,
+                                        direction.ordinal(),
+                                        String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
+                                                mode.getName(),
+                                                mode.getName()),
+                                        scale);
+
+                        images[mode.ordinal()][direction.ordinal()] = frames;
+
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadAnimations(
+                                numFrames,
                                 direction.ordinal(),
                                 String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
                                 scale);
-
-                        animations[mode.ordinal()][direction.ordinal()] = new Animation(
-                                images[mode.ordinal()][direction.ordinal()],
-                                shadow_images[mode.ordinal()][direction.ordinal()],
-                                mode.isLoop(), DEFAULT_FPS, this);
 
                     }
                 }
@@ -191,26 +178,57 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
                     };
                     int numFrames = mode.getNumFrames();
                     for (Direction direction : Direction.values()) {
-                        images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
-                                String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
-                                        mode.getName(),
-                                        mode.getName()),
-                                scale, left);
 
-                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(numFrames,
+                        images[mode.ordinal()][direction.ordinal()] = ImageLoader
+                                .loadTurnAnimations(numFrames,
+                                        String.format("/isometric-Mini-Crusader/%s/crusader_%s_",
+                                                mode.getName(),
+                                                mode.getName()),
+                                        scale, left);
+
+                        shadow_images[mode.ordinal()][direction.ordinal()] = ImageLoader.loadTurnAnimations(
+                                numFrames,
                                 String.format("/isometric-Mini-Crusader/%s/_shadows/shadow-crusader_%s_",
                                         mode.getName(),
                                         mode.getName()),
                                 scale, left);
 
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    protected void loadAnimations() {
+        Mode[] modes = Mode.values();
+        for (Mode mode : modes) {
+            switch (mode) {
+                case ATTACK:
+                case DEATH:
+                case FALL:
+                case GOTHIT:
+                case IDLE:
+                case JUMP:
+                case RUN:
+                case WALK:
+                    // case BLOCK:
+                case TURN_LEFT:
+                case TURN_RIGHT:
+                case WALK_LEFT:
+                case WALK_RIGHT: {
+                    for (Direction direction : Direction.values()) {
                         animations[mode.ordinal()][direction.ordinal()] = new Animation(
                                 images[mode.ordinal()][direction.ordinal()],
                                 shadow_images[mode.ordinal()][direction.ordinal()],
                                 mode.isLoop(), DEFAULT_FPS, this);
-
                     }
-
                 }
+                    break;
+                default:
                     break;
             }
         }
@@ -250,13 +268,13 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     }
 
     @Override
-    void render(Graphics g) {
+    void render(Graphics g, Color color) {
         Animation<CharacterMode> anim = getCurrentAnimation(currentMode.ordinal());
         BufferedImage image = anim.getCurrentFrame();
         BufferedImage shadow = anim.getCurrentShadow();
-        TileMap.drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1f, brightness);
-        TileMap.drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1f, brightness);
-        super.render(g, currentMode.ordinal());
+        TileMap.drawImage(x, y, z, shadow, g, RenderType.CONSTRUCTION, 1f, brightness, color);
+        TileMap.drawImage(x, y, z, image, g, RenderType.CONSTRUCTION, 1f, brightness, color);
+        super.render(g, currentMode.ordinal(), color);
     }
 
     int getRank() {
@@ -266,11 +284,10 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
     @Override
     protected boolean callTickTrigger(float frameIndex) {
         if (super.callTickTrigger(frameIndex)) {
-
             switch (currentMode) {
                 case RUN, WALK -> {
                     if ((int) (frameIndex % 8) == 3) {
-                        SoundManager.getInstance().play(currentSound.name());
+                        SoundCache.playCached(currentSound.name());
                     }
                 }
                 default -> {
@@ -287,7 +304,7 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             switch (currentMode) {
                 case GOTHIT:
                 case JUMP:
-                    SoundManager.getInstance().play(currentSound.name());
+                    SoundCache.playCached(currentSound.name());
                 default:
                     break;
             }
@@ -308,18 +325,18 @@ public class Crusader extends AbstractCharacter<CharacterMode> {
             switch (currentMode) {
                 case ATTACK:
                 case GOTHIT:
-                    SoundManager.getInstance().play(currentSound.name());
+                    SoundCache.playCached(currentSound.name());
                     currentMode = savedMode;
                     currentSound = savedSound;
                     break;
                 case FALL:
                     currentMode = Mode.DEATH;
-                    SoundManager.getInstance().play(currentSound.name());
+                    SoundCache.playCached(currentSound.name());
                     animations[currentMode.ordinal()][currentDirection.ordinal()].lastFrame();
                     break;
                 case JUMP:
                     currentMode = savedMode;
-                    SoundManager.getInstance().play(currentSound.name());
+                    SoundCache.playCached(currentSound.name());
                     currentSound = savedSound;
                 default:
                     break;

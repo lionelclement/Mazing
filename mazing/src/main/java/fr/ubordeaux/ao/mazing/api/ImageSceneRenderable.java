@@ -1,5 +1,6 @@
 package fr.ubordeaux.ao.mazing.api;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -42,7 +43,7 @@ class ImageSceneRenderable extends AbstractRenderable {
     }
 
     void render(Graphics g) {
-        TileMap.drawImage(x, y, z, bufferedImage, g, renderType, alpha, 0f);
+        TileMap.drawImage(x, y, z, bufferedImage, g, renderType, alpha, 0f, null);
     }
 
     int getRank() {
@@ -107,6 +108,10 @@ class ImageSceneRenderable extends AbstractRenderable {
         return true;
     }
 
-    
+    @Override
+    void render(Graphics g, Color color) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'render'");
+    }
 
 }

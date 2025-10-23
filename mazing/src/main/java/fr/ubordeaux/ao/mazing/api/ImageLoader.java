@@ -71,6 +71,8 @@ class ImageLoader {
 			String directionNumber = String.format("%01d", direction);
 			String path = String.format("%s%s%s.png", prefix, directionNumber, frameNumber);
 
+			// System.out.println(path);
+
 			BufferedImage img = loadImage(path);
 			if (img != null) {
 				int originalWidth = img.getWidth();
@@ -148,5 +150,7 @@ class ImageLoader {
 
 		return animations;
 	}
+
+	
 
 }
