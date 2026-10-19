@@ -1,0 +1,11 @@
+# editors
+.vscode/
+.idea/
+.settings/
+.classpath
+.project
+
+# build output
+bin/
+build/
+target/
