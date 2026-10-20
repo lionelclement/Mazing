@@ -43,8 +43,7 @@ public class AnimatedOrientedSprite implements Sprite {
 			ps = this.textureIndexes.get(orientation.asSimple());
 		}
 		Point p = ps.get(animationIndex);
-		atlas.blit(g, x, y - 448, p.x(), p.y(), zoom);
-
+		atlas.blit(g, x, y, p.x(), p.y(), zoom);
 	}
 
 	@Override

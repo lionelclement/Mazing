@@ -39,7 +39,7 @@ public class OrientedSprite implements Sprite {
 			// if the direction is not known, try the "simpler" version of the direction
 			p = this.textureIndexes.get(orientation.asSimple());
 		}
-		atlas.blit(g, x, y - 448/zoom, p.x(), p.y(), zoom);
+		atlas.blit(g, x, y, p.x(), p.y(), zoom);
 	}
 
 	@Override

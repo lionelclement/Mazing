@@ -30,7 +30,6 @@ import java.util.Map;
 public class Main {
 	static void main(String[] args) throws IOException {
 		TextureAtlases.writeAllToDisk("atlases-test");
-		// System.out.println(Sprites.BARREL);
 
 		// BufferedImage test = new BufferedImage(2048, 2048, BufferedImage.TYPE_INT_ARGB);
 		// Graphics2D g = test.createGraphics();
@@ -62,7 +61,8 @@ public class Main {
 		// }
 		// g.dispose();
 		// ImageIO.write(test, "png", new File("test.png"));
-		var crusader = new AnimatedEntity(AnimatedSprites.CRUSADER_ATTACK, Orientation.NORTH, 1, 2, 0);
+		var crusader = new AnimatedEntity(AnimatedSprites.CRUSADER_ATTACK, Orientation.NORTH, 1, 2, 0, 2);
+		var spider = new AnimatedEntity(AnimatedSprites.SPIDER_ATTACK, Orientation.NORTH, 1, 3, 0, 1);
 
 		ViewWindow w = new ViewWindow();
 		w.addKeyListener(new KeyAdapter() {
@@ -105,8 +105,6 @@ public class Main {
 		repaintLoop.start();
 		Timer animationLoop = new Timer(1000 / 20, e -> {
 			w.panel.animationTick();
-			// w.panel.repaint();
-			// w.panel.forEachRenderable(r -> r.animationTick());
 		});
 		animationLoop.start();
 		int[] t = {0};
@@ -125,13 +123,12 @@ public class Main {
 			if (t[0] > 7) {
 				t[0] = 0;
 			}
-			// w.panel.repaint();
-			// w.panel.forEachRenderable(r -> r.animationTick());
 		});
 		testLoop.start();
 
 		w.panel.addRenderables(floor);
 		w.panel.addRenderable(crusader);
+		w.panel.addRenderable(spider);
 
 		var dw = new DebugWindow();
 

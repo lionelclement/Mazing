@@ -19,6 +19,10 @@ public interface Renderable extends Comparable<Renderable> {
 
 	int getZ();
 
+	default int getBlitOrder() {
+		return 0;
+	}
+
 	@Override
 	default int compareTo(Renderable o) {
 		int rX = o.getX() - this.getX();
@@ -29,7 +33,11 @@ public interface Renderable extends Comparable<Renderable> {
 		if (rY != 0) {
 			return rY;
 		}
-		return this.getZ() - o.getZ();
+		int rZ = this.getZ() - o.getZ();
+		if (rZ != 0) {
+			return rZ;
+		}
+		return this.getBlitOrder() - o.getBlitOrder();
 	}
 
 	void setSprite(Sprite sprite);

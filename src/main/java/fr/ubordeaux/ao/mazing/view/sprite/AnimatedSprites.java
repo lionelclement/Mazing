@@ -19,6 +19,10 @@ public final class AnimatedSprites {
 	public static final AnimatedOrientedSprite CRUSADER_RUN = register("crusader_run", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_RUN), 17, 11).build());
 	public static final AnimatedOrientedSprite CRUSADER_WALK = register("crusader_walk", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_WALK), 15, 10).build());
 
+	public static final AnimatedOrientedSprite SPIDER_ATTACK = register("spider_attack", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_ATTACK), 8, 8).build());
+	public static final AnimatedOrientedSprite SPIDER_DEATH = register("spider_death", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_DEATH), 8, 8).build());
+	public static final AnimatedOrientedSprite SPIDER_WALK = register("spider_walk", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_WALK), 25, 14).build());
+
 	private static AnimatedOrientedSprite.Builder setupSprites(AnimatedOrientedSprite.Builder b, int animSize, int spriteAmountInWidthInAtlas) {
 		int x = 0;
 		int y = 0;

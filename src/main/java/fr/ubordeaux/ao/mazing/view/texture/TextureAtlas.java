@@ -18,13 +18,21 @@ public class TextureAtlas {
 	public final int atlasHeight;
 	public final int textureWidth;
 	public final int textureHeight;
+	public final int xOffset;
+	public final int yOffset;
 
-	private TextureAtlas(BufferedImage atlas, int atlasWidth, int atlasHeight, int textureWidth, int textureHeight) {
+	private TextureAtlas(BufferedImage atlas, int atlasWidth, int atlasHeight, int textureWidth, int textureHeight, int xOffset, int yOffset) {
 		this.atlas = atlas;
 		this.atlasWidth = atlasWidth;
 		this.atlasHeight = atlasHeight;
 		this.textureWidth = textureWidth;
 		this.textureHeight = textureHeight;
+		this.xOffset = xOffset;
+		this.yOffset = yOffset;
+	}
+
+	private TextureAtlas(BufferedImage atlas, int atlasWidth, int atlasHeight, int textureWidth, int textureHeight) {
+		this(atlas, atlasWidth, atlasHeight, textureWidth, textureHeight, 0, 0);
 	}
 
 	public static TextureAtlas loadFromImage(Path path, int textureWidth, int textureHeight) throws IOException {
@@ -43,12 +51,17 @@ public class TextureAtlas {
 		return new TextureAtlas(img, img.getWidth(), img.getHeight(), textureWidth, textureHeight);
 	}
 
-	public static TextureAtlas stitchFromResourceDir(String path) {
+	public static TextureAtlas stitchFromResourceDir(String path, int xOffset, int yOffset) {
 		URL resource = TextureAtlas.class.getResource(path);
-		return stitchFromDir(Path.of(resource.getPath()));
+		return stitchFromDir(Path.of(resource.getPath()), xOffset, yOffset);
 	}
 
-	public static TextureAtlas stitchFromDir(Path dirPath) {
+	public static TextureAtlas stitchFromResourceDir(String path) {
+		URL resource = TextureAtlas.class.getResource(path);
+		return stitchFromDir(Path.of(resource.getPath()), 0, 0);
+	}
+
+	public static TextureAtlas stitchFromDir(Path dirPath, int xOffset, int yOffset) {
 		File dir = new File(dirPath.toString());
 		if (!dir.exists() || !dir.isDirectory()) {
 			throw new IllegalArgumentException("Path is not a directory");
@@ -96,7 +109,7 @@ public class TextureAtlas {
 			}
 		}
 		g.dispose();
-		return new TextureAtlas(atlas, atlasWidth, atlasHeight, textureWidth, textureHeight);
+		return new TextureAtlas(atlas, atlasWidth, atlasHeight, textureWidth, textureHeight, xOffset, yOffset);
 
 	}
 
@@ -113,13 +126,11 @@ public class TextureAtlas {
 	}
 
 	private void blitAbsolute(Graphics2D g, int x, int y, int textureX, int textureY) {
-		// int dx2 = x + textureWidth;
-		// int dy2 = y + textureHeight;
-		g.drawImage(atlas, x, y, x + textureWidth, y + textureHeight, textureX, textureY, textureX + this.textureWidth, textureY + this.textureHeight, null);
+		blitAbsolute(g, x, y, textureX, textureY, 1);
 	}
 
 	private void blitAbsolute(Graphics2D g, int x, int y, int textureX, int textureY, int zoom) {
-		g.drawImage(atlas, x, y, x + textureWidth / zoom, y + textureHeight / zoom, textureX, textureY, textureX + textureWidth, textureY + textureHeight, null);
+		g.drawImage(atlas, x + xOffset / zoom, y + yOffset / zoom, x + textureWidth / zoom + xOffset / zoom, y + textureHeight / zoom + yOffset / zoom, textureX, textureY, textureX + textureWidth, textureY + textureHeight, null);
 		// g.drawRect(x, y, textureWidth / zoom, textureHeight / zoom);
 	}
 
@@ -161,7 +172,7 @@ public class TextureAtlas {
 	/// @param textureX the x index of the texture in the atlas
 	/// @param textureY the y index of the texture in the atlas
 	public void blit(Graphics2D g, int x, int y, int textureX, int textureY, int zoom) {
-		this.blitAbsolute(g, x, y, textureX * this.textureWidth, textureY * this.textureHeight,  zoom);
+		this.blitAbsolute(g, x, y, textureX * this.textureWidth, textureY * this.textureHeight, zoom);
 	}
 
 	@Override

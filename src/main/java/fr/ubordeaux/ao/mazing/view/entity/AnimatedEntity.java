@@ -15,17 +15,23 @@ public class AnimatedEntity implements Renderable {
 	private int x;
 	private int y;
 	private int z;
+	private int blitOrder;
 	private int currentSprite;
 	private int lastAnimationTick;
 
-	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation, int x, int y, int z) {
+	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation, int x, int y, int z, int blitOrder) {
 		this.sprite = sprite;
 		this.orientation = orientation;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.blitOrder = blitOrder;
 		this.currentSprite = 0;
 		this.lastAnimationTick = 0;
+	}
+
+	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation, int x, int y, int z) {
+		this(sprite, orientation, x, y, z, 0);
 	}
 
 	public AnimatedEntity(AnimatedOrientedSprite sprite) {
@@ -87,6 +93,11 @@ public class AnimatedEntity implements Renderable {
 
 	public int getZ() {
 		return z;
+	}
+
+	@Override
+	public int getBlitOrder() {
+		return blitOrder;
 	}
 
 	public void setZ(int z) {

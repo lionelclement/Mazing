@@ -25,7 +25,7 @@ public class IsometricRenderer implements Renderer {
 		this.halfTileDiagX = tileDiagX / 2;
 		this.halfTileDiagY = tileDiagY / 2;
 		this.tileHeight = tileHeight;
-		this.debug = false;
+		this.debug = true;
 		this.zoom = 2;
 	}
 
