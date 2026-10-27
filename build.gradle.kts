@@ -1,4 +1,5 @@
 plugins {
+    application
     id("java-library")
 }
 
@@ -34,4 +35,8 @@ tasks.withType<Jar>().configureEach {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+application {
+    mainClass.set("fr.ubordeaux.ao.mazing.Main")
 }

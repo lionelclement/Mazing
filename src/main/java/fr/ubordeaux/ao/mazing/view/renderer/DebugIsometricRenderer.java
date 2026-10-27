@@ -9,15 +9,15 @@ import java.awt.geom.Rectangle2D;
 /// A Debug renderer. Not to be used outside the API.
 /// Made public due to technical limitation.
 public class DebugIsometricRenderer implements Renderer {
-	public int origX;
-	public int origY;
-	public final int tileDiagX;
-	public final int tileDiagY;
-	public final int halfTileDiagX;
-	public final int halfTileDiagY;
-	public final int tileHeight;
-	public int zoom;
-	public boolean debug;
+	private int origX;
+	private int origY;
+	private final int tileDiagX;
+	private final int tileDiagY;
+	private final int halfTileDiagX;
+	private final int halfTileDiagY;
+	private final int tileHeight;
+	private int zoom;
+	private boolean debug;
 
 	public DebugIsometricRenderer(int origX, int origY, int tileDiagX, int tileDiagY, int tileHeight) {
 		this.origX = origX;
@@ -67,4 +67,16 @@ public class DebugIsometricRenderer implements Renderer {
 		this.origX = originX;
 		this.origY = originY;
 	}
+	public int getZoom() {
+		return zoom;
+	}
+
+	public void setZoom(int zoom) {
+		if (zoom <= 0) {
+			throw new IllegalArgumentException("zoom must be positive");
+		}
+		this.zoom = zoom;
+	}
+	public int getTileDiagX() { return tileDiagX; }
+	public int getTileDiagY() { return tileDiagY; }
 }

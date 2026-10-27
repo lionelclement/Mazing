@@ -9,3 +9,5 @@
 bin/
 build/
 target/
+*.saved
+.DS_Store

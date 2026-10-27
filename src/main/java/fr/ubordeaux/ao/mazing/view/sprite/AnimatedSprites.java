@@ -2,50 +2,106 @@ package fr.ubordeaux.ao.mazing.view.sprite;
 
 import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.texture.TextureAtlases;
+import fr.ubordeaux.ao.mazing.view.texture.TextureAtlas;
 
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Provides predefined animated sprites for characters and creatures.
+ * Animation frames are registered according to their atlas layout.
+ */
 public final class AnimatedSprites {
 
-	public static final HashMap<String, AnimatedOrientedSprite> REGISTRY = new HashMap<>();
+	private static final HashMap<String, AnimatedOrientedSprite> registry = new HashMap<>();
+	public static final java.util.Map<String, AnimatedOrientedSprite> REGISTRY = java.util.Collections
+			.unmodifiableMap(registry);
 
-	public static final AnimatedOrientedSprite CRUSADER_ATTACK = register("crusader_attack", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_ATTACK), 18, 12).build());
-	public static final AnimatedOrientedSprite CRUSADER_BLOCK = register("crusader_block", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_BLOCK), 16, 11).build());
-	public static final AnimatedOrientedSprite CRUSADER_DEATH = register("crusader_death", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_DEATH), 9, 8).build());
-	public static final AnimatedOrientedSprite CRUSADER_HIT = register("crusader_hit", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_HIT), 13, 10).build());
-	public static final AnimatedOrientedSprite CRUSADER_IDLE = register("crusader_idle", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_IDLE), 16, 11).build());
-	public static final AnimatedOrientedSprite CRUSADER_JUMP = register("crusader_jump", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_JUMP), 16, 11).build());
-	public static final AnimatedOrientedSprite CRUSADER_RUN = register("crusader_run", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_RUN), 17, 11).build());
-	public static final AnimatedOrientedSprite CRUSADER_WALK = register("crusader_walk", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.CRUSADER_WALK), 15, 10).build());
+	public static final AnimatedOrientedSprite CRUSADER_ATTACK = registerAnimationWithShadow("crusader_attack",
+			TextureAtlases.CRUSADER_ATTACK,
+			TextureAtlases.CRUSADER_ATTACK_SHADOW, 18, 12);
 
-	public static final AnimatedOrientedSprite SPIDER_ATTACK = register("spider_attack", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_ATTACK), 8, 8).build());
-	public static final AnimatedOrientedSprite SPIDER_DEATH = register("spider_death", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_DEATH), 8, 8).build());
-	public static final AnimatedOrientedSprite SPIDER_WALK = register("spider_walk", setupSprites(new AnimatedOrientedSprite.Builder(TextureAtlases.SPIDER_WALK), 25, 14).build());
+	public static final AnimatedOrientedSprite CRUSADER_BLOCK = registerAnimationWithShadow("crusader_block",
+			TextureAtlases.CRUSADER_BLOCK,
+			TextureAtlases.CRUSADER_BLOCK_SHADOW, 16, 11);
 
-	private static AnimatedOrientedSprite.Builder setupSprites(AnimatedOrientedSprite.Builder b, int animSize, int spriteAmountInWidthInAtlas) {
-		int x = 0;
-		int y = 0;
-		for (Orientation o : List.of(Orientation.NORTH_WEST, Orientation.WEST, Orientation.SOUTH_WEST, Orientation.SOUTH, Orientation.SOUTH_EAST, Orientation.EAST, Orientation.NORTH_EAST, Orientation.NORTH)) {
-			int[] dirs = new int[animSize * 2];
-			for (int i = 0; i < animSize*2; i+=2) {
-				dirs[i] = x;
-				dirs[i + 1] = y;
-				x++;
-				if (x == spriteAmountInWidthInAtlas) {
-					x = 0;
-					y++;
+	public static final AnimatedOrientedSprite CRUSADER_DEATH = registerAnimationWithShadow("crusader_death",
+			TextureAtlases.CRUSADER_DEATH,
+			TextureAtlases.CRUSADER_DEATH_SHADOW, 9, 8);
+
+	public static final AnimatedOrientedSprite CRUSADER_HIT = registerAnimationWithShadow("crusader_hit",
+			TextureAtlases.CRUSADER_HIT,
+			TextureAtlases.CRUSADER_HIT_SHADOW, 13, 10);
+
+	public static final AnimatedOrientedSprite CRUSADER_IDLE = registerAnimationWithShadow("crusader_idle",
+			TextureAtlases.CRUSADER_IDLE,
+			TextureAtlases.CRUSADER_IDLE_SHADOW, 16, 11);
+
+	public static final AnimatedOrientedSprite CRUSADER_JUMP = registerAnimationWithShadow("crusader_jump",
+			TextureAtlases.CRUSADER_JUMP,
+			TextureAtlases.CRUSADER_JUMP_SHADOW, 16, 11);
+
+	public static final AnimatedOrientedSprite CRUSADER_RUN = registerAnimationWithShadow("crusader_run",
+			TextureAtlases.CRUSADER_RUN,
+			TextureAtlases.CRUSADER_RUN_SHADOW, 17, 11);
+
+	public static final AnimatedOrientedSprite CRUSADER_WALK = registerAnimationWithShadow("crusader_walk",
+			TextureAtlases.CRUSADER_WALK,
+			TextureAtlases.CRUSADER_WALK_SHADOW, 15, 10);
+
+	public static final AnimatedOrientedSprite SPIDER_ATTACK = registerAnimationWithShadow("spider_attack", TextureAtlases.SPIDER_ATTACK, TextureAtlases.SPIDER_ATTACK_SHADOW, 8, 8);
+	public static final AnimatedOrientedSprite SPIDER_DEATH = registerAnimationWithShadow("spider_death", TextureAtlases.SPIDER_DEATH, TextureAtlases.SPIDER_DEATH_SHADOW, 8, 8);
+	public static final AnimatedOrientedSprite SPIDER_WALK = registerAnimationWithShadow("spider_walk", TextureAtlases.SPIDER_WALK, TextureAtlases.SPIDER_WALK_SHADOW, 25, 14);
+
+	private static AnimatedOrientedSprite.Builder configureAnimationFrames(AnimatedOrientedSprite.Builder spriteBuilder, int frameCount,
+			int framesPerAtlasRow) {
+		spriteBuilder.animationSize(frameCount);
+		int atlasColumn = 0;
+		int atlasRow = 0;
+
+		for (Orientation orientation : List.of(
+				Orientation.SOUTH_EAST,
+				Orientation.EAST,
+				Orientation.NORTH_EAST,
+				Orientation.NORTH,
+				Orientation.NORTH_WEST,
+				Orientation.WEST,
+				Orientation.SOUTH_WEST,
+				Orientation.SOUTH)) {
+			int[] frameCoordinates = new int[frameCount * 2];
+			for (int coordinateIndex = 0; coordinateIndex < frameCount * 2; coordinateIndex += 2) {
+				frameCoordinates[coordinateIndex] = atlasColumn;
+				frameCoordinates[coordinateIndex + 1] = atlasRow;
+				atlasColumn++;
+				if (atlasColumn == framesPerAtlasRow) {
+					atlasColumn = 0;
+					atlasRow++;
 				}
 			}
-			b.inOrientation(o, dirs);
+			spriteBuilder.inOrientation(orientation, frameCoordinates);
 		}
 
-		return b.animationSize(animSize);
+		return spriteBuilder;
 	}
 
 	private static AnimatedOrientedSprite register(String name, AnimatedOrientedSprite sprite) {
-		REGISTRY.put(name, sprite);
+		registry.put(name, sprite);
 		return sprite;
 	}
 
+	private static AnimatedOrientedSprite registerAnimationWithShadow(
+			String name,
+			TextureAtlas characterAtlas,
+			TextureAtlas shadowAtlas,
+			int frameCount,
+			int framesPerAtlasRow) {
+
+		AnimatedOrientedSprite.Builder spriteBuilder = new AnimatedOrientedSprite.Builder(characterAtlas)
+				.withShadowAtlas(shadowAtlas);
+
+		AnimatedOrientedSprite sprite = configureAnimationFrames(
+				spriteBuilder, frameCount, framesPerAtlasRow).build();
+
+		return register(name, sprite);
+	}
 }

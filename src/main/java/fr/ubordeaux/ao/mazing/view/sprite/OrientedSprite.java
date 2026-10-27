@@ -8,6 +8,10 @@ import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a sprite whose texture depends on its orientation.
+ * Each orientation refers to a texture position in an atlas.
+ */
 public class OrientedSprite implements Sprite {
 	private final Orientation defaultOrientation;
 	private final TextureAtlas atlas;
@@ -18,7 +22,7 @@ public class OrientedSprite implements Sprite {
 	public OrientedSprite(TextureAtlas atlas, Map<Orientation, Point> textureIndexes) {
 		this.defaultOrientation = Orientation.NORTH;
 		this.atlas = atlas;
-		this.textureIndexes = textureIndexes;
+		this.textureIndexes = Map.copyOf(textureIndexes);
 	}
 
 	/**
@@ -29,17 +33,26 @@ public class OrientedSprite implements Sprite {
 	public OrientedSprite(Orientation defaultOrientation, TextureAtlas atlas, Map<Orientation, Point> textureIndexes) {
 		this.defaultOrientation = defaultOrientation;
 		this.atlas = atlas;
-		this.textureIndexes = textureIndexes;
+		this.textureIndexes = Map.copyOf(textureIndexes);
 	}
 
 	@Override
 	public void render(Graphics2D g, int x, int y, Orientation orientation, int animationIndex, int zoom) {
-		Point p = this.textureIndexes.get(orientation);
-		if (p == null) {
-			// if the direction is not known, try the "simpler" version of the direction
-			p = this.textureIndexes.get(orientation.asSimple());
+		Point texturePosition = this.textureIndexes.get(orientation);
+		if (texturePosition == null) {
+			// Fall back to the corresponding cardinal orientation.
+			texturePosition = this.textureIndexes.get(orientation.asSimple());
 		}
-		atlas.blit(g, x, y, p.x(), p.y(), zoom);
+		atlas.blit(g, x, y, texturePosition.x(), texturePosition.y(), zoom);
+	}
+
+	/**
+	 * Scales around the center of the atlas cell, including its offset.
+	 * This keeps the visual anchored to its isometric grid cell.
+	 */
+	@Override
+	public double getScaleAnchorX(int zoom) {
+		return (atlas.getXOffset() + atlas.getTextureWidth() / 2.0) / zoom;
 	}
 
 	@Override

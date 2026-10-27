@@ -7,7 +7,8 @@ import java.util.HashMap;
 
 public final class Sprites {
 
-	public static final HashMap<String, Sprite> REGISTRY = new HashMap<>();
+	private static final HashMap<String, Sprite> registry = new HashMap<>();
+	public static final java.util.Map<String, Sprite> REGISTRY = java.util.Collections.unmodifiableMap(registry);
 
 	public static final Sprite BARREL = registerAngle("barrel", 0, 0, 1, 0, 2, 0, 3, 0);
 	public static final Sprite BARRELS_STACKED = registerAngle("barrels_stacked", 4, 0, 5, 0, 6, 0, 7, 0);
@@ -86,14 +87,14 @@ public final class Sprites {
 	// private static Renderable registerENSW(String name, TextureAtlas atlas, int... indexes) {
 	// 	Renderable r = new SimpleRenderable.Builder(TextureAtlases.ANGLE)
 	// 			.east(0, 0).north(1, 0).south(2, 0).west(3, 0).build();
-	// 	REGISTRY.put(name, r);
+	// 	registry.put(name, r);
 	// 	return r;
 	// }
 
 	private static Sprite registerENSW(String name, TextureAtlas atlas, int ex, int ey, int nx, int ny, int sx, int sy, int wx, int wy) {
 		Sprite r = new OrientedSprite.Builder(atlas)
 				.east(ex, ey).north(nx, ny).south(sx, sy).west(wx, wy).build();
-		REGISTRY.put(name, r);
+		registry.put(name, r);
 		return r;
 	}
 

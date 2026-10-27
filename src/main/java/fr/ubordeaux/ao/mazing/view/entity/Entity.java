@@ -4,31 +4,53 @@ import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.Renderable;
 import fr.ubordeaux.ao.mazing.view.sprite.Sprite;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.util.Objects;
 
-/// An entity in the 3D Isometric grid
+/**
+ * Represents an object positioned in a three-dimensional
+ * isometric grid.
+ */
 public class Entity implements Renderable {
 
 	private Sprite sprite;
 	private Orientation orientation;
-	private int x;
-	private int y;
-	private int z;
+	private int xPosition;
+	private int yPosition;
+	private int zPosition;
+	private double scale = 1.0;
 
-	public Entity(Sprite sprite, Orientation orientation, int x, int y, int z) {
-		this.sprite = sprite;
-		this.orientation = orientation;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public Entity(Sprite sprite, Orientation orientation, int xPosition, int yPosition, int zPosition) {
+		this.sprite = Objects.requireNonNull(sprite, "sprite must not be null");
+		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
+		this.xPosition = xPosition;
+		this.yPosition = yPosition;
+		this.zPosition = zPosition;
+	}
+
+	/**
+	 * Creates an entity with a custom visual scale.
+	 * The scale changes only the image size, not the grid position.
+	 *
+	 * @param sprite the sprite to render
+	 * @param orientation the sprite orientation
+	 * @param xPosition the X coordinate on the grid
+	 * @param yPosition the Y coordinate on the grid
+	 * @param zPosition the Z coordinate on the grid
+	 * @param scale visual size multiplier (1.0 is the original size)
+	 */
+	public Entity(Sprite sprite, Orientation orientation,
+			int xPosition, int yPosition, int zPosition, double scale) {
+		this(sprite, orientation, xPosition, yPosition, zPosition);
+		setScale(scale);
 	}
 
 	public Entity(Sprite sprite) {
 		this(sprite, Orientation.NORTH, 0, 0, 0);
 	}
 
-	public Entity(Sprite sprite, int x, int y, int z) {
-		this(sprite, Orientation.NORTH, x, y, z);
+	public Entity(Sprite sprite, int xPosition, int yPosition, int zPosition) {
+		this(sprite, Orientation.NORTH, xPosition, yPosition, zPosition);
 	}
 
 	public Entity(Sprite sprite, Orientation orientation) {
@@ -37,10 +59,48 @@ public class Entity implements Renderable {
 
 
 	@Override
-	public void renderInScreen(Graphics2D g, int x, int y, int animationTick, int zoom) {
-		// g.drawRect(x, y, 20, 20);
-		this.sprite.render(g, x, y, orientation, animationTick, zoom);
-		// g.draw(new Ellipse2D.Double(x-2, y-2, 4, 4));
+	public void renderInScreen(Graphics2D graphics, int screenX, int screenY, int animationTick, int zoom) {
+		if (scale == 1.0) {
+			sprite.render(graphics, screenX, screenY, orientation, animationTick, zoom);
+			return;
+		}
+
+		// The projected grid point is at the left edge of an atlas cell,
+		// not at the object's horizontal center. Scaling about screenX
+		// would therefore make enlarged objects drift to the right.
+		// Keep the horizontal atlas center and the ground reference fixed.
+		double anchorX = screenX + sprite.getScaleAnchorX(zoom);
+		Graphics2D scaledGraphics = (Graphics2D) graphics.create();
+		try {
+			scaledGraphics.translate(anchorX, screenY);
+			scaledGraphics.scale(scale, scale);
+			scaledGraphics.translate(-anchorX, -screenY);
+			sprite.render(scaledGraphics, screenX, screenY, orientation, animationTick, zoom);
+		} finally {
+			scaledGraphics.dispose();
+		}
+	}
+
+	/**
+	 * Returns the visual size multiplier of this entity.
+	 *
+	 * @return the visual scale (1.0 is the original size)
+	 */
+	public double getScale() {
+		return scale;
+	}
+
+	/**
+	 * Changes the visual size of this entity without moving it on the grid.
+	 *
+	 * @param scale a positive, finite size multiplier
+	 * @throws IllegalArgumentException if the scale is not positive or finite
+	 */
+	public void setScale(double scale) {
+		if (!Double.isFinite(scale) || scale <= 0.0) {
+			throw new IllegalArgumentException("scale must be positive and finite");
+		}
+		this.scale = scale;
 	}
 
 	public Sprite getSprite() {
@@ -52,58 +112,58 @@ public class Entity implements Renderable {
 	}
 
 	public void setOrientation(Orientation orientation) {
-		this.orientation = orientation;
+		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
 	}
 
 	public int getX() {
-		return x;
+		return xPosition;
 	}
 
-	public void setX(int x) {
-		this.x = x;
+	public void setX(int xPosition) {
+		this.xPosition = xPosition;
 	}
 
 	public int getY() {
-		return y;
+		return yPosition;
 	}
 
-	public void setY(int y) {
-		this.y = y;
+	public void setY(int yPosition) {
+		this.yPosition = yPosition;
 	}
 
 	public int getZ() {
-		return z;
+		return zPosition;
 	}
 
-	public void setZ(int z) {
-		this.z = z;
+	public void setZ(int zPosition) {
+		this.zPosition = zPosition;
 	}
 
-	public void moveX(int x) {
-		this.x += x;
+	public void moveX(int deltaX) {
+		this.xPosition += deltaX;
 	}
 
-	public void moveY(int y) {
-		this.y += y;
+	public void moveY(int deltaY) {
+		this.yPosition += deltaY;
 	}
 
-	public void moveZ(int z) {
-		this.z += z;
+	public void moveZ(int deltaZ) {
+		this.zPosition += deltaZ;
 	}
 
-	public void move(int x, int y) {
-		this.x += x;
-		this.y += y;
+	public void move(int deltaX, int deltaY) {
+		this.xPosition += deltaX;
+		this.yPosition += deltaY;
 	}
 
-	public void move(int x, int y, int z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
+	public void move(int deltaX, int deltaY, int deltaZ) {
+		this.xPosition += deltaX;
+		this.yPosition += deltaY;
+		this.zPosition += deltaZ;
 	}
 
 	@Override
 	public void setSprite(Sprite sprite) {
-		this.sprite = sprite;
+		this.sprite = Objects.requireNonNull(sprite, "sprite must not be null");
 	}
 }

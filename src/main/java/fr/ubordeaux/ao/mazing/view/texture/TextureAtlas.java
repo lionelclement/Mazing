@@ -14,12 +14,12 @@ import java.util.Comparator;
 
 public class TextureAtlas {
 	private BufferedImage atlas;
-	public final int atlasWidth;
-	public final int atlasHeight;
-	public final int textureWidth;
-	public final int textureHeight;
-	public final int xOffset;
-	public final int yOffset;
+	private final int atlasWidth;
+	private final int atlasHeight;
+	private final int textureWidth;
+	private final int textureHeight;
+	private final int xOffset;
+	private final int yOffset;
 
 	private TextureAtlas(BufferedImage atlas, int atlasWidth, int atlasHeight, int textureWidth, int textureHeight, int xOffset, int yOffset) {
 		this.atlas = atlas;
@@ -184,5 +184,23 @@ public class TextureAtlas {
 				", textureWidth=" + textureWidth +
 				", textureHeight=" + textureHeight +
 				'}';
+	}
+	public int getAtlasWidth() {
+		return atlasWidth;
+	}
+	public int getAtlasHeight() {
+		return atlasHeight;
+	}
+	public int getTextureWidth() {
+		return textureWidth;
+	}
+	public int getTextureHeight() {
+		return textureHeight;
+	}
+	public int getXOffset() {
+		return xOffset;
+	}
+	public int getYOffset() {
+		return yOffset;
 	}
 }

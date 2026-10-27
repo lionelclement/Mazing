@@ -15,9 +15,9 @@ import java.awt.geom.Line2D;
 import java.util.Map;
 
 public class DebugWindow extends JFrame {
-	public final ViewPanel panel;
-	public int zoom = 2;
-	public Orientation orientation = Orientation.NORTH;
+	private final ViewPanel panel;
+	private int zoom = 2;
+	private Orientation orientation = Orientation.NORTH;
 
 	private enum Mode {
 		FLOOR,
@@ -113,7 +113,7 @@ public class DebugWindow extends JFrame {
 		for (Map.Entry<String, Sprite> sprite : IsometricSprites.REGISTRY.entrySet().stream()
 				.sorted(Map.Entry.comparingByKey())
 				.toList()) {
-			Renderable renderable = new DebugEntity(new Entity(sprite.getValue(), orientation, x, y, 0), renderer.tileDiagX, renderer.tileDiagY, sprite.getKey().toUpperCase());
+			Renderable renderable = new DebugEntity(new Entity(sprite.getValue(), orientation, x, y, 0), renderer.getTileDiagX(), renderer.getTileDiagY(), sprite.getKey().toUpperCase());
 			panel.addRenderable(renderable);
 			x++;
 			y++;
@@ -166,4 +166,7 @@ public class DebugWindow extends JFrame {
 		}
 	}
 
+	public ViewPanel getPanel() {
+		return panel;
+	}
 }

@@ -10,45 +10,111 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Objects;
+
+/**
+ * Represents an oriented sprite with multiple animation frames.
+ * Frame selection depends on the requested orientation and frame index.
+ * An optional shadow atlas may be rendered before the main texture.
+ */
 public class AnimatedOrientedSprite implements Sprite {
 	private final Orientation defaultOrientation;
 	private final TextureAtlas atlas;
 	private final Map<Orientation, List<Point>> textureIndexes;
 	private final int animationSize;
+	private final TextureAtlas shadowAtlas;
 
-	/**
-	 * @param defaultOrientation the default orientation
-	 * @param atlas              the atlas to use for drawing
-	 * @param textureIndexes     indexes of the texture to use for the direction, in the order of the direction enum
-	 * @param animationSize   the number of sprites to display an animation
-	 */
-	public AnimatedOrientedSprite(Orientation defaultOrientation, TextureAtlas atlas, Map<Orientation, List<Point>> textureIndexes, int animationSize) {
+	public AnimatedOrientedSprite(
+			Orientation defaultOrientation,
+			TextureAtlas atlas,
+			Map<Orientation, List<Point>> textureIndexes,
+			int animationSize) {
+
+		this(defaultOrientation, atlas, null, textureIndexes, animationSize);
+	}
+
+	private AnimatedOrientedSprite(
+			Orientation defaultOrientation,
+			TextureAtlas atlas,
+			TextureAtlas shadowAtlas,
+			Map<Orientation, List<Point>> textureIndexes,
+			int animationSize) {
+
 		this.defaultOrientation = defaultOrientation;
 		this.atlas = atlas;
-		this.textureIndexes = textureIndexes;
+		this.shadowAtlas = shadowAtlas;
+		this.textureIndexes = textureIndexes.entrySet().stream()
+				.collect(java.util.stream.Collectors.toUnmodifiableMap(
+						Map.Entry::getKey,
+						entry -> List.copyOf(entry.getValue())));
 		this.animationSize = animationSize;
 	}
 
-	/// @param atlas          the atlas to use for drawing
-	/// @param textureIndexes indexes of the texture to use for the direction, in the order of the direction enum
+	/// @param atlas      the atlas to use for drawing
+	/// @param textureIndexes indexes of the texture to use for the direction, in the
+	///                       order of the direction enum
 	public AnimatedOrientedSprite(TextureAtlas atlas, Map<Orientation, List<Point>> textureIndexes, int animationSize) {
 		this(Orientation.NORTH, atlas, textureIndexes, animationSize);
 	}
 
 	@Override
-	public void render(Graphics2D g, int x, int y, Orientation orientation, int animationIndex, int zoom) {
-		List<Point> ps = this.textureIndexes.get(orientation);
-		if (ps == null) {
-			// if the direction is not known, try the "simpler" version of the direction
-			ps = this.textureIndexes.get(orientation.asSimple());
+	public void render(
+			Graphics2D graphics,
+			int screenX,
+			int screenY,
+			Orientation orientation,
+			int frameIndex,
+			int zoom) {
+
+		render(graphics, screenX, screenY, orientation,
+				frameIndex, zoom, false);
+	}
+
+	public void render(
+			Graphics2D graphics,
+			int screenX,
+			int screenY,
+			Orientation orientation,
+			int frameIndex,
+			int zoom,
+			boolean drawShadow) {
+
+		List<Point> framePositions = textureIndexes.get(orientation);
+
+		if (framePositions == null) {
+			framePositions = textureIndexes.get(orientation.asSimple());
 		}
-		Point p = ps.get(animationIndex);
-		atlas.blit(g, x, y, p.x(), p.y(), zoom);
+
+		Point framePosition = framePositions.get(frameIndex);
+
+		if (drawShadow) {
+			if (shadowAtlas == null) {
+				throw new IllegalStateException(
+						"No shadow atlas configured for this sprite");
+			}
+
+			shadowAtlas.blit(
+					graphics, screenX, screenY,
+					framePosition.x(), framePosition.y(), zoom);
+		}
+
+		atlas.blit(
+				graphics, screenX, screenY,
+				framePosition.x(), framePosition.y(), zoom);
+	}
+
+	/**
+	 * Scales around the center of the atlas cell, including its offset.
+	 * This keeps the visual anchored to its isometric grid cell.
+	 */
+	@Override
+	public double getScaleAnchorX(int zoom) {
+		return (atlas.getXOffset() + atlas.getTextureWidth() / 2.0) / zoom;
 	}
 
 	@Override
 	public int animationSize() {
-			return animationSize;
+		return animationSize;
 	}
 
 	@Override
@@ -65,6 +131,7 @@ public class AnimatedOrientedSprite implements Sprite {
 		private final TextureAtlas atlas;
 		private final Map<Orientation, List<Point>> textureIndexes;
 		private int animationSize;
+		private TextureAtlas shadowAtlas;
 
 		public Builder(TextureAtlas atlas, Orientation orientation, int animationSize) {
 			this.orientation = orientation;
@@ -83,8 +150,9 @@ public class AnimatedOrientedSprite implements Sprite {
 		}
 
 		public Builder inOrientation(Orientation orientation, int... xy) {
-			if (xy.length % 2 != 0 && xy.length / 2 != this.animationSize) {
-				throw new IllegalArgumentException("xy must have an even number of elements and be two times the number of animation sprites");
+			if (xy.length % 2 != 0 || xy.length / 2 != this.animationSize) {
+				throw new IllegalArgumentException(
+						"xy must have an even number of elements and be two times the number of animation sprites");
 			}
 			ArrayList<Point> ps = new ArrayList<>();
 			for (int i = 0; i < xy.length; i += 2) {
@@ -126,8 +194,18 @@ public class AnimatedOrientedSprite implements Sprite {
 			return inOrientation(Orientation.SOUTH_WEST, xy);
 		}
 
+		public Builder withShadowAtlas(TextureAtlas shadowAtlas) {
+			this.shadowAtlas = Objects.requireNonNull(shadowAtlas);
+			return this;
+		}
+
 		public AnimatedOrientedSprite build() {
-			return new AnimatedOrientedSprite(this.orientation, this.atlas, this.textureIndexes, this.animationSize);
+			return new AnimatedOrientedSprite(
+					orientation,
+					atlas,
+					shadowAtlas,
+					textureIndexes,
+					animationSize);
 		}
 	}
 }

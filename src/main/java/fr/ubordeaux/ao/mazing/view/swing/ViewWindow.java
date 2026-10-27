@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 import java.awt.Dimension;
 
 public class ViewWindow extends JFrame {
-	public final ViewPanel panel;
+	private final ViewPanel panel;
 
 	public ViewWindow() {
 		super("Isometric 3D Game");
@@ -20,5 +20,8 @@ public class ViewWindow extends JFrame {
 		setSize(new Dimension(1600, 1000));
 		pack();
 
+	}
+	public ViewPanel getPanel() {
+		return panel;
 	}
 }

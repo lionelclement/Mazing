@@ -15,7 +15,7 @@ public class IsometricRenderer implements Renderer {
 	private final int halfTileDiagY;
 	private final int tileHeight;
 	private boolean debug;
-	public int zoom;
+	private int zoom;
 
 	public IsometricRenderer(int origX, int origY, int tileDiagX, int tileDiagY, int tileHeight) {
 		this.origX = origX;
@@ -30,17 +30,51 @@ public class IsometricRenderer implements Renderer {
 	}
 
 	@Override
-	public Point renderInIsoGrid(Graphics2D g, Renderable renderable, int tick) {
-		int screenX = this.origX + (halfTileDiagX/zoom) * (renderable.getX() + renderable.getY());
-		int screenY = this.origY + (halfTileDiagY/zoom) * (renderable.getY() - renderable.getX() - 1) - renderable.getZ() * (this.tileHeight/zoom);
-		renderable.renderInScreen(g, screenX, screenY, tick, zoom);
-		if (debug) {
-			var str = String.format("(%d, %d, %d)", renderable.getX(), renderable.getY(), renderable.getZ());
-			Rectangle2D bound = g.getFont().getStringBounds(str, g.getFontRenderContext());
-			g.drawString(str, (int) (screenX + this.tileDiagX / zoom / 2 - bound.getWidth() / 2), (int) (screenY  - bound.getHeight() / 2));
-		}
-		return new Point(screenX, screenY);
-	}
+	public Point renderInIsoGrid(
+            Graphics2D graphics,
+            Renderable renderable,
+            int animationTick) {
+
+        double gridX = renderable.getPreciseX();
+        double gridY = renderable.getPreciseY();
+
+        double projectedX =
+                origX + (halfTileDiagX / (double) zoom)
+                * (gridX + gridY);
+
+        double projectedY =
+                origY + (halfTileDiagY / (double) zoom)
+                * (gridY - gridX - 1)
+                - renderable.getZ() * (tileHeight / (double) zoom);
+
+        int screenX = (int) Math.round(projectedX);
+        int screenY = (int) Math.round(projectedY);
+
+        renderable.renderInScreen(
+                graphics, screenX, screenY, animationTick, zoom);
+
+        if (debug) {
+            String coordinates = String.format(
+                    "(%.2f, %.2f, %d)",
+                    gridX, gridY, renderable.getZ());
+
+            Rectangle2D textBounds =
+                    graphics.getFont().getStringBounds(
+                            coordinates,
+                            graphics.getFontRenderContext());
+
+            int labelX = (int) Math.round(
+                    screenX + tileDiagX / (double) zoom / 2
+                    - textBounds.getWidth() / 2);
+
+            int labelY = (int) Math.round(
+                    screenY - textBounds.getHeight() / 2);
+
+            graphics.drawString(coordinates, labelX, labelY);
+        }
+
+        return new Point(screenX, screenY);
+    }
 
 	@Override
 	public void renderInScreen(Graphics2D g, Renderable renderable, int tick) {
@@ -58,4 +92,14 @@ public class IsometricRenderer implements Renderer {
 		this.debug = debug;
 	}
 
+	public int getZoom() {
+		return zoom;
+	}
+
+	public void setZoom(int zoom) {
+		if (zoom <= 0) {
+			throw new IllegalArgumentException("zoom must be positive");
+		}
+		this.zoom = zoom;
+	}
 }

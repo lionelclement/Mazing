@@ -1,181 +1,488 @@
 package fr.ubordeaux.ao.mazing;
 
+import static fr.ubordeaux.ao.mazing.view.entity.ShadowMode.WITH_SHADOW;
+
 import fr.ubordeaux.ao.mazing.view.Orientation;
-import fr.ubordeaux.ao.mazing.view.Point;
-import fr.ubordeaux.ao.mazing.view.Renderable;
-import fr.ubordeaux.ao.mazing.view.swing.DebugWindow;
-import fr.ubordeaux.ao.mazing.view.swing.ViewWindow;
 import fr.ubordeaux.ao.mazing.view.entity.AnimatedEntity;
 import fr.ubordeaux.ao.mazing.view.entity.Entity;
-import fr.ubordeaux.ao.mazing.view.renderer.DebugIsometricRenderer;
+import fr.ubordeaux.ao.mazing.view.entity.FloorTile;
+import fr.ubordeaux.ao.mazing.view.renderer.IsometricRenderer;
+import fr.ubordeaux.ao.mazing.view.sound.CrusaderCombatSounds;
+import fr.ubordeaux.ao.mazing.view.sound.CrusaderStaticSounds;
+import fr.ubordeaux.ao.mazing.view.sound.FootstepSound;
 import fr.ubordeaux.ao.mazing.view.sprite.AnimatedSprites;
 import fr.ubordeaux.ao.mazing.view.sprite.IsometricSprites;
-import fr.ubordeaux.ao.mazing.view.sprite.Sprite;
-import fr.ubordeaux.ao.mazing.view.texture.TextureAtlases;
+import fr.ubordeaux.ao.mazing.view.swing.ViewPanel;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+/**
+ * Shows an isometric scene with animated characters and sounds.
+ */
+public final class Main {
 
+    // Scene size and tile dimensions.
+    private static final int GRID_SIZE = 5;
+    private static final int WINDOW_WIDTH = 800;
+    private static final int WINDOW_HEIGHT = 600;
+    private static final int ORIGIN_X = 150;
+    private static final int ORIGIN_Y = 320;
+    private static final int TILE_DIAGONAL_X = 256;
+    private static final int TILE_DIAGONAL_Y = 128;
+    private static final int TILE_HEIGHT = 60;
 
-public class Main {
-	static void main(String[] args) throws IOException {
-		TextureAtlases.writeAllToDisk("atlases-test");
+    // Screen refresh rate and sprite animation rate.
+    private static final int RENDER_FPS = 60;
+    private static final int ANIMATION_FPS = 24;
+    private static final double MAX_ELAPSED_SECONDS = 0.05;
 
-		// BufferedImage test = new BufferedImage(2048, 2048, BufferedImage.TYPE_INT_ARGB);
-		// Graphics2D g = test.createGraphics();
-		// g.setComposite(AlphaComposite.Clear);
-		// g.fillRect(0, 0, 2048, 2048);
-		// g.setComposite(AlphaComposite.SrcOver);
-		// g.setColor(Color.BLACK);
-		List<Renderable> floor = new ArrayList<>();
-		for (int x = 0; x < 5; x++) {
-			for (int y = 0; y < 5; y++) {
-				var sprite = IsometricSprites.DIRT;
-				if ((x + y) % 2 == 0) {
-					sprite = IsometricSprites.STONE;
-				}
-				floor.add(new Entity(sprite, Orientation.NORTH, x, y, 0));
-			}
-		}
-		System.out.println(floor.size());
-		int tick = 0;
-		// Renderer renderer = new IsometricRenderer(10, 1000, 256, 128, 60);
-		// renderer.setDebug(true);
-		floor.add(new Entity(IsometricSprites.STAIRS, Orientation.SOUTH, 1, 2, 0));
-		floor.add(new Entity(IsometricSprites.STONE_MISSING_TILES, Orientation.NORTH, 2, 1, 1));
-		floor.add(new Entity(IsometricSprites.STAIRS, Orientation.SOUTH, 2, 2, 1));
-		floor.add(new Entity(IsometricSprites.STONE_WALL, Orientation.EAST, 2, 4, 0));
-		floor.add(new Entity(IsometricSprites.CHEST_CLOSED, Orientation.SOUTH, 2, 3, 1));
-		// for (Renderable renderable : floor.stream().sorted().toList()) {
-		// 	renderer.renderInIsoGrid(g, renderable, tick);
-		// }
-		// g.dispose();
-		// ImageIO.write(test, "png", new File("test.png"));
-		var crusader = new AnimatedEntity(AnimatedSprites.CRUSADER_ATTACK, Orientation.NORTH, 1, 2, 0, 2);
-		var spider = new AnimatedEntity(AnimatedSprites.SPIDER_ATTACK, Orientation.NORTH, 1, 3, 0, 1);
+    // Limits of the square path.
+    private static final int MIN_POSITION = 1;
+    private static final int MAX_POSITION = 3;
+    private static final double WALK_SPEED = 0.75; // Tiles per second.
 
-		ViewWindow w = new ViewWindow();
-		w.addKeyListener(new KeyAdapter() {
-			boolean toggle = false;
-			@Override
-			public void keyPressed(KeyEvent e) {
-				super.keyPressed(e);
-				switch (e.getKeyCode()) {
-					case KeyEvent.VK_UP:
-						crusader.setY(crusader.getY() - 1);
-						break;
-					case KeyEvent.VK_DOWN:
-						crusader.setY(crusader.getY() + 1);
-						break;
-					case KeyEvent.VK_LEFT:
-						crusader.setX(crusader.getX() - 1);
-						break;
-					case KeyEvent.VK_RIGHT:
-						crusader.setX(crusader.getX() + 1);
-						break;
-					case KeyEvent.VK_Q, KeyEvent.VK_ESCAPE:
-						w.dispatchEvent(new WindowEvent(w, WindowEvent.WINDOW_CLOSING));
-						break;
-					case KeyEvent.VK_SPACE:
-						if (toggle) {
-							crusader.setSprite(AnimatedSprites.CRUSADER_BLOCK);
-						} else {
-							crusader.setSprite(AnimatedSprites.CRUSADER_ATTACK);
-						}
-						toggle = !toggle;
-						break;
+    /** Starts the application. */
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Main::createAndShowScene);
+    }
 
-				}
-			}
-		});
+    /** Creates the scene and starts the animation. */
+    private static void createAndShowScene() {
+        ViewPanel scene = createScene();
 
-		Timer repaintLoop = new Timer(1000 / 60, e -> {
-			w.panel.repaint();
-		});
-		repaintLoop.start();
-		Timer animationLoop = new Timer(1000 / 20, e -> {
-			w.panel.animationTick();
-		});
-		animationLoop.start();
-		int[] t = {0};
-		Timer testLoop = new Timer(1000 , e -> {
-			switch (t[0]) {
-				case 0 -> crusader.setSprite(AnimatedSprites.CRUSADER_ATTACK);
-				case 1 -> crusader.setSprite(AnimatedSprites.CRUSADER_BLOCK);
-				case 2 -> crusader.setSprite(AnimatedSprites.CRUSADER_DEATH);
-				case 3 -> crusader.setSprite(AnimatedSprites.CRUSADER_HIT);
-				case 4 -> crusader.setSprite(AnimatedSprites.CRUSADER_IDLE);
-				case 5 -> crusader.setSprite(AnimatedSprites.CRUSADER_JUMP);
-				case 6 -> crusader.setSprite(AnimatedSprites.CRUSADER_RUN);
-				case 7 -> crusader.setSprite(AnimatedSprites.CRUSADER_WALK);
-			}
-			t[0]++;
-			if (t[0] > 7) {
-				t[0] = 0;
-			}
-		});
-		testLoop.start();
+        AnimatedEntity crusader = createCrusader();
+        registerCrusaderSounds(crusader);
+        scene.addRenderable(crusader);
+        scene.addRenderable(createSpider());
 
-		w.panel.addRenderables(floor);
-		w.panel.addRenderable(crusader);
-		w.panel.addRenderable(spider);
+        CrusaderDemoSequence demo = new CrusaderDemoSequence(crusader);
+        showWindow(scene);
+        startAnimationLoop(scene, demo);
+    }
 
-		var dw = new DebugWindow();
+    /** Creates the renderer and the scene. */
+    private static ViewPanel createScene() {
+        IsometricRenderer renderer = new IsometricRenderer(
+                ORIGIN_X, ORIGIN_Y,
+                TILE_DIAGONAL_X, TILE_DIAGONAL_Y, TILE_HEIGHT);
+        renderer.setDebug(false);
 
-		// printDebugScene();
-	}
+        ViewPanel scene = new ViewPanel(WINDOW_WIDTH, WINDOW_HEIGHT, renderer);
+        addFloor(scene);
 
+        // Add the chair and the walls.
+        addObjects(scene);
+        addWalls(scene);
+        return scene;
+    }
 
-	public static void printDebugScene() throws IOException {
-		BufferedImage test = new BufferedImage(2200, 2650, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = test.createGraphics();
-		g.setComposite(AlphaComposite.Clear);
-		g.fillRect(0, 0, 2048, 2048);
-		g.setComposite(AlphaComposite.SrcOver);
-		g.setColor(Color.BLACK);
-		int size = 2048 / 256 - 1;
-		int startX = size / 2;
-		int startY = -size / 2;
-		int x = startX;
-		int y = startY;
-		DebugIsometricRenderer renderer = new DebugIsometricRenderer(2, 1250, 256, 128, 60);
-		for (Map.Entry<String, Sprite> sprite : IsometricSprites.REGISTRY.entrySet().stream()
-				.sorted(Map.Entry.comparingByKey())
-				.toList()) {
-			Renderable renderable = new Entity(sprite.getValue(), Orientation.NORTH, x, y, 0);
-			Point p = renderer.renderInIsoGrid(g, renderable, 0);
-			g.setColor(Color.RED);
-			g.setStroke(new BasicStroke(2));
-			g.drawPolygon(new int[]{p.x(), p.x() + renderer.halfTileDiagX, p.x() + renderer.tileDiagX, p.x() + renderer.halfTileDiagX},
-					new int[]{p.y(), p.y() - renderer.halfTileDiagY, p.y(), p.y() + renderer.halfTileDiagY},
-					4);
-			p = renderer.renderInIsoGrid(g, renderable, 0);
-			g.setFont(g.getFont().deriveFont(16f).deriveFont(Font.BOLD));
-			var bounds = g.getFont().getStringBounds(sprite.getKey().toUpperCase(), g.getFontRenderContext());
-			g.setColor(Color.BLACK);
-			g.drawString(sprite.getKey().toUpperCase(), (int) (p.x() + 128 - bounds.getWidth() / 2), (int) (p.y() + 60 + bounds.getHeight()));
-			x++;
-			y++;
-			if (x - startX > size) {
-				startX--;
-				startY++;
-				x = startX;
-				y = startY;
-			}
-		}
-		g.dispose();
-		ImageIO.write(test, "png", new File("debug.png"));
+    /** Creates the crusader and its shadow. */
+    private static AnimatedEntity createCrusader() {
+        // On screen, this sprite orientation faces east.
+        return new AnimatedEntity(
+                AnimatedSprites.CRUSADER_WALK,
+                Orientation.NORTH,
+                MIN_POSITION, MIN_POSITION, 0, 2, WITH_SHADOW);
+    }
 
-	}
+    /** Creates an animated spider that stays in place. */
+    private static AnimatedEntity createSpider() {
+        AnimatedEntity spider = new AnimatedEntity(
+                AnimatedSprites.SPIDER_WALK,
+                Orientation.EAST, 4, 2, 0, 2, WITH_SHADOW);
+        spider.setAnimationSpeed(0.5);
+        return spider;
+    }
 
+    /** Plays sounds at specific animation frames. */
+    private static void registerCrusaderSounds(AnimatedEntity crusader) {
+        FootstepSound footsteps = new FootstepSound();
+        CrusaderCombatSounds combat = new CrusaderCombatSounds();
+        CrusaderStaticSounds stationary = new CrusaderStaticSounds();
+
+        crusader.setAnimationFrameListener(frame -> {
+            var sprite = crusader.getSprite();
+
+            if (sprite == AnimatedSprites.CRUSADER_WALK
+                    || sprite == AnimatedSprites.CRUSADER_RUN) {
+                // Two sounds per walking or running cycle.
+                if (frame == 1 || frame == 8) {
+                    footsteps.play();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_JUMP) {
+                if (frame == 1) {
+                    stationary.playJumpTakeoff();
+                } else if (frame == sprite.animationSize() - 2) {
+                    stationary.playJumpLanding();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_IDLE) {
+                if (frame == 1) {
+                    stationary.playIdleBreath();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_BLOCK) {
+                if (frame == 3) {
+                    stationary.playShieldBlock();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_ATTACK) {
+                if (frame == sprite.animationSize() - 2) {
+                    combat.playAttack();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_DEATH) {
+                if (frame == 1) {
+                    combat.playDeathCry();
+                } else if (frame == sprite.animationSize() - 1) {
+                    combat.playDeathExhale();
+                }
+            } else if (sprite == AnimatedSprites.CRUSADER_HIT && frame == 1) {
+                combat.playHit();
+            }
+        });
+    }
+
+    /** Displays the window. */
+    private static void showWindow(ViewPanel scene) {
+        JFrame window = new JFrame("Mazing - Isometric Demo");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setContentPane(scene);
+        window.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        window.setLocationRelativeTo(null);
+        window.setVisible(true);
+    }
+
+    /** Starts the timer for movement and animation. */
+    private static void startAnimationLoop(ViewPanel scene, CrusaderDemoSequence demo) {
+        DemoClock clock = new DemoClock(scene, demo);
+        new Timer(1000 / RENDER_FPS, event -> clock.tick()).start();
+    }
+
+    /** Adds the floor tiles. */
+    private static void addFloor(ViewPanel scene) {
+        for (int x = 0; x < GRID_SIZE; x++) {
+            for (int y = 0; y < GRID_SIZE; y++) {
+                scene.addRenderable(new FloorTile(
+                        IsometricSprites.STONE, Orientation.NORTH, x, y, 0));
+            }
+        }
+    }
+
+    /** Adds a chair to the floor. */
+    private static void addObjects(ViewPanel scene) {
+        // The last argument sets the size: 1.0 is the original size.
+        scene.addRenderable(new Entity(
+                IsometricSprites.CHAIR, Orientation.WEST, 2, 2, 0, 1.75));
+    }
+
+    /** Adds the walls around the floor. */
+    private static void addWalls(ViewPanel scene) {
+        for (int position = 1; position < GRID_SIZE - 1; position++) {
+            scene.addRenderable(new Entity(
+                    IsometricSprites.STONE_WALL,
+                    Orientation.EAST, position, 0, 0));
+            scene.addRenderable(new Entity(
+                    IsometricSprites.STONE_WALL,
+                    Orientation.NORTH, 0, position, 0));
+            scene.addRenderable(new Entity(
+                    IsometricSprites.STONE_WALL,
+                    Orientation.WEST, position, GRID_SIZE - 1, 0));
+            scene.addRenderable(new Entity(
+                    IsometricSprites.STONE_WALL,
+                    Orientation.SOUTH, GRID_SIZE - 1, position, 0));
+        }
+
+        int last = GRID_SIZE - 1;
+        scene.addRenderable(new Entity(
+                IsometricSprites.STONE_WALL_CORNER,
+                Orientation.NORTH_EAST, 0, 0, 0));
+        scene.addRenderable(new Entity(
+                IsometricSprites.STONE_WALL_CORNER,
+                Orientation.SOUTH_EAST, last, 0, 0));
+        scene.addRenderable(new Entity(
+                IsometricSprites.STONE_WALL_CORNER,
+                Orientation.NORTH_WEST, 0, last, 0));
+        scene.addRenderable(new Entity(
+                IsometricSprites.STONE_WALL_CORNER,
+                Orientation.SOUTH_WEST, last, last, 0));
+    }
+
+    /**
+     * Updates movement at 60 FPS and sprite animation at 24 FPS.
+     */
+    private static final class DemoClock {
+
+        private static final long NANOS_PER_SECOND = 1_000_000_000L;
+        private static final long ANIMATION_INTERVAL =
+                NANOS_PER_SECOND / ANIMATION_FPS;
+
+        private final ViewPanel scene;
+        private final CrusaderDemoSequence demo;
+        private long previousTime = System.nanoTime();
+        private long accumulatedAnimationNanos;
+
+        private DemoClock(ViewPanel scene, CrusaderDemoSequence demo) {
+            this.scene = scene;
+            this.demo = demo;
+        }
+
+        /** Updates movement, sprite frames, and the screen. */
+        private void tick() {
+            long currentTime = System.nanoTime();
+            long elapsedNanos = Math.max(0L, currentTime - previousTime);
+            previousTime = currentTime;
+
+            // Limit large jumps after a pause.
+            double elapsedSeconds = Math.min(
+                    elapsedNanos / (double) NANOS_PER_SECOND,
+                    MAX_ELAPSED_SECONDS);
+            demo.update(elapsedSeconds);
+
+            accumulatedAnimationNanos += elapsedNanos;
+            while (accumulatedAnimationNanos >= ANIMATION_INTERVAL) {
+                scene.animationTick();
+                accumulatedAnimationNanos -= ANIMATION_INTERVAL;
+            }
+
+            scene.repaint();
+        }
+    }
+
+    /** Lists the crusader animations in order. */
+    private enum CrusaderDemoPhase {
+        WALK,
+        RUN,
+        JUMP,
+        IDLE,
+        BLOCK,
+        IDLE_BEFORE_ATTACK,
+        ATTACK,
+        IDLE_BEFORE_DEATH,
+        DEATH,
+        IDLE_BEFORE_HIT,
+        HIT
+    }
+
+    /**
+     * Runs the crusader animations in sequence.
+     * Walking and running make one full lap. Other animations stay in place.
+     */
+    private static final class CrusaderDemoSequence {
+
+        private static final double RUN_MOVEMENT_MULTIPLIER = 2.0;
+        private static final double RUN_ANIMATION_MULTIPLIER = 1.5;
+        private static final double CORNER_TURN_SECONDS = 0.12;
+        private static final double BEFORE_ACTION_IDLE_SECONDS = 0.6;
+        private static final double LAP_DISTANCE =
+                4.0 * (MAX_POSITION - MIN_POSITION);
+        private static final double EPSILON = 1e-8;
+
+        private final AnimatedEntity crusader;
+        private CrusaderDemoPhase phase = CrusaderDemoPhase.WALK;
+        private Orientation gridDirection = Orientation.EAST;
+
+        private double traveledDistance;
+        private double remainingCornerTurnSeconds;
+        private double elapsedPhaseSeconds;
+        private double phaseDurationSeconds;
+
+        private CrusaderDemoSequence(AnimatedEntity crusader) {
+            this.crusader = crusader;
+            configurePhase();
+        }
+
+        /** Updates the current animation phase. */
+        private void update(double elapsedSeconds) {
+            if (elapsedSeconds <= 0.0) {
+                return;
+            }
+
+            if (phase == CrusaderDemoPhase.WALK || phase == CrusaderDemoPhase.RUN) {
+                updateMovement(elapsedSeconds);
+            } else {
+                updateStationaryAnimation(elapsedSeconds);
+            }
+        }
+
+        /** Moves the crusader and handles turns at the corners. */
+        private void updateMovement(double elapsedSeconds) {
+            double speed = WALK_SPEED * (phase == CrusaderDemoPhase.RUN
+                    ? RUN_MOVEMENT_MULTIPLIER : 1.0);
+            double remainingTime = elapsedSeconds;
+
+            while (remainingTime > EPSILON) {
+                // Pause movement while turning.
+                if (remainingCornerTurnSeconds > EPSILON) {
+                    double turnTime = Math.min(
+                            remainingTime, remainingCornerTurnSeconds);
+                    remainingCornerTurnSeconds -= turnTime;
+                    remainingTime -= turnTime;
+
+                    if (remainingCornerTurnSeconds <= EPSILON) {
+                        remainingCornerTurnSeconds = 0.0;
+                        crusader.setOrientation(spriteOrientation(gridDirection));
+
+                        // Finish the last turn before the next animation.
+                        if (LAP_DISTANCE - traveledDistance <= EPSILON) {
+                            advancePhase();
+                            return;
+                        }
+                    }
+                    continue;
+                }
+
+                double remainingLap = Math.max(0.0, LAP_DISTANCE - traveledDistance);
+                if (remainingLap <= EPSILON) {
+                    advancePhase();
+                    return;
+                }
+
+                double distanceToCorner = distanceToCorner();
+                double distance = Math.min(
+                        Math.min(distanceToCorner, remainingLap),
+                        speed * remainingTime);
+
+                if (distance > EPSILON) {
+                    moveAlongCurrentSide(distance);
+                    traveledDistance += distance;
+                    remainingTime -= distance / speed;
+                } else if (distanceToCorner > EPSILON) {
+                    return;
+                }
+
+                if (distanceToCorner - distance <= EPSILON) {
+                    beginCornerTurn();
+                }
+            }
+        }
+
+        /** Returns the distance to the next corner. */
+        private double distanceToCorner() {
+            double x = crusader.getPreciseX();
+            double y = crusader.getPreciseY();
+
+            return switch (gridDirection) {
+                case EAST -> Math.max(0.0, MAX_POSITION - x);
+                case SOUTH -> Math.max(0.0, MAX_POSITION - y);
+                case WEST -> Math.max(0.0, x - MIN_POSITION);
+                case NORTH -> Math.max(0.0, y - MIN_POSITION);
+                default -> throw new IllegalStateException("Expected cardinal direction");
+            };
+        }
+
+        /** Moves the crusader along the current side. */
+        private void moveAlongCurrentSide(double distance) {
+            switch (gridDirection) {
+                case EAST -> crusader.moveBy(distance, 0);
+                case SOUTH -> crusader.moveBy(0, distance);
+                case WEST -> crusader.moveBy(-distance, 0);
+                case NORTH -> crusader.moveBy(0, -distance);
+                default -> throw new IllegalStateException("Expected cardinal direction");
+            }
+            crusader.setOrientation(spriteOrientation(gridDirection));
+        }
+
+        /** Turns through a diagonal orientation. */
+        private void beginCornerTurn() {
+            Orientation diagonal = switch (gridDirection) {
+                case EAST -> Orientation.NORTH_EAST;
+                case SOUTH -> Orientation.SOUTH_EAST;
+                case WEST -> Orientation.SOUTH_WEST;
+                case NORTH -> Orientation.NORTH_WEST;
+                default -> throw new IllegalStateException("Expected cardinal direction");
+            };
+
+            gridDirection = switch (gridDirection) {
+                case EAST -> Orientation.SOUTH;
+                case SOUTH -> Orientation.WEST;
+                case WEST -> Orientation.NORTH;
+                case NORTH -> Orientation.EAST;
+                default -> throw new IllegalStateException("Expected cardinal direction");
+            };
+
+            crusader.setOrientation(diagonal);
+            remainingCornerTurnSeconds = CORNER_TURN_SECONDS;
+        }
+
+        /**
+         * Converts grid direction to sprite orientation.
+         * The sprite directions are rotated by 90 degrees.
+         */
+        private static Orientation spriteOrientation(Orientation gridDirection) {
+            return switch (gridDirection) {
+                case EAST -> Orientation.NORTH;
+                case SOUTH -> Orientation.EAST;
+                case WEST -> Orientation.SOUTH;
+                case NORTH -> Orientation.WEST;
+                default -> throw new IllegalStateException("Expected cardinal direction");
+            };
+        }
+
+        /** Waits for the current animation to finish. */
+        private void updateStationaryAnimation(double elapsedSeconds) {
+            elapsedPhaseSeconds += elapsedSeconds;
+            if (elapsedPhaseSeconds >= phaseDurationSeconds) {
+                advancePhase();
+            }
+        }
+
+        /** Switches to the next animation. */
+        private void advancePhase() {
+            phase = switch (phase) {
+                case WALK -> CrusaderDemoPhase.RUN;
+                case RUN -> CrusaderDemoPhase.JUMP;
+                case JUMP -> CrusaderDemoPhase.IDLE;
+                case IDLE -> CrusaderDemoPhase.BLOCK;
+                case BLOCK -> CrusaderDemoPhase.IDLE_BEFORE_ATTACK;
+                case IDLE_BEFORE_ATTACK -> CrusaderDemoPhase.ATTACK;
+                case ATTACK -> CrusaderDemoPhase.IDLE_BEFORE_DEATH;
+                case IDLE_BEFORE_DEATH -> CrusaderDemoPhase.DEATH;
+                case DEATH -> CrusaderDemoPhase.IDLE_BEFORE_HIT;
+                case IDLE_BEFORE_HIT -> CrusaderDemoPhase.HIT;
+                case HIT -> CrusaderDemoPhase.WALK;
+            };
+            configurePhase();
+        }
+
+        /** Sets the sprite, speed, and duration for this phase. */
+        private void configurePhase() {
+            var animation = switch (phase) {
+                case WALK -> AnimatedSprites.CRUSADER_WALK;
+                case RUN -> AnimatedSprites.CRUSADER_RUN;
+                case JUMP -> AnimatedSprites.CRUSADER_JUMP;
+                case IDLE, IDLE_BEFORE_ATTACK, IDLE_BEFORE_DEATH,
+                        IDLE_BEFORE_HIT -> AnimatedSprites.CRUSADER_IDLE;
+                case BLOCK -> AnimatedSprites.CRUSADER_BLOCK;
+                case ATTACK -> AnimatedSprites.CRUSADER_ATTACK;
+                case DEATH -> AnimatedSprites.CRUSADER_DEATH;
+                case HIT -> AnimatedSprites.CRUSADER_HIT;
+            };
+
+            double playbackSpeed = phase == CrusaderDemoPhase.RUN
+                    ? RUN_ANIMATION_MULTIPLIER : 1.0;
+
+            traveledDistance = 0.0;
+            elapsedPhaseSeconds = 0.0;
+            remainingCornerTurnSeconds = 0.0;
+
+            if (phase == CrusaderDemoPhase.WALK || phase == CrusaderDemoPhase.RUN) {
+                // Start each lap at the same corner.
+                crusader.setX(MIN_POSITION);
+                crusader.setY(MIN_POSITION);
+                gridDirection = Orientation.EAST;
+                crusader.setOrientation(spriteOrientation(gridDirection));
+            }
+
+            // Changing the sprite restarts its animation.
+            crusader.setSprite(animation);
+            crusader.setAnimationSpeed(playbackSpeed);
+
+            double animationDuration =
+                    animation.animationSize() / (ANIMATION_FPS * playbackSpeed);
+            phaseDurationSeconds = switch (phase) {
+                case IDLE -> Math.max(1.5, animationDuration);
+                case IDLE_BEFORE_ATTACK, IDLE_BEFORE_DEATH,
+                        IDLE_BEFORE_HIT -> BEFORE_ACTION_IDLE_SECONDS;
+                default -> animationDuration;
+            };
+        }
+    }
 }
