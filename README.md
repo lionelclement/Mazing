@@ -58,6 +58,33 @@ java -cp "build\classes\java\main;build\resources\main" fr.ubordeaux.ao.mazing.M
 
 La compilation réussie affiche `BUILD SUCCESSFUL`. L'exécution ouvre une **fenêtre Swing** montrant un exemple de scène isométrique. Vous pouvez ensuite modifier `src/main/java/fr/ubordeaux/ao/mazing/Main.java` et relancer la compilation.
 
+## 4. Documentation de l’API (Javadoc)
+
+Pour générer la documentation HTML des classes et méthodes :
+
+**macOS / Linux**
+
+```sh
+./gradlew javadoc
+```
+
+**Windows**
+
+```powershell
+.\gradlew.bat javadoc
+```
+
+Ouvrez ensuite `build/docs/javadoc/index.html` dans un navigateur.
+
+Pour produire l’archive Javadoc associée à la bibliothèque :
+
+```sh
+./gradlew javadocJar
+```
+
+Le fichier est généré dans `build/libs/`, avec le suffixe `-javadoc.jar`.
+La Javadoc décrit l’API Java ; le fichier `GUIDE_SCENE.md` fournit des exemples pratiques pour composer une scène.
+
 ## En cas de problème
 
 - **`UnsupportedClassVersionError`** : vous lancez probablement le programme avec une version de Java antérieure à 25. Vérifiez `java -version`.
