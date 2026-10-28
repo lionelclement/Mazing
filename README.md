@@ -93,3 +93,13 @@ La Javadoc décrit l’API Java ; le fichier `GUIDE_SCENE.md` fournit des exempl
 - **Aucune fenêtre** : le programme nécessite un environnement graphique (Swing).
 
 > Le fichier JAR généré dans `build/libs/` est une bibliothèque, pas une application autonome à lancer avec `java -jar`. Pour l'essai, utilisez les commandes ci-dessus.
+
+## Documentation
+
+- [Créer une scène](doc/GUIDE_SCENE.md)
+- [Guide de l'API](doc/GUIDE_API.md)
+- [Licences des ressources](doc/ASSET_LICENSES.md)
+- [Audit des ressources](doc/RESOURCE_AUDIT.md)
+
+Le code original de Mazing est proposé sous licence MIT.
+Les ressources de tiers conservent leurs propres licences.

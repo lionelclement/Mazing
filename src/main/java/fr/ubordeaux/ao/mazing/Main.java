@@ -40,7 +40,6 @@ public final class Main {
     // Limits of the square path.
     private static final int MIN_POSITION = 1;
     private static final int MAX_POSITION = 3;
-    private static final double WALK_SPEED = 0.75; // Tiles per second.
 
     /** Starts the application. */
     public static void main(String[] args) {
@@ -97,9 +96,9 @@ public final class Main {
 
     /** Plays sounds at specific animation frames. */
     private static void registerCrusaderSounds(AnimatedEntity crusader) {
-        FootstepSound footsteps = new FootstepSound();
-        CrusaderCombatSounds combat = new CrusaderCombatSounds();
-        CrusaderStaticSounds stationary = new CrusaderStaticSounds();
+        FootstepSound footstepsSound = new FootstepSound();
+        CrusaderCombatSounds combatSound = new CrusaderCombatSounds();
+        CrusaderStaticSounds stationarySound = new CrusaderStaticSounds();
 
         crusader.setAnimationFrameListener(frame -> {
             var sprite = crusader.getSprite();
@@ -108,34 +107,34 @@ public final class Main {
                     || sprite == AnimatedSprites.CRUSADER_RUN) {
                 // Two sounds per walking or running cycle.
                 if (frame == 1 || frame == 8) {
-                    footsteps.play();
+                    footstepsSound.play();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_JUMP) {
                 if (frame == 1) {
-                    stationary.playJumpTakeoff();
+                    stationarySound.playJumpTakeoff();
                 } else if (frame == sprite.animationSize() - 2) {
-                    stationary.playJumpLanding();
+                    stationarySound.playJumpLanding();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_IDLE) {
                 if (frame == 1) {
-                    stationary.playIdleBreath();
+                    stationarySound.playIdleBreath();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_BLOCK) {
                 if (frame == 3) {
-                    stationary.playShieldBlock();
+                    stationarySound.playShieldBlock();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_ATTACK) {
                 if (frame == sprite.animationSize() - 2) {
-                    combat.playAttack();
+                    combatSound.playAttack();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_DEATH) {
                 if (frame == 1) {
-                    combat.playDeathCry();
+                    combatSound.playDeathCry();
                 } else if (frame == sprite.animationSize() - 1) {
-                    combat.playDeathExhale();
+                    combatSound.playDeathExhale();
                 }
             } else if (sprite == AnimatedSprites.CRUSADER_HIT && frame == 1) {
-                combat.playHit();
+                combatSound.playHit();
             }
         });
     }
@@ -266,9 +265,8 @@ public final class Main {
      * Walking and running make one full lap. Other animations stay in place.
      */
     private static final class CrusaderDemoSequence {
-
-        private static final double RUN_MOVEMENT_MULTIPLIER = 2.0;
-        private static final double RUN_ANIMATION_MULTIPLIER = 1.5;
+    private static final double WALK_SPEED = 0.75; // Tiles per second.
+		private static final double RUN_SPEED = 1.50;
         private static final double CORNER_TURN_SECONDS = 0.12;
         private static final double BEFORE_ACTION_IDLE_SECONDS = 0.6;
         private static final double LAP_DISTANCE =
@@ -304,8 +302,7 @@ public final class Main {
 
         /** Moves the crusader and handles turns at the corners. */
         private void updateMovement(double elapsedSeconds) {
-            double speed = WALK_SPEED * (phase == CrusaderDemoPhase.RUN
-                    ? RUN_MOVEMENT_MULTIPLIER : 1.0);
+            double speed = phase == CrusaderDemoPhase.RUN ? RUN_SPEED : WALK_SPEED;
             double remainingTime = elapsedSeconds;
 
             while (remainingTime > EPSILON) {
@@ -456,8 +453,8 @@ public final class Main {
                 case HIT -> AnimatedSprites.CRUSADER_HIT;
             };
 
-            double playbackSpeed = phase == CrusaderDemoPhase.RUN
-                    ? RUN_ANIMATION_MULTIPLIER : 1.0;
+            // Animation speed is independent of movement speed.
+            double animationSpeed = phase == CrusaderDemoPhase.RUN ? 1.5 : 1.0;
 
             traveledDistance = 0.0;
             elapsedPhaseSeconds = 0.0;
@@ -473,10 +470,10 @@ public final class Main {
 
             // Changing the sprite restarts its animation.
             crusader.setSprite(animation);
-            crusader.setAnimationSpeed(playbackSpeed);
+            crusader.setAnimationSpeed(animationSpeed);
 
             double animationDuration =
-                    animation.animationSize() / (ANIMATION_FPS * playbackSpeed);
+                    animation.animationSize() / (ANIMATION_FPS * animationSpeed);
             phaseDurationSeconds = switch (phase) {
                 case IDLE -> Math.max(1.5, animationDuration);
                 case IDLE_BEFORE_ATTACK, IDLE_BEFORE_DEATH,

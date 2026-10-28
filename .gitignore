@@ -11,3 +11,7 @@ build/
 target/
 *.saved
 .DS_Store
+/build/
+/.gradle/
+/bin/
+**/.DS_Store
