@@ -9,76 +9,88 @@ import java.awt.*;
  * in an isometric scene.
  */
 public interface Renderable extends Comparable<Renderable> {
-	/// Render the object on the screen.
-	///
-	/// @param g the graphics context used for drawing
-	/// @param x    the x position to render the object
-	/// @param y    the y position to render the object
-	/// @param animationTick the current animation tick
+	/**
+	 * Renders the object at its projected screen position.
+	 *
+	 * @param g graphics context used for drawing
+	 * @param x projected X screen coordinate
+	 * @param y projected Y screen coordinate
+	 * @param animationTick current animation tick
+	 * @param zoom renderer zoom factor
+	 */
 	void renderInScreen(Graphics2D g, int x, int y, int animationTick, int zoom);
 
-	    /**
-     * Returns the precise X coordinate in grid units.
-     *
-     * @return the X coordinate, including its fractional part
-     */
-    default double getPreciseX() {
-        return getX();
-    }
+	/** Returns the precise X coordinate in grid units. */
+	default double getPreciseX() {
+		return getX();
+	}
 
-    /**
-     * Returns the precise Y coordinate in grid units.
-     *
-     * @return the Y coordinate, including its fractional part
-     */
-    default double getPreciseY() {
-        return getY();
-    }
+	/** Returns the precise Y coordinate in grid units. */
+	default double getPreciseY() {
+		return getY();
+	}
 
-int getX();
+	int getX();
 
 	int getY();
 
 	int getZ();
 
-    /**
-     * Returns the rendering layer of this object.
-     * Objects in lower layers are rendered first.
-     *
-     * @return the rendering layer
-     */
-    default int getRenderLayer() {
-        return 1;
-    }
+	/** Returns the precise height in grid levels. */
+	default double getPreciseZ() {
+		return getZ();
+	}
+
+	/**
+	 * Rendering order level, independent of the rounded grid position.
+	 * Animated characters may enter the next level while climbing.
+	 */
+	default int getRenderLevel() {
+		return getZ();
+	}
+
+	/** Returns the rendering layer; lower layers are rendered first. */
+	default int getRenderLayer() {
+		return 1;
+	}
 
 	default int getBlitOrder() {
 		return 0;
 	}
 
 	@Override
-	default int compareTo(Renderable o) {
-        int layerComparison = Integer.compare(
-                this.getRenderLayer(),
-                o.getRenderLayer());
-
-        if (layerComparison != 0) {
-            return layerComparison;
-        }
-
-
-		int rX = o.getX() - this.getX();
-		if (rX != 0) {
-			return rX;
+	default int compareTo(Renderable other) {
+		// Draw lower floors first, then higher floors.
+		int levelComparison = Integer.compare(getRenderLevel(), other.getRenderLevel());
+		if (levelComparison != 0) {
+			return levelComparison;
 		}
-		int rY = this.getY() - o.getY();
-		if (rY != 0) {
-			return rY;
+
+		// On the same level, draw every floor tile before other objects.
+		int layerComparison = Integer.compare(
+				getRenderLayer(), other.getRenderLayer());
+		if (layerComparison != 0) {
+			return layerComparison;
 		}
-		int rZ = this.getZ() - o.getZ();
-		if (rZ != 0) {
-			return rZ;
+
+		// Within a layer, draw back-to-front along the isometric grid.
+		// The viewer is toward +X (east) and -Y (south).
+		int depthComparison = Double.compare(
+				getPreciseX() - getPreciseY(),
+				other.getPreciseX() - other.getPreciseY());
+		if (depthComparison != 0) {
+			return depthComparison;
 		}
-		return this.getBlitOrder() - o.getBlitOrder();
+
+		return Integer.compare(getBlitOrder(), other.getBlitOrder());
+	}
+
+	/** Advances animated state even when the sprite is off-screen. */
+	default void updateAnimation(int animationTick) { }
+
+	/** Returns null when conservative painted bounds are unknown. */
+	default Rectangle getScreenBounds(int screenX, int screenY, int zoom) {
+		return null;
 	}
 
 	void setSprite(Sprite sprite);

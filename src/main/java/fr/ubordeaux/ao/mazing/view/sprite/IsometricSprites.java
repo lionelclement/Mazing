@@ -1,23 +1,75 @@
 package fr.ubordeaux.ao.mazing.view.sprite;
 
+import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.texture.TextureAtlas;
 import fr.ubordeaux.ao.mazing.view.texture.TextureAtlases;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Provides predefined isometric sprites for terrain, objects,
  * structures, walls, and stairs.
  */
-/**
- * Provides predefined isometric sprites for terrain, objects,
- * buildings, walls, and stairs.
- */
 public final class IsometricSprites {
 
 	private static final HashMap<String, Sprite> registry = new HashMap<>();
+	private static final Set<Sprite> objectSprites =
+			Collections.newSetFromMap(new IdentityHashMap<>());
+	private static final Set<Sprite> wallSprites =
+			Collections.newSetFromMap(new IdentityHashMap<>());
+	/** Associates a corner sprite with the matching family of straight walls. */
+	private static final Map<Sprite, Sprite> cornerWallFamilies = new IdentityHashMap<>();
+
+	/** One independently rendered, independently occluding face of a corner. */
+	public record CornerFace(Sprite sprite, Orientation orientation) { }
+
+	/**
+	 * Registers a family whose E/W PNG corners are assembled from straight walls.
+	 * Additional wall families can register here without changing the renderer.
+	 */
+	public static void registerWallCorner(Sprite corner, Sprite straightWall) {
+		cornerWallFamilies.put(Objects.requireNonNull(corner),
+				Objects.requireNonNull(straightWall));
+	}
+
+	/**
+	 * Corner artwork naming is opposite the actual tile side. N and S keep
+	 * their single PNG; E becomes E then N (WEST then SOUTH in world axes),
+	 * and W becomes S then W (NORTH then EAST in world axes).
+	 * An empty list means that the original corner PNG must be used unchanged.
+	 */
+	public static List<CornerFace> cornerFaces(Sprite sprite,
+			Orientation worldCorner) {
+		Sprite wall = cornerWallFamilies.get(sprite);
+		if (wall == null) {
+			return List.of();
+		}
+		return switch (worldCorner) {
+			case SOUTH_WEST -> List.of(
+					new CornerFace(wall, Orientation.WEST),
+					new CornerFace(wall, Orientation.SOUTH));
+			case NORTH_EAST -> List.of(
+					new CornerFace(wall, Orientation.NORTH),
+					new CornerFace(wall, Orientation.EAST));
+			default -> List.of();
+		};
+	}
+
+	/** Whether a sprite belongs to the wall atlas, not the column atlas. */
+	public static boolean isWallSprite(Sprite sprite) {
+		return wallSprites.contains(sprite);
+	}
+
+	/** Sprites whose PNG already contains the object's ground shadow. */
+	public static boolean hasEmbeddedShadow(Sprite sprite) {
+		return objectSprites.contains(sprite);
+	}
 	public static final Map<String, Sprite> REGISTRY = Collections.unmodifiableMap(registry);
 
 	public static final Sprite STONE_COLUMN_WOOD = buildCardinalOrientedSprite("stone_column_wood", TextureAtlases.ISO_CONSTRUCTIONS, 0, 0, 1, 0, 2, 0, 3, 0);
@@ -63,10 +115,10 @@ public final class IsometricSprites {
 	public static final Sprite WOODEN_CRATES = buildCardinalOrientedSprite("wooden_crates", TextureAtlases.ISO_OBJECTS, 3, 7, 4, 7, 5, 7, 6, 7);
 	public static final Sprite WOODEN_PILE = buildCardinalOrientedSprite("wooden_pile", TextureAtlases.ISO_OBJECTS, 0, 8, 1, 8, 2, 8, 3, 8);
 
-	public static final Sprite STAIRS_AGED = buildCardinalOrientedSprite("stairs_aged", TextureAtlases.ISO_STAIRS, 0, 0, 1, 0, 2, 0, 3, 0);
+	public static final Sprite STAIRS_AGED = ramp("stairs_aged", buildCardinalOrientedSprite("stairs_aged", TextureAtlases.ISO_STAIRS, 0, 0, 1, 0, 2, 0, 3, 0), 0.65);
 	public static final Sprite STAIRS_CORNER = buildCardinalOrientedSprite("stairs_corner", TextureAtlases.ISO_STAIRS, 0, 1, 1, 1, 2, 1, 3, 1);
 	public static final Sprite STAIRS_SPIRAL = buildCardinalOrientedSprite("stairs_spiral", TextureAtlases.ISO_STAIRS, 0, 2, 1, 2, 2, 2, 3, 2);
-	public static final Sprite STAIRS = buildCardinalOrientedSprite("stairs", TextureAtlases.ISO_STAIRS, 0, 3, 1, 3, 2, 3, 3, 3);
+	public static final Sprite STAIRS = ramp("stairs", buildCardinalOrientedSprite("stairs", TextureAtlases.ISO_STAIRS, 0, 3, 1, 3, 2, 3, 3, 3), 0.65);
 
 	public static final Sprite STONE_WALL_AGED_LEFT = buildCardinalOrientedSprite("stone_wall_aged_left", TextureAtlases.ISO_WALLS, 0, 0, 1, 0, 2, 0, 3, 0);
 	public static final Sprite STONE_WALL_AGED_RIGHT = buildCardinalOrientedSprite("stone_wall_aged_right", TextureAtlases.ISO_WALLS, 4, 0, 5, 0, 6, 0, 7, 0);
@@ -97,30 +149,76 @@ public final class IsometricSprites {
 	public static final Sprite STONE_WALL_WINDOW = buildCardinalOrientedSprite("stone_wall_window", TextureAtlases.ISO_WALLS, 4, 10, 5, 10, 6, 10, 7, 10);
 	public static final Sprite STONE_WALL = buildCardinalOrientedSprite("stone_wall", TextureAtlases.ISO_WALLS, 8, 10, 9, 10, 0, 11, 1, 11);
 
+	static {
+		registerWallCorner(STONE_WALL_CORNER, STONE_WALL);
+	}
+
+	/** Assigns a physical ramp to any oriented sprite without changing its image. */
+	private static Sprite ramp(String name, Sprite artwork, double rise) {
+		Sprite sprite = new RampSprite(artwork, rise);
+		registry.put(name, sprite);
+		return sprite;
+	}
+
 	private static Sprite buildDiagonalOrientedSprite(
 			String name, TextureAtlas atlas,
 			int northEastX, int northEastY,
 			int northWestX, int northWestY,
 			int southEastX, int southEastY,
 			int southWestX, int southWestY) {
+		// The four STONE_WALL_CORNER atlas files (E, N, S, W) sit at the
+		// south-west, south-east, north-west and north-east tile corners,
+		// respectively. Orientations in the API describe the *world* corner.
+		boolean wallCorner = atlas == TextureAtlases.ISO_WALLS;
 		Sprite sprite = new OrientedSprite.Builder(atlas)
-				.northEast(northEastX, northEastY)
-				.northWest(northWestX, northWestY)
-				.southEast(southEastX, southEastY)
-				.southWest(southWestX, southWestY)
+				.northEast(wallCorner ? southWestX : northEastX,
+						wallCorner ? southWestY : northEastY)
+				.northWest(wallCorner ? southEastX : northWestX,
+						wallCorner ? southEastY : northWestY)
+				.southEast(wallCorner ? northWestX : southEastX,
+						wallCorner ? northWestY : southEastY)
+				.southWest(wallCorner ? northEastX : southWestX,
+						wallCorner ? northEastY : southWestY)
 				.build();
 		registry.put(name, sprite);
+		if (atlas == TextureAtlases.ISO_OBJECTS) {
+			objectSprites.add(sprite);
+		} else if (atlas == TextureAtlases.ISO_WALLS) {
+			wallSprites.add(sprite);
+		}
 		return sprite;
 	}
 
 	private static Sprite buildCardinalOrientedSprite(String name, TextureAtlas atlas, int eastColumn, int eastRow, int northColumn, int northRow, int southColumn, int southRow, int westColumn, int westRow) {
+		// In the wall/construction artwork, the filename denotes the
+		// *opposite* tile side: E.png lies on WEST, N.png on SOUTH,
+		// W.png on EAST and S.png on NORTH. The public Orientation always
+		// denotes the actual world side (+X=EAST, +Y=NORTH).
+		// Do not apply this rule to ground, furniture or stair sprites.
+		boolean oppositeSideAtlas = atlas == TextureAtlases.ISO_WALLS
+				|| atlas == TextureAtlases.ISO_CONSTRUCTIONS;
+		// Stair PNGs point toward their low step in the new world axes.
+		// Swap the four pictures so Orientation names the uphill direction.
+		// A spiral staircase has no low/high end and keeps its own mapping.
+		boolean reverseStairs = atlas == TextureAtlases.ISO_STAIRS
+				&& !name.equals("stairs_spiral");
+		boolean reverseCardinals = oppositeSideAtlas || reverseStairs;
 		Sprite sprite = new OrientedSprite.Builder(atlas)
-				.east(eastColumn, eastRow)
-				.north(northColumn, northRow)
-				.south(southColumn, southRow)
-				.west(westColumn, westRow)
+				.east(reverseCardinals ? westColumn : eastColumn,
+						reverseCardinals ? westRow : eastRow)
+				.north(reverseCardinals ? southColumn : northColumn,
+						reverseCardinals ? southRow : northRow)
+				.south(reverseCardinals ? northColumn : southColumn,
+						reverseCardinals ? northRow : southRow)
+				.west(reverseCardinals ? eastColumn : westColumn,
+						reverseCardinals ? eastRow : westRow)
 				.build();
 		registry.put(name, sprite);
+		if (atlas == TextureAtlases.ISO_OBJECTS) {
+			objectSprites.add(sprite);
+		} else if (atlas == TextureAtlases.ISO_WALLS) {
+			wallSprites.add(sprite);
+		}
 		return sprite;
 	}
 

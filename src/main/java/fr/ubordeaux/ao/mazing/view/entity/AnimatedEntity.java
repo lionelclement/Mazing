@@ -20,13 +20,15 @@ public class AnimatedEntity implements Renderable {
 	private Orientation orientation;
 	private double xPosition;
 	private double yPosition;
-	private int zPosition;
+	private double zPosition;
 	private int blitOrder;
 	private int currentFrameIndex;
+    private boolean animationPaused;
     private IntConsumer animationFrameListener = frame -> {};
 	private int lastAnimationTick;
     private double animationSpeed = 1.0;
     private double animationProgress = 0.0;
+	private double scale = 1.0;
 	private final ShadowMode shadowMode;
 
 	public AnimatedEntity(
@@ -80,10 +82,10 @@ public class AnimatedEntity implements Renderable {
 	}
 
 	@Override
-	public void renderInScreen(Graphics2D graphics, int screenX, int screenY, int animationTick, int zoom) {
-		// update our animation counter and sprite to display, according to the new
-		// animation tick
-		if (lastAnimationTick == -1) {
+	public void updateAnimation(int animationTick) {
+		if (animationPaused) {
+            lastAnimationTick = animationTick;
+        } else if (lastAnimationTick == -1) {
 			lastAnimationTick = animationTick;
 		} else {
 			int elapsedTicks = animationTick - lastAnimationTick;
@@ -92,6 +94,9 @@ public class AnimatedEntity implements Renderable {
 				int framesToAdvance = (int) animationProgress;
 				if (framesToAdvance > 0) {
 				    for (int frame = 0; frame < framesToAdvance; frame++) {
+				        if (animationPaused) {
+				            break;
+				        }
 				        currentFrameIndex =
 				                (currentFrameIndex + 1) % sprite.animationSize();
 				        animationFrameListener.accept(currentFrameIndex);
@@ -101,14 +106,62 @@ public class AnimatedEntity implements Renderable {
 				lastAnimationTick = animationTick;
 			}
 		}
-		sprite.render(
-				graphics,
-				screenX,
-				screenY,
-				orientation,
-				currentFrameIndex,
-				zoom,
-				shadowMode == ShadowMode.WITH_SHADOW);
+	}
+
+	/**
+	 * Resizes the animated character about its ground contact point.
+	 * The same scale applies to all animation frames and their optional shadow.
+	 *
+	 * @param scale positive and finite visual size multiplier
+	 */
+	public void setScale(double scale) {
+		if (!Double.isFinite(scale) || scale <= 0.0) {
+			throw new IllegalArgumentException("scale must be positive and finite");
+		}
+		this.scale = scale;
+	}
+
+	@Override
+	public java.awt.Rectangle getScreenBounds(int screenX, int screenY, int zoom) {
+		java.awt.Rectangle bounds = sprite.getScreenBounds(screenX, screenY, zoom);
+		if (bounds == null || scale == 1.0) {
+			return bounds;
+		}
+
+		// Match the exact transform used for drawing, including the occlusion mask.
+		double anchorX = screenX + sprite.getScaleAnchorX(zoom);
+		double left = anchorX + scale * (bounds.getMinX() - anchorX);
+		double right = anchorX + scale * (bounds.getMaxX() - anchorX);
+		double top = screenY + scale * (bounds.getMinY() - screenY);
+		double bottom = screenY + scale * (bounds.getMaxY() - screenY);
+		int x = (int) Math.floor(left) - 1;
+		int y = (int) Math.floor(top) - 1;
+		return new java.awt.Rectangle(x, y,
+				(int) Math.ceil(right) - x + 1,
+				(int) Math.ceil(bottom) - y + 1);
+	}
+
+	@Override
+	public void renderInScreen(Graphics2D graphics, int screenX, int screenY, int animationTick, int zoom) {
+		updateAnimation(animationTick);
+		if (scale == 1.0) {
+			sprite.render(graphics, screenX, screenY, orientation,
+					currentFrameIndex, zoom, shadowMode == ShadowMode.WITH_SHADOW);
+			return;
+		}
+
+		// Keep the projected ground contact fixed when making a character smaller.
+		double anchorX = screenX + sprite.getScaleAnchorX(zoom);
+		Graphics2D scaled = (Graphics2D) graphics.create();
+		try {
+			scaled.translate(anchorX, screenY);
+			scaled.scale(scale, scale);
+			scaled.translate(-anchorX, -screenY);
+			sprite.render(scaled, screenX, screenY, orientation,
+					currentFrameIndex, zoom, shadowMode == ShadowMode.WITH_SHADOW);
+		} finally {
+			scaled.dispose();
+		}
 	}
 
 	    /**
@@ -149,6 +202,27 @@ public class AnimatedEntity implements Renderable {
                 Objects.requireNonNull(listener, "listener must not be null");
     }
 
+
+    /**
+     * Pauses or resumes the current animation.
+     *
+     * The current frame remains visible while paused.
+     *
+     * @param paused true to pause the animation
+     */
+    public void setAnimationPaused(boolean paused) {
+        this.animationPaused = paused;
+    }
+
+    /**
+     * Returns whether the animation is paused.
+     *
+     * @return true if the animation is paused
+     */
+    public boolean isAnimationPaused() {
+        return animationPaused;
+    }
+
 public Sprite getSprite() {
 		return sprite;
 	}
@@ -161,7 +235,7 @@ public Sprite getSprite() {
 		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
 	}
 
-	    @Override
+	@Override
     public double getPreciseX() {
         return xPosition;
     }
@@ -169,6 +243,25 @@ public Sprite getSprite() {
     @Override
     public double getPreciseY() {
         return yPosition;
+    }
+
+    /**
+     * Places the animated entity at an exact position in world coordinates.
+     * Positive X points east, positive Y points north, and positive Z is up.
+     * Changing position does not change orientation or restart the animation.
+     *
+     * @param x east-west position, in tile units
+     * @param y north-south position, in tile units
+     * @param z elevation, in world levels
+     * @throws IllegalArgumentException if a coordinate is not finite
+     */
+    public void setPosition(double x, double y, double z) {
+        if (!Double.isFinite(x) || !Double.isFinite(y) || !Double.isFinite(z)) {
+            throw new IllegalArgumentException("Position coordinates must be finite");
+        }
+        xPosition = x;
+        yPosition = y;
+        zPosition = z;
     }
 
     /**
@@ -194,9 +287,9 @@ public Sprite getSprite() {
         } else if (deltaX < 0 && deltaY == 0) {
             setOrientation(Orientation.WEST);
         } else if (deltaY > 0 && deltaX == 0) {
-            setOrientation(Orientation.SOUTH);
-        } else if (deltaY < 0 && deltaX == 0) {
             setOrientation(Orientation.NORTH);
+        } else if (deltaY < 0 && deltaX == 0) {
+            setOrientation(Orientation.SOUTH);
         }
 
         moveBy(deltaX, deltaY);
@@ -219,7 +312,29 @@ public int getX() {
 	}
 
 	public int getZ() {
+		return (int) Math.round(zPosition);
+	}
+
+	/**
+	 * Paints a climbing character after the raised floor from the first step.
+	 * Its true Z coordinate remains continuous for projection and movement.
+	 */
+	@Override
+	public int getRenderLevel() {
+		return (int) Math.ceil(zPosition);
+	}
+
+	@Override
+	public double getPreciseZ() {
 		return zPosition;
+	}
+
+	/** Sets the height, including fractions of a level. */
+	public void setPreciseZ(double zPosition) {
+		if (!Double.isFinite(zPosition)) {
+			throw new IllegalArgumentException("Height must be finite");
+		}
+		this.zPosition = zPosition;
 	}
 
 	@Override

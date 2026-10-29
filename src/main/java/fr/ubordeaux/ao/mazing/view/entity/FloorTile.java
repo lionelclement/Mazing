@@ -4,7 +4,7 @@ import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.sprite.Sprite;
 
 /**
- * Represents a floor tile rendered behind scene objects.
+ * Represents a floor tile drawn below objects on the same level.
  */
 public final class FloorTile extends Entity {
 
@@ -25,6 +25,14 @@ public final class FloorTile extends Entity {
             int zPosition) {
 
         super(sprite, orientation, xPosition, yPosition, zPosition);
+    }
+
+    /** Allows raised tiles at fractional world elevations, e.g. 0.75. */
+    public FloorTile(Sprite sprite, Orientation orientation,
+            int xPosition, int yPosition, double zPosition) {
+        this(sprite, orientation, xPosition, yPosition,
+                (int) Math.ceil(zPosition));
+        setPreciseZ(zPosition);
     }
 
     @Override

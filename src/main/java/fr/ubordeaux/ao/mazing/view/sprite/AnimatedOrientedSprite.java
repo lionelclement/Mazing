@@ -113,6 +113,23 @@ public class AnimatedOrientedSprite implements Sprite {
 	}
 
 	@Override
+	public java.awt.Rectangle getScreenBounds(int screenX, int screenY, int zoom) {
+		java.awt.Rectangle bounds = new java.awt.Rectangle(
+				screenX + atlas.getXOffset() / zoom,
+				screenY + atlas.getYOffset() / zoom,
+				Math.max(1, atlas.getTextureWidth() / zoom),
+				Math.max(1, atlas.getTextureHeight() / zoom));
+		if (shadowAtlas != null) {
+			bounds.add(new java.awt.Rectangle(
+					screenX + shadowAtlas.getXOffset() / zoom,
+					screenY + shadowAtlas.getYOffset() / zoom,
+					Math.max(1, shadowAtlas.getTextureWidth() / zoom),
+					Math.max(1, shadowAtlas.getTextureHeight() / zoom)));
+		}
+		return bounds;
+	}
+
+	@Override
 	public int animationSize() {
 		return animationSize;
 	}

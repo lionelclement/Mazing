@@ -1,5 +1,10 @@
 package fr.ubordeaux.ao.mazing.view;
 
+/**
+ * World-space facing or tile side: EAST = +X, NORTH = +Y.
+ * The PNG naming conventions are translated by the sprite registry and
+ * must not leak into the public API.
+ */
 public enum Orientation {
 	NORTH,
 	NORTH_EAST,

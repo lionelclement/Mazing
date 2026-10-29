@@ -34,14 +34,9 @@ public class DebugIsometricRenderer implements Renderer {
 	@Override
 	public Point renderInIsoGrid(Graphics2D g, Renderable renderable, int tick) {
 		int dx = halfTileDiagX/zoom * (renderable.getX() + renderable.getY());
-		int dy = halfTileDiagY/zoom * (renderable.getY() - renderable.getX() - 1) - renderable.getZ() * (this.tileHeight/zoom);
+		int dy = halfTileDiagY/zoom * (renderable.getX() - renderable.getY() - 1) - renderable.getZ() * (this.tileHeight/zoom);
 		int y = dy / (this.tileDiagY/zoom);
 		int x = dx / (this.tileDiagX/zoom);
-		// if (dy <= 0) {
-		// 	// g.drawRect(screenX, screenY, 30, 30);
-		// 	// g.drawString(String.format("(%d, %d, %d)", dy, y,0), screenX, screenY);
-		// 	// dy -= this.tileDiagY;
-		// }
 		Point p = new Point(this.origX + dx + 18 * x, this.origY + dy + 180/zoom * y);
 		renderable.renderInScreen(g, p.x(), p.y(), 0, zoom);
 		if (debug) {

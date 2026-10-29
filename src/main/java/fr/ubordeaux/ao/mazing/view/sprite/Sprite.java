@@ -16,6 +16,14 @@ public interface Sprite {
 	 */
 	void render(Graphics2D g, int x, int y, Orientation orientation, int animationIndex, int zoom);
 
+	/**
+	 * Conservative screen bounds of the sprite, including atlas offsets.
+	 * Returning null disables visibility culling for a custom sprite.
+	 */
+	default Rectangle getScreenBounds(int screenX, int screenY, int zoom) {
+		return null;
+	}
+
 	/// @return the size (in frames) of the animation
 	int animationSize();
 
