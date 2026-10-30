@@ -17,7 +17,7 @@ Moteur de rendu dimétrique 2:1 pour Java/Swing.
 
 `fr.ubordeaux.ao.mazing.view.swing.ViewPanel`
 
-Composant Swing contenant la scène. Gère les objets affichables, leur animation et leur rendu.
+Composant Swing contenant la scène. Gère les objets affichables, leur animation et leur rendu. Le constructeur avec trois arguments accepte un `Renderer` (ici un `IsometricRenderer`).
 
 **Construction**
 
@@ -60,16 +60,15 @@ Si la géométrie permanente de la scène change, invalider le cache d'ombres st
 
 Effectue la transformation des coordonnées du monde en coordonnées écran.
 
-**Constructeurs utilisés**
+**Constructeur disponible**
 
 ```java
 new IsometricRenderer(originX, originY);
-
-new IsometricRenderer(
-    originX, originY,
-    tileDiagonalX, tileDiagonalY, tileHeight
-);
 ```
+
+Les dimensions de tuile utilisées par ce renderer sont définies par les
+constantes de la classe ; il n’existe pas de constructeur public recevant
+`tileDiagonalX`, `tileDiagonalY` et `tileHeight`.
 
 **Méthodes**
 
@@ -83,10 +82,7 @@ new IsometricRenderer(
 Exemple :
 
 ```java
-IsometricRenderer renderer = new IsometricRenderer(
-    150, 320,
-    256, 128, 90
-);
+IsometricRenderer renderer = new IsometricRenderer(150, 320);
 
 renderer.setZoom(2);
 renderer.pan(32, -16);
@@ -94,7 +90,7 @@ renderer.pan(32, -16);
 
 `zoom = 2` produit un affichage deux fois plus petit que `zoom = 1`.
 
-`tileDiagonalX`, `tileDiagonalY` et `tileHeight` sont exprimés en pixels source, avant application du zoom.
+Les dimensions des tuiles sont exprimées en pixels source, avant application du zoom.
 
 **Repère du moteur**
 
@@ -376,7 +372,7 @@ scene.animationTick();
 scene.repaint();
 ```
 
-Utiliser un accumulateur temporel lorsque la fréquence d'affichage diffère de celle des animations. `Demo` contient une implémentation de référence avec `System.nanoTime()` et un accumulateur de nanosecondes.
+Utiliser un accumulateur temporel lorsque la fréquence d'affichage diffère de celle des animations. `Test` contient une implémentation utilisant `System.nanoTime()` et un accumulateur de temps.
 
 Les opérations sur les composants Swing s'effectuent sur l'EDT.
 
@@ -422,7 +418,7 @@ Les ombres statiques sont mises en cache pour éviter leur recalcul systématiqu
 | `setPosition()` | Coordonnées du monde, pas pixels écran |
 | `prepareStaticShadows()` | À utiliser après la construction du décor statique |
 | `invalidateStaticShadows()` | Nécessaire après modification d'un décor statique affectant ses ombres |
-| Ressources graphiques | PNG chargés depuis les fichiers accessibles au lancement |
+| Ressources graphiques | PNG fournis dans `src/main/resources/` et chargés via le classpath |
 
 ## 9. Exemples
 

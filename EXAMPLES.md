@@ -1,35 +1,42 @@
-# Examples and demos (not part of the library JAR)
+# Exemples exécutables
 
-The Java rendering library lives under `src/main/java`. The runnable examples
-(`Demo`, `Gallery`, `Main`, `ShadowGallery`) live under `src/examples/java`.
-Their package names have not changed, so existing Gradle main class strings remain valid.
+Les trois points d’entrée Swing se trouvent dans
+`src/examples/java/fr/ubordeaux/ao/mazing/`. Ils sont compilés dans le
+source set Gradle `examples`, distinct de la bibliothèque (`src/main`).
+Le JAR produit par `jar` ne contient donc aucune de ces trois classes.
 
-## Enable the separate examples source set
+## Lancer une démonstration
 
-The root `build.gradle.kts` already applies the configuration:
+Depuis la racine du projet, avec un JDK 25 disponible et une session graphique :
 
-```kotlin
-apply(from = "examples.gradle.kts")
+```sh
+./gradlew build       # bibliothèque, compilation des exemples et tests éventuels
+./gradlew run         # lancement de Main (application par défaut)
+./gradlew runMain     # même démonstration
+./gradlew runDemo     # alias historique de runMain : pas de classe Demo
+./gradlew runTest     # démonstration complète Test
+./gradlew runGallery  # galerie Gallery
 ```
 
-The script creates the `examples` source set, gives `run`, `runDemo`,
-`runMain`, `runGallery` and `runShadowGallery` access to its classes, and compiles
-examples on `./gradlew build` without putting them in the main JAR. It deliberately
-does not redefine your tasks or their `mainClass`.
+Sous Windows, utilisez `gradlew.bat` (CMD) ou `.\gradlew.bat` (PowerShell).
+Le Gradle Wrapper fourni évite d’installer Gradle séparément.
 
-## Build / launch
+## Contenu des exemples
 
-```bash
-./gradlew clean build
-./gradlew runDemo
-./gradlew runGallery
-```
+| Classe | Rôle | Tâches Gradle |
+|---|---|---|
+| `Main` | Scène 5 × 5 avec sol, cubes de débogage et personnage animé | `run`, `runMain`, `runDemo` |
+| `Test` | Démonstration plus complète : plateformes, escaliers, caméra, animations, sons et ombres statiques | `runTest` |
+| `Gallery` | Inspection visuelle des sprites et animations sur une grande scène | `runGallery` |
 
-The compatibility `ShadowGallery` entry point is retained because some existing
-Gradle tasks still use it.
+Les fenêtres sont construites avec Swing : ces tâches nécessitent un affichage
+et ne conviennent pas à un environnement sans interface graphique.
 
-## Undo
+## Autres tâches
 
-Reverse the examples-isolation Git patch if you want to restore all four Java
-sources to `src/main/java`. Do not simply remove the Gradle script line: that
-would leave the example sources outside the compiled source sets.
+`./gradlew javadoc` génère la documentation de la bibliothèque dans
+`build/docs/javadoc/`. `./gradlew generateShadowMasks` produit des masques
+sous `build/generated/shadow-masks/` : cette tâche est indépendante des
+exemples et ne fait pas partie de `build`.
+
+Pour les classes et méthodes de l’API, voir [le guide API](doc/GUIDE_API.md).

@@ -1,105 +1,95 @@
-# Mazing — prise en main
+# Mazing
 
-Mazing est une petite bibliothèque Java pour afficher des scènes **2D isométriques** avec Swing.
+Mazing est une bibliothèque Java/Swing de rendu de scènes **isométriques (dimétriques 2:1)**.
+Le moteur et ses ressources se trouvent dans `src/main/`. Trois démonstrations
+graphiques sont isolées dans `src/examples/java/` : `Main`, `Test` et `Gallery`.
+Elles ne sont pas faites pour montrer un code modèle, mais pour montrer des exemples.
 
-Ce guide permet de **télécharger**, **installer** et **essayer** le projet sur Windows, macOS ou Linux.
+## Prérequis
 
-## 1. Télécharger
+- **JDK 25**, utilisé pour compiler le code source. Vérifiez avec `java -version`.
+- Un environnement graphique pour exécuter les exemples Swing.
+- Une connexion Internet lors du premier lancement de Gradle, pour obtenir
+  sa distribution et les éventuelles dépendances.
 
-1. Ouvrez la page du dépôt GitHub de Mazing.
-2. Cliquez sur **Code → Download ZIP**.
-3. Décompressez l'archive, puis ouvrez le dossier `Mazing-main` dans un terminal.
+Le **Gradle Wrapper** est fourni : inutile d’installer Gradle séparément.
+Le projet configure une toolchain Java 25 : un JDK 25 doit être disponible
+localement ou via un mécanisme de téléchargement de toolchain configuré
+dans Gradle.
 
-Vous pouvez aussi cloner le dépôt avec Git si vous connaissez son adresse.
+## Compiler et exécuter
 
-## 2. Installer Java
-
-Mazing nécessite **Java JDK 25**.
-
-- **Windows** : installez [Temurin JDK 25](https://adoptium.net/temurin/releases/?version=25) (installateur Windows).
-- **macOS** : installez le même JDK, ou utilisez Homebrew : `brew install openjdk@25`.
-- **Linux** : installez le JDK 25 proposé pour votre distribution sur [Adoptium](https://adoptium.net/temurin/releases/?version=25).
-
-Ouvrez un **nouveau terminal**, puis vérifiez :
-
-```sh
-java -version
-```
-
-La version affichée doit commencer par `25`. Si une autre version apparaît, configurez votre `JAVA_HOME` et votre `PATH` pour sélectionner le JDK 25.
-
-**Gradle n'a pas besoin d'être installé :** les scripts nécessaires sont inclus dans le projet. Une connexion Internet est nécessaire lors de la première compilation.
-
-## 3. Compiler et essayer
-
-Depuis le dossier `Mazing-main` (où se trouve `build.gradle.kts`) :
+Depuis la racine du dépôt (le dossier contenant `gradlew` et `build.gradle.kts`) :
 
 **macOS / Linux**
 
 ```sh
-chmod +x gradlew
+chmod +x gradlew   # seulement si le fichier n'est pas exécutable
 ./gradlew build
-java -cp "build/classes/java/main:build/resources/main" fr.ubordeaux.ao.mazing.Main
+./gradlew run
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-.\gradlew.bat build
-java -cp "build/classes/java/main;build/resources/main" fr.ubordeaux.ao.mazing.Main
+.\\gradlew.bat build
+.\\gradlew.bat run
 ```
 
-**Windows (Invite de commandes / CMD)**
+**Windows (CMD)**
 
 ```bat
 gradlew.bat build
-java -cp "build\classes\java\main;build\resources\main" fr.ubordeaux.ao.mazing.Main
+gradlew.bat run
 ```
 
-La compilation réussie affiche `BUILD SUCCESSFUL`. L'exécution ouvre une **fenêtre Swing** montrant un exemple de scène isométrique. Vous pouvez ensuite modifier `src/main/java/fr/ubordeaux/ao/mazing/Main.java` et relancer la compilation.
+`build` compile la bibliothèque et vérifie la compilation des exemples
+via la tâche `check` ; les tests JUnit sont exécutés s’il y en a. `run` démarre la scène minimale (`fr.ubordeaux.ao.mazing.Main`).
+Les autres démonstrations sont disponibles avec les tâches suivantes :
 
-## 4. Documentation de l’API (Javadoc)
+| Tâche | Classe exécutée | Contenu |
+|---|---|---|
+| `run` / `runMain` / `runDemo` | `Main` | Sol 5 × 5, personnage animé et cubes de débogage |
+| `runTest` | `Test` | Décor à plusieurs niveaux, personnages, déplacements, caméra et sons |
+| `runGallery` | `Gallery` | Galerie des sprites fixes et animés |
 
-Pour générer la documentation HTML des classes et méthodes :
+Sous Windows, lancez ces tâches via `gradlew.bat`. Voir aussi
+[EXAMPLES.md](EXAMPLES.md).
 
-**macOS / Linux**
+## Bibliothèque et documentation
+
+Le JAR de bibliothèque est produit dans `build/libs/` par `./gradlew jar`
+(ou `./gradlew build`). **Il ne contient pas les classes des exemples** et
+ne doit pas être lancé avec `java -jar`. Les ressources situées dans `src/main/resources/` sont incluses dans ce JAR.
+
+Pour générer la Javadoc :
 
 ```sh
 ./gradlew javadoc
-```
-
-**Windows**
-
-```powershell
-.\gradlew.bat javadoc
-```
-
-Ouvrez ensuite `build/docs/javadoc/index.html` dans un navigateur.
-
-Pour produire l’archive Javadoc associée à la bibliothèque :
-
-```sh
 ./gradlew javadocJar
 ```
 
-Le fichier est généré dans `build/libs/`, avec le suffixe `-javadoc.jar`.
-La Javadoc décrit l’API Java ; le fichier `GUIDE_SCENE.md` fournit des exemples pratiques pour composer une scène.
+La documentation HTML est placée dans `build/docs/javadoc/index.html` et
+l'archive Javadoc dans `build/libs/`.
+
+La tâche optionnelle `./gradlew generateShadowMasks` extrait des silhouettes
+depuis les images de `src/main/resources/Dungeon-Pack/Isometric` et les écrit
+sous `build/generated/shadow-masks/`. Elle n'est pas exécutée par `build`.
 
 ## En cas de problème
 
-- **`UnsupportedClassVersionError`** : vous lancez probablement le programme avec une version de Java antérieure à 25. Vérifiez `java -version`.
-- **`Permission denied`** (macOS/Linux) : lancez `chmod +x gradlew`.
-- **`java: command not found`** : vérifiez l'installation du JDK et la variable `PATH`.
-- **Aucune fenêtre** : le programme nécessite un environnement graphique (Swing).
+- **JDK incorrect / erreur de compilation** : utilisez JDK 25 et vérifiez
+  `java -version` et `JAVA_HOME`. La compilation utilise une toolchain Java 25.
+- **`Permission denied`** : exécutez `chmod +x gradlew` sur macOS/Linux.
+- **Pas de fenêtre** : les démonstrations Swing exigent une session graphique.
+- **Téléchargement impossible** : vérifiez la connexion au réseau ou la
+  configuration des dépôts et des toolchains Gradle.
 
-> Le fichier JAR généré dans `build/libs/` est une bibliothèque, pas une application autonome à lancer avec `java -jar`. Pour l'essai, utilisez les commandes ci-dessus.
+## Références
 
-## Documentation
-
-- [Créer une scène](doc/GUIDE_SCENE.md)
 - [Guide de l'API](doc/GUIDE_API.md)
-- [Licences des ressources](doc/ASSET_LICENSES.md)
-- [Audit des ressources](doc/RESOURCE_AUDIT.md)
+- [Exemples](EXAMPLES.md)
 
-Le code original de Mazing est proposé sous licence MIT.
-Les ressources de tiers conservent leurs propres licences.
+Le code de Mazing est distribué sous licence MIT (`LICENSE`). Les ressources
+tierces conservent leurs licences respectives (voir les fichiers de licence
+présents sous `src/main/resources/`).
