@@ -16,3 +16,16 @@ target/
 /bin/
 **/.DS_Store
 .gradle/
+# Gradle
+.gradle/
+build/
+bin/
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+
