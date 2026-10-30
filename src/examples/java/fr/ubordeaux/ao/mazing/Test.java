@@ -31,7 +31,7 @@ import java.awt.event.ActionEvent;
  * Démonstration complète : décor, plateformes, escaliers, personnages,
  * déplacements et sons.
  */
-public final class Demo {
+public final class Test {
 
 	// Scene size and tile dimensions.
 	private static final int GRID_SIZE = 5;
@@ -63,7 +63,7 @@ public final class Demo {
 
 	/** Starts the application. */
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(Demo::createAndShowScene);
+		SwingUtilities.invokeLater(Test::createAndShowScene);
 	}
 
 	/** Creates the scene and starts the animation. */

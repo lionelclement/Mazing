@@ -1,28 +1,37 @@
-// Examples are deliberately not compiled into the distributable main JAR.
-// Applied from build.gradle.kts with: apply(from = "examples.gradle.kts")
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.JavaExec
 
-val exampleSourceSets = extensions.getByType(SourceSetContainer::class.java)
-val mainSourceSet = exampleSourceSets.getByName("main")
-val examplesSourceSet = exampleSourceSets.create("examples") {
-    java.setSrcDirs(listOf("src/examples/java"))
-    compileClasspath += mainSourceSet.output + mainSourceSet.compileClasspath
-    runtimeClasspath += mainSourceSet.runtimeClasspath
+// The library JAR contains only src/main; the Swing demos live in src/examples.
+val sets = extensions.getByType<SourceSetContainer>()
+val library = sets.getByName("main")
+val examples = sets.create("examples") {
+    java.srcDir("src/examples/java")
+    compileClasspath += library.output + library.compileClasspath
+    runtimeClasspath += library.output + library.runtimeClasspath
 }
 
-// These existing JavaExec tasks must execute the *examples* output, not just
-// the main library JAR. Explicitly depend on compilation so invoking runDemo
-// directly works even if `build` has not been executed beforehand.
-// The standard application `run` task also launches Main from this source set.
-tasks.withType(JavaExec::class.java).configureEach {
-    if (name in setOf("run", "runDemo", "runGallery", "runMain", "runShadowGallery")) {
-        dependsOn(examplesSourceSet.classesTaskName)
-        classpath = examplesSourceSet.runtimeClasspath
+// A build checks that the examples still compile, but does not bundle them.
+tasks.named("check") {
+    dependsOn(examples.classesTaskName)
+}
+
+// The application plugin creates run; point it at the examples classpath.
+tasks.named<JavaExec>("run") {
+    dependsOn(examples.classesTaskName)
+    classpath = examples.runtimeClasspath
+}
+
+fun registerDemo(taskName: String, entryPoint: String, details: String) {
+    tasks.register<JavaExec>(taskName) {
+        group = "application"
+        description = details
+        dependsOn(examples.classesTaskName)
+        classpath = examples.runtimeClasspath
+        mainClass.set(entryPoint)
     }
 }
 
-// Also compile the examples during `./gradlew build` without packaging them.
-tasks.named("check") {
-    dependsOn(examplesSourceSet.classesTaskName)
-}
+registerDemo("runMain", "fr.ubordeaux.ao.mazing.Main", "Runs the minimal isometric scene")
+registerDemo("runDemo", "fr.ubordeaux.ao.mazing.Main", "Alias for the minimal example")
+registerDemo("runTest", "fr.ubordeaux.ao.mazing.Test", "Runs the interactive demonstration")
+registerDemo("runGallery", "fr.ubordeaux.ao.mazing.Gallery", "Runs the sprite gallery")
