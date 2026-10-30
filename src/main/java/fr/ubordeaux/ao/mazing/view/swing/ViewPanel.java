@@ -28,6 +28,8 @@ import java.util.Map;
 public class ViewPanel extends JPanel {
 	private int originX;
 	private int originY;
+	private int mapWidth;
+	private int mapHeight;
 	private final Renderer renderer;
 	private final boolean ownsRenderer;
 	private final List<Renderable> renderables;
@@ -59,13 +61,64 @@ public class ViewPanel extends JPanel {
 		this.animationTick = 0;
 	}
 
+
+	/**
+	 * Creates an isometric scene centered on a rectangular map.
+	 *
+	 * @param width panel width in pixels
+	 * @param height panel height in pixels
+	 * @param mapWidth map width in tiles
+	 * @param mapHeight map height in tiles
+	 */
+	public ViewPanel(int width, int height, int mapWidth, int mapHeight) {
+		this(width, height);
+
+		if (width <= 0 || height <= 0 || mapWidth <= 0 || mapHeight <= 0) {
+			throw new IllegalArgumentException(
+					"Scene and map dimensions must be positive");
+		}
+
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
+
+		centerMap(width, height);
+
+		addComponentListener(new java.awt.event.ComponentAdapter() {
+			@Override
+			public void componentResized(java.awt.event.ComponentEvent event) {
+				centerMap(getWidth(), getHeight());
+			}
+		});
+	}
+
+	/** Centers the map using the renderer's actual projection and zoom. */
+	private void centerMap(int width, int height) {
+		IsometricRenderer isoRenderer = (IsometricRenderer) renderer;
+
+		double centerCol = (mapWidth - 1) / 2.0;
+		double centerRow = (mapHeight - 1) / 2.0;
+
+		isoRenderer.setOrigin(0, 0);
+		Point center = isoRenderer.projectWorld(centerCol, centerRow, 0);
+
+		originX = width / 2 - center.x();
+		originY = height / 2 - center.y();
+
+		isoRenderer.setOrigin(originX, originY);
+		repaint();
+	}
+
 	@Override
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
 		// Preserve the camera offset when the panel uses an external renderer.
 		if (ownsRenderer) {
-			this.originY = height / 2;
-			renderer.setOrigin(this.originX, this.originY);
+			if (mapWidth > 0 && mapHeight > 0) {
+				centerMap(width, height);
+			} else {
+				this.originY = height / 2;
+				renderer.setOrigin(this.originX, this.originY);
+			}
 		}
 	}
 
