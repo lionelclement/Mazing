@@ -12,13 +12,23 @@ public final class DebugCube {
     private final double y;
     private final double z;
 
+    /**
+     * Creates an instance of DebugCube.
+      * @param x x value
+      * @param y y value
+      * @param z z value
+     */
     public DebugCube(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    /** Draws all twelve edges using the renderer's projection and current zoom. */
+    /**
+     * Draws all twelve edges using the renderer's projection and current zoom.
+     * @param graphics graphics context used for drawing
+     * @param renderer renderer providing the isometric projection
+     */
     public void paint(Graphics2D graphics, IsometricRenderer renderer) {
         Point[] corners = new Point[8];
         for (int i = 0; i < corners.length; i++) {

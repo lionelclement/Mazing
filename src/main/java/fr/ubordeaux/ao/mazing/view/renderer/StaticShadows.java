@@ -36,6 +36,9 @@ import java.util.Objects;
  * moves, changes sprite/orientation/scale, or when the scene is edited.
  */
 public final class StaticShadows {
+
+    /** Creates an instance of StaticShadows. */
+    public StaticShadows() { }
     private DirectionalLight light = DirectionalLight.DEFAULT;
     private final Map<FloorTile, BufferedImage> overlays = new IdentityHashMap<>();
     private final Map<FloorTile, PreparedTile> preparedTiles = new IdentityHashMap<>();
@@ -53,7 +56,10 @@ public final class StaticShadows {
         }
     }
 
-    /** Configures the light; its color and direction are shared by all casters. */
+    /**
+     * Configures the light; its color and direction are shared by all casters.
+     * @param light light value
+     */
     public void setLight(DirectionalLight light) {
         this.light = Objects.requireNonNull(light, "light");
         invalidate();
@@ -70,6 +76,8 @@ public final class StaticShadows {
     /**
      * Precomputes all static floor overlays. Invoke after building the scene,
      * before starting its animation loop, to avoid first-frame work.
+     * @param renderer renderer providing projection coordinates
+     * @param scene scene value
      */
     public void prepare(IsometricRenderer renderer, List<Renderable> scene) {
         int zoom = renderer.getZoom();
@@ -87,6 +95,11 @@ public final class StaticShadows {
     /**
      * Paints a precomposited static floor sprite with just one image blit.
      * Debug labels still use the renderer's original draw path.
+     * @param graphics graphics value
+     * @param renderer renderer providing projection coordinates
+     * @param floor floor value
+     * @param scene scene value
+     * @param animationTick current animation frame tick
      */
     public void paintFloor(Graphics2D graphics, IsometricRenderer renderer,
             FloorTile floor, List<Renderable> scene, int animationTick) {
@@ -179,7 +192,13 @@ public final class StaticShadows {
         preparedTiles.put(floor, new PreparedTile(trimmed, minX, minY));
     }
 
-    /** Draws the cached overlay using the receiver's real PNG alpha. */
+    /**
+     * Draws the cached overlay using the receiver's real PNG alpha.
+     * @param graphics graphics value
+     * @param renderer renderer providing projection coordinates
+     * @param receiver receiver value
+     * @param scene scene value
+     */
     public void paint(Graphics2D graphics, IsometricRenderer renderer,
             FloorTile receiver, List<Renderable> scene) {
         int zoom = renderer.getZoom();

@@ -11,28 +11,67 @@ import fr.ubordeaux.ao.mazing.view.sprite.Sprite;
  */
 public final class OccludingEntity extends Entity {
 
+    /**
+     * Creates a OccludingEntity instance.
+     * @param sprite sprite to display
+     * @param orientation orientation of the sprite
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     */
     public OccludingEntity(Sprite sprite, Orientation orientation,
                       int x, int y, int z) {
         super(sprite, orientation, x, y, z);
     }
 
+    /**
+     * Creates a OccludingEntity instance.
+     * @param sprite sprite to display
+     * @param orientation orientation of the sprite
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     * @param scale visual scaling factor
+     */
     public OccludingEntity(Sprite sprite, Orientation orientation,
                            int x, int y, int z, double scale) {
         super(sprite, orientation, x, y, z, scale);
     }
-    /** Structures can also be anchored to a fractional platform elevation. */
+    /**
+     * Structures can also be anchored to a fractional platform elevation.
+     * @param sprite sprite to display
+     * @param orientation orientation of the sprite
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     */
     public OccludingEntity(Sprite sprite, Orientation orientation,
             int x, int y, double z) {
         this(sprite, orientation, (double) x, (double) y, z);
     }
 
-    /** A wall or other occluding structure placed freely in 3D space. */
+    /**
+     * A wall or other occluding structure placed freely in 3D space.
+     * @param sprite sprite to display
+     * @param orientation orientation of the sprite
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     */
     public OccludingEntity(Sprite sprite, Orientation orientation,
             double x, double y, double z) {
         super(sprite, orientation, x, y, z);
     }
 
-    /** Exact world position with an optional visual size multiplier. */
+    /**
+     * Exact world position with an optional visual size multiplier.
+     * @param sprite sprite to display
+     * @param orientation orientation of the sprite
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     * @param scale visual scaling factor
+     */
     public OccludingEntity(Sprite sprite, Orientation orientation,
             double x, double y, double z, double scale) {
         super(sprite, orientation, x, y, z, scale);

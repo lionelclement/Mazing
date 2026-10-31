@@ -3,9 +3,18 @@ package fr.ubordeaux.ao.mazing.view.swing;
 import javax.swing.JFrame;
 import java.awt.Dimension;
 
+/**
+ * Represents ViewWindow in the rendering system.
+ */
 public class ViewWindow extends JFrame {
+	/**
+	 * Provides the private final viewpanel panel; value.
+	 */
 	private final ViewPanel panel;
 
+	/**
+	 * Creates a ViewWindow instance.
+	 */
 	public ViewWindow() {
 		super("Isometric 3D Game");
 
@@ -21,6 +30,10 @@ public class ViewWindow extends JFrame {
 		pack();
 
 	}
+	/**
+	 * Returns the panel.
+	 * @return the resulting value
+	 */
 	public ViewPanel getPanel() {
 		return panel;
 	}

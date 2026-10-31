@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Represents TextureAtlas in the rendering system.
+ */
 public class TextureAtlas {
 	private BufferedImage atlas;
 	private final int atlasWidth;
@@ -35,11 +38,26 @@ public class TextureAtlas {
 		this(atlas, atlasWidth, atlasHeight, textureWidth, textureHeight, 0, 0);
 	}
 
+	/**
+	 * Performs the loadFromImage operation.
+	 * @param path path value
+	 * @param textureWidth texture width value
+	 * @param textureHeight texture height value
+	 * @return the resulting value
+	 * @throws java.io.IOException if the operation cannot be completed
+	 */
 	public static TextureAtlas loadFromImage(Path path, int textureWidth, int textureHeight) throws IOException {
 		BufferedImage img = ImageIO.read(path.toFile());
 		return new TextureAtlas(img, img.getWidth(), img.getHeight(), textureWidth, textureHeight);
 	}
 
+	/**
+	 * Performs the loadFromResourceImage operation.
+	 * @param path path value
+	 * @param textureWidth texture width value
+	 * @param textureHeight texture height value
+	 * @return the resulting value
+	 */
 	public static TextureAtlas loadFromResourceImage(String path, int textureWidth, int textureHeight) {
 		URL resource = TextureAtlas.class.getResource(path);
 		BufferedImage img = null;
@@ -51,16 +69,35 @@ public class TextureAtlas {
 		return new TextureAtlas(img, img.getWidth(), img.getHeight(), textureWidth, textureHeight);
 	}
 
+	/**
+	 * Performs the stitchFromResourceDir operation.
+	 * @param path path value
+	 * @param xOffset x offset value
+	 * @param yOffset y offset value
+	 * @return the resulting value
+	 */
 	public static TextureAtlas stitchFromResourceDir(String path, int xOffset, int yOffset) {
 		URL resource = TextureAtlas.class.getResource(path);
 		return stitchFromDir(Path.of(resource.getPath()), xOffset, yOffset);
 	}
 
+	/**
+	 * Performs the stitchFromResourceDir operation.
+	 * @param path path value
+	 * @return the resulting value
+	 */
 	public static TextureAtlas stitchFromResourceDir(String path) {
 		URL resource = TextureAtlas.class.getResource(path);
 		return stitchFromDir(Path.of(resource.getPath()), 0, 0);
 	}
 
+	/**
+	 * Performs the stitchFromDir operation.
+	 * @param dirPath dir path value
+	 * @param xOffset x offset value
+	 * @param yOffset y offset value
+	 * @return the resulting value
+	 */
 	public static TextureAtlas stitchFromDir(Path dirPath, int xOffset, int yOffset) {
 		File dir = new File(dirPath.toString());
 		if (!dir.exists() || !dir.isDirectory()) {
@@ -113,6 +150,12 @@ public class TextureAtlas {
 
 	}
 
+	/**
+	 * Performs the writeToDisk operation.
+	 * @param directory directory value
+	 * @param name name value
+	 * @throws java.io.IOException if the operation cannot be completed
+	 */
 	public void writeToDisk(String directory, String name) throws IOException {
 		if (!new File(directory).exists()) {
 			Files.createDirectories(Path.of(directory));
@@ -121,6 +164,11 @@ public class TextureAtlas {
 		ImageIO.write(this.atlas, "png", path.toFile());
 	}
 
+	/**
+	 * Performs the writeToDisk operation.
+	 * @param name name value
+	 * @throws java.io.IOException if the operation cannot be completed
+	 */
 	public void writeToDisk(String name) throws IOException {
 		writeToDisk(".", name);
 	}
@@ -134,43 +182,27 @@ public class TextureAtlas {
 		// g.drawRect(x, y, textureWidth / zoom, textureHeight / zoom);
 	}
 
-
-	/// Draw a texture from the atlas at the specified position.
-	///
-	/// If you have an atlas of 3\*2 textures:
-	/// ```
-    /// TextureAtlas atlas = createAtlas("3*2");
-    /// // draws the top left texture, in the top left corner of the screen
-    /// atlas.blit(g, 0, 0, 0, 0);
-    /// // draw the second texture in the top row of the atlas in the top left corner of the screen
-    /// atlas.blit(g, 0, 0, 0, 1);
-    /// ```
-	///
-	/// @param g        the graphics context to draw onto
-	/// @param x        the x position to draw the texture
-	/// @param y        the y position to draw the texture
-	/// @param textureX the x index of the texture in the atlas
-	/// @param textureY the y index of the texture in the atlas
+	/**
+	 * Draws an atlas tile at the specified screen coordinates.
+	 * @param g destination graphics context
+	 * @param x horizontal screen position
+	 * @param y vertical screen position
+	 * @param textureX atlas tile column
+	 * @param textureY atlas tile row
+	 */
 	public void blit(Graphics2D g, int x, int y, int textureX, int textureY) {
 		this.blitAbsolute(g, x, y, textureX * this.textureWidth, textureY * this.textureHeight);
 	}
 
-	/// Draw a texture from the atlas at the specified position.
-	///
-	/// If you have an atlas of 3\*2 textures:
-	/// ```
-    /// TextureAtlas atlas = createAtlas("3*2");
-    /// // draws the top left texture, in the top left corner of the screen
-    /// atlas.blit(g, 0, 0, 0, 0);
-    /// // draw the second texture in the top row of the atlas in the top left corner of the screen
-    /// atlas.blit(g, 0, 0, 0, 1);
-    /// ```
-	///
-	/// @param g        the graphics context to draw onto
-	/// @param x        the x position to draw the texture
-	/// @param y        the y position to draw the texture
-	/// @param textureX the x index of the texture in the atlas
-	/// @param textureY the y index of the texture in the atlas
+	/**
+	 * Draws an atlas tile at the specified screen coordinates.
+	 * @param g destination graphics context
+	 * @param x horizontal screen position
+	 * @param y vertical screen position
+	 * @param textureX atlas tile column
+	 * @param textureY atlas tile row
+	 * @param zoom rendering zoom factor
+	 */
 	public void blit(Graphics2D g, int x, int y, int textureX, int textureY, int zoom) {
 		this.blitAbsolute(g, x, y, textureX * this.textureWidth, textureY * this.textureHeight, zoom);
 	}
@@ -185,21 +217,45 @@ public class TextureAtlas {
 				", textureHeight=" + textureHeight +
 				'}';
 	}
+	/**
+	 * Returns the atlaswidth.
+	 * @return the resulting value
+	 */
 	public int getAtlasWidth() {
 		return atlasWidth;
 	}
+	/**
+	 * Returns the atlasheight.
+	 * @return the resulting value
+	 */
 	public int getAtlasHeight() {
 		return atlasHeight;
 	}
+	/**
+	 * Returns the texturewidth.
+	 * @return the resulting value
+	 */
 	public int getTextureWidth() {
 		return textureWidth;
 	}
+	/**
+	 * Returns the textureheight.
+	 * @return the resulting value
+	 */
 	public int getTextureHeight() {
 		return textureHeight;
 	}
+	/**
+	 * Returns the xoffset.
+	 * @return the resulting value
+	 */
 	public int getXOffset() {
 		return xOffset;
 	}
+	/**
+	 * Returns the yoffset.
+	 * @return the resulting value
+	 */
 	public int getYOffset() {
 		return yOffset;
 	}

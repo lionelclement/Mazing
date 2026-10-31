@@ -6,6 +6,9 @@ import fr.ubordeaux.ao.mazing.view.Renderable;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Represents IsometricRenderer in the rendering system.
+ */
 public class IsometricRenderer implements Renderer {
 	private static final int TILE_DIAGONAL_X = 256;
 	private static final int TILE_DIAGONAL_Y = 128;
@@ -20,6 +23,11 @@ public class IsometricRenderer implements Renderer {
 	private boolean debug;
 	private int zoom;
 
+	/**
+	 * Creates a IsometricRenderer instance.
+	 * @param origX orig x value
+	 * @param origY orig y value
+	 */
 	public IsometricRenderer(int origX, int origY) {
 		int tileDiagX = TILE_DIAGONAL_X;
 		int tileDiagY = TILE_DIAGONAL_Y;
@@ -87,6 +95,10 @@ public class IsometricRenderer implements Renderer {
 	 * Projects world coordinates: +X is east (screen down-right), +Y is north
 	 * (screen up-right), and +Z is up. The source tile's lower-left anchor
 	 * accounts for the constant -1 in the vertical projection.
+	 * @param x horizontal coordinate
+	 * @param y vertical coordinate
+	 * @param z height coordinate
+	 * @return the resulting value
 	 */
 	public Point projectWorld(double x, double y, double z) {
 		double screenX = origX + (halfTileDiagX / (double) zoom) * (x + y);
@@ -96,7 +108,11 @@ public class IsometricRenderer implements Renderer {
 		return new Point((int) Math.round(screenX), (int) Math.round(screenY));
 	}
 
-	/** Returns the same screen anchor used by the drawing code. */
+	/**
+	 * Returns the same screen anchor used by the drawing code.
+	 * @param renderable renderable value
+	 * @return the resulting value
+	 */
 	public Point project(Renderable renderable) {
 		return projectWorld(renderable.getPreciseX(), renderable.getPreciseY(),
 				renderable.getPreciseZ());
@@ -129,30 +145,50 @@ public class IsometricRenderer implements Renderer {
 		this.debug = debug;
 	}
 
-	/** Whether the renderer draws coordinate labels over scene sprites. */
+	/**
+	 * Whether the renderer draws coordinate labels over scene sprites.
+	 * @return the resulting value
+	 */
 	public boolean isDebug() {
 		return debug;
 	}
 
-	/** Width of one floor tile in atlas pixels. */
+	/**
+	 * Width of one floor tile in atlas pixels.
+	 * @return the resulting value
+	 */
 	public int getTileDiagonalX() {
 		return tileDiagX;
 	}
 
-	/** Height of one floor tile in atlas pixels. */
+	/**
+	 * Height of one floor tile in atlas pixels.
+	 * @return the resulting value
+	 */
 	public int getTileDiagonalY() {
 		return tileDiagY;
 	}
 
-	/** Screen-vertical height of one world level in atlas pixels. */
+	/**
+	 * Screen-vertical height of one world level in atlas pixels.
+	 * @return the resulting value
+	 */
 	public int getTileHeight() {
 		return tileHeight;
 	}
 
+	/**
+	 * Returns the zoom.
+	 * @return the resulting value
+	 */
 	public int getZoom() {
 		return zoom;
 	}
 
+	/**
+	 * Updates the zoom.
+	 * @param zoom rendering zoom level
+	 */
 	public void setZoom(int zoom) {
 		if (zoom <= 0) {
 			throw new IllegalArgumentException("zoom must be positive");

@@ -20,23 +20,44 @@ public interface Renderable extends Comparable<Renderable> {
 	 */
 	void renderInScreen(Graphics2D g, int x, int y, int animationTick, int zoom);
 
-	/** Returns the precise X coordinate in grid units. */
+	/**
+	 * Returns the precise X coordinate in grid units.
+	 * @return the requested value
+	 */
 	default double getPreciseX() {
 		return getX();
 	}
 
-	/** Returns the precise Y coordinate in grid units. */
+	/**
+	 * Returns the precise Y coordinate in grid units.
+	 * @return the requested value
+	 */
 	default double getPreciseY() {
 		return getY();
 	}
 
+	/**
+	 * Returns x.
+	  * @return the value or object described above
+	 */
 	int getX();
 
+	/**
+	 * Returns y.
+	  * @return the value or object described above
+	 */
 	int getY();
 
+	/**
+	 * Returns z.
+	  * @return the value or object described above
+	 */
 	int getZ();
 
-	/** Returns the precise height in grid levels. */
+	/**
+	 * Returns the precise height in grid levels.
+	 * @return the requested value
+	 */
 	default double getPreciseZ() {
 		return getZ();
 	}
@@ -44,16 +65,24 @@ public interface Renderable extends Comparable<Renderable> {
 	/**
 	 * Rendering order level, independent of the rounded grid position.
 	 * Animated characters may enter the next level while climbing.
+	 * @return the requested value
 	 */
 	default int getRenderLevel() {
 		return getZ();
 	}
 
-	/** Returns the rendering layer; lower layers are rendered first. */
+	/**
+	 * Returns the rendering layer; lower layers are rendered first.
+	 * @return the requested value
+	 */
 	default int getRenderLayer() {
 		return 1;
 	}
 
+	/**
+	 * Returns blitorder.
+	  * @return the value or object described above
+	 */
 	default int getBlitOrder() {
 		return 0;
 	}
@@ -85,13 +114,26 @@ public interface Renderable extends Comparable<Renderable> {
 		return Integer.compare(getBlitOrder(), other.getBlitOrder());
 	}
 
-	/** Advances animated state even when the sprite is off-screen. */
+	/**
+	 * Advances animated state even when the sprite is off-screen.
+	 * @param animationTick current animation tick
+	 */
 	default void updateAnimation(int animationTick) { }
 
-	/** Returns null when conservative painted bounds are unknown. */
+	/**
+	 * Returns null when conservative painted bounds are unknown.
+	 * @param screenX horizontal position in screen pixels
+	 * @param screenY vertical position in screen pixels
+	 * @param zoom rendering zoom factor
+	 * @return the screen-space bounds, or null if unavailable
+	 */
 	default Rectangle getScreenBounds(int screenX, int screenY, int zoom) {
 		return null;
 	}
 
+	/**
+	 * Sets sprite.
+	  * @param sprite sprite to draw
+	 */
 	void setSprite(Sprite sprite);
 }

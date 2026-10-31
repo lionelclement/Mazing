@@ -9,6 +9,7 @@ public interface ShadowCaster {
     /**
      * Returns explicitly defined physical geometry, or {@code null} to let
      * the shadow renderer estimate it from the sprite's alpha silhouette.
+     * @return the requested value
      */
     ShadowGeometry shadowGeometry();
 }

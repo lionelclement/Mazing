@@ -18,6 +18,11 @@ public final class RampSprite implements Sprite {
     private final Sprite artwork;
     private final double rise;
 
+    /**
+     * Creates a RampSprite instance.
+     * @param artwork artwork value
+     * @param rise rise value
+     */
     public RampSprite(Sprite artwork, double rise) {
         this.artwork = Objects.requireNonNull(artwork, "artwork");
         if (!Double.isFinite(rise) || rise <= 0) {
@@ -26,6 +31,10 @@ public final class RampSprite implements Sprite {
         this.rise = rise;
     }
 
+    /**
+     * Performs the rise operation.
+     * @return the resulting value
+     */
     public double rise() {
         return rise;
     }

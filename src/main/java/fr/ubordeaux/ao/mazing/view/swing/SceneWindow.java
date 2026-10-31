@@ -13,11 +13,19 @@ public final class SceneWindow {
     private final JComponent component;
     private JFrame frame;
 
+    /**
+     * Creates a SceneWindow instance.
+     * @param title title value
+     * @param component component value
+     */
     public SceneWindow(String title, JComponent component) {
         this.title = java.util.Objects.requireNonNull(title);
         this.component = java.util.Objects.requireNonNull(component);
     }
 
+    /**
+     * Performs the show operation.
+     */
     public void show() {
         SwingUtilities.invokeLater(() -> {
             if (frame == null) {
@@ -32,6 +40,9 @@ public final class SceneWindow {
         });
     }
 
+    /**
+     * Performs the close operation.
+     */
     public void close() {
         SwingUtilities.invokeLater(() -> {
             if (frame != null) {

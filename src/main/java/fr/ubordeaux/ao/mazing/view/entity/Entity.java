@@ -29,7 +29,14 @@ public class Entity implements Renderable, ShadowCaster {
 	private int renderOffsetY;
 	private ShadowGeometry shadowGeometry;
 
-	/** Creates a tile-aligned entity (legacy integer coordinates). */
+	/**
+	 * Creates a tile-aligned entity (legacy integer coordinates).
+	 * @param sprite sprite to render
+	 * @param orientation orientation used to select the sprite frames
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
+	 */
 	public Entity(Sprite sprite, Orientation orientation,
 			int xPosition, int yPosition, int zPosition) {
 		this(sprite, orientation, (double) xPosition,
@@ -40,6 +47,11 @@ public class Entity implements Renderable, ShadowCaster {
 	 * Creates a decor entity at an exact world-space position. The integer
 	 * getters remain available for legacy grid operations; rendering, depth
 	 * ordering, occlusion and shadows use the precise coordinates.
+	  * @param sprite sprite to draw
+	  * @param orientation orientation of the sprite
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
 	 */
 	public Entity(Sprite sprite, Orientation orientation,
 			double xPosition, double yPosition, double zPosition) {
@@ -66,21 +78,45 @@ public class Entity implements Renderable, ShadowCaster {
 		setScale(scale);
 	}
 
-	/** Exact position and custom visual scale (independent parameters). */
+	/**
+	 * Exact position and custom visual scale (independent parameters).
+	 * @param sprite sprite to draw
+	 * @param orientation orientation of the sprite
+	 * @param xPosition horizontal grid position
+	 * @param yPosition vertical grid position
+	 * @param zPosition height in grid levels
+	 * @param scale scale value
+	 */
 	public Entity(Sprite sprite, Orientation orientation,
 			double xPosition, double yPosition, double zPosition, double scale) {
 		this(sprite, orientation, xPosition, yPosition, zPosition);
 		setScale(scale);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param sprite sprite to display
+	 */
 	public Entity(Sprite sprite) {
 		this(sprite, Orientation.NORTH, 0, 0, 0);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param sprite sprite to display
+	 * @param xPosition horizontal world-grid coordinate
+	 * @param yPosition vertical world-grid coordinate
+	 * @param zPosition height in grid levels
+	 */
 	public Entity(Sprite sprite, int xPosition, int yPosition, int zPosition) {
 		this(sprite, Orientation.NORTH, xPosition, yPosition, zPosition);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param sprite sprite to display
+	 * @param orientation orientation of the sprite
+	 */
 	public Entity(Sprite sprite, Orientation orientation) {
 		this(sprite, orientation, 0, 0, 0);
 	}
@@ -111,18 +147,28 @@ public class Entity implements Renderable, ShadowCaster {
 		}
 	}
 
-	/** Moves the sprite relative to its grid anchor, in source-image pixels. */
+	/**
+	 * Moves the sprite relative to its grid anchor, in source-image pixels.
+	 * @param xPixels xPixels value
+	 * @param yPixels yPixels value
+	 */
 	public void setRenderOffset(int xPixels, int yPixels) {
 		this.renderOffsetX = xPixels;
 		this.renderOffsetY = yPixels;
 	}
 
-	/** Horizontal image offset, in original sprite pixels. */
+	/**
+	 * Horizontal image offset, in original sprite pixels.
+	 * @return the value or object described above
+	 */
 	public int getRenderOffsetX() {
 		return renderOffsetX;
 	}
 
-	/** Vertical image offset, in original sprite pixels. */
+	/**
+	 * Vertical image offset, in original sprite pixels.
+	 * @return the value or object described above
+	 */
 	public int getRenderOffsetY() {
 		return renderOffsetY;
 	}
@@ -174,6 +220,7 @@ public class Entity implements Renderable, ShadowCaster {
 	/**
 	 * Overrides the generic physical approximation used for this static object.
 	 * Changes to scene geometry require ViewPanel.invalidateStaticShadows().
+	  * @param geometry geometry value
 	 */
 	public void setShadowGeometry(ShadowGeometry geometry) {
 		this.shadowGeometry = Objects.requireNonNull(geometry, "geometry");
@@ -188,6 +235,7 @@ public class Entity implements Renderable, ShadowCaster {
 	 * Explicit sprite geometry takes precedence. Ordinary furniture has no
 	 * fixed box: the shadow renderer estimates its dimensions from the
 	 * actual rendered PNG silhouette and the grid's projection.
+	  * @return the value or object described above
 	 */
 	protected ShadowGeometry defaultShadowGeometry() {
 		if (sprite instanceof ShadowGeometryProvider provider) {
@@ -196,14 +244,26 @@ public class Entity implements Renderable, ShadowCaster {
 		return null;
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @return the resulting value
+	 */
 	public Sprite getSprite() {
 		return sprite;
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @return the resulting value
+	 */
 	public Orientation getOrientation() {
 		return orientation;
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param orientation orientation of the sprite
+	 */
 	public void setOrientation(Orientation orientation) {
 		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
 	}
@@ -219,7 +279,10 @@ public class Entity implements Renderable, ShadowCaster {
 		return preciseXPosition;
 	}
 
-	/** Sets integer X, deliberately snapping only that axis to the grid. */
+	/**
+	 * Sets integer X, deliberately snapping only that axis to the grid.
+	 * @param xPosition horizontal grid position
+	 */
 	public void setX(int xPosition) {
 		setPrecisePosition(xPosition, preciseYPosition);
 	}
@@ -235,7 +298,10 @@ public class Entity implements Renderable, ShadowCaster {
 		return preciseYPosition;
 	}
 
-	/** Sets integer Y, deliberately snapping only that axis to the grid. */
+	/**
+	 * Sets integer Y, deliberately snapping only that axis to the grid.
+	 * @param yPosition vertical grid position
+	 */
 	public void setY(int yPosition) {
 		setPrecisePosition(preciseXPosition, yPosition);
 	}
@@ -243,6 +309,8 @@ public class Entity implements Renderable, ShadowCaster {
 	/**
 	 * Moves an object to a precise horizontal position. For a static scene,
 	 * call ViewPanel.invalidateStaticShadows() after changing a shadow caster.
+	  * @param x x value
+	  * @param y y value
 	 */
 	public void setPrecisePosition(double x, double y) {
 		// Validate both coordinates before changing any state.
@@ -263,7 +331,11 @@ public class Entity implements Renderable, ShadowCaster {
 		return (int) Math.round(value);
 	}
 
-	/** Moves an entity by an exact horizontal displacement. */
+	/**
+	 * Moves an entity by an exact horizontal displacement.
+	 * @param dx dx value
+	 * @param dy dy value
+	 */
 	public void moveBy(double dx, double dy) {
 		setPrecisePosition(preciseXPosition + dx, preciseYPosition + dy);
 	}
@@ -278,7 +350,10 @@ public class Entity implements Renderable, ShadowCaster {
 		return preciseZPosition;
 	}
 
-	/** Set elevation independently of horizontal coordinates. */
+	/**
+	 * Set elevation independently of horizontal coordinates.
+	 * @param zPosition height in grid levels
+	 */
 	public void setPreciseZ(double zPosition) {
 		if (!Double.isFinite(zPosition)
 				|| zPosition < Integer.MIN_VALUE
@@ -290,26 +365,53 @@ public class Entity implements Renderable, ShadowCaster {
 		this.zPosition = (int) Math.ceil(zPosition);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param zPosition height in grid levels
+	 */
 	public void setZ(int zPosition) {
 		setPreciseZ(zPosition);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param deltaX horizontal displacement
+	 */
 	public void moveX(int deltaX) {
 		moveBy(deltaX, 0);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param deltaY vertical displacement
+	 */
 	public void moveY(int deltaY) {
 		moveBy(0, deltaY);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param deltaZ vertical displacement in grid levels
+	 */
 	public void moveZ(int deltaZ) {
 		setPreciseZ(preciseZPosition + deltaZ);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param deltaX horizontal displacement
+	 * @param deltaY vertical displacement
+	 */
 	public void move(int deltaX, int deltaY) {
 		moveBy(deltaX, deltaY);
 	}
 
+	/**
+	 * Documents this public type or member.
+	 * @param deltaX horizontal displacement
+	 * @param deltaY vertical displacement
+	 * @param deltaZ vertical displacement in grid levels
+	 */
 	public void move(int deltaX, int deltaY, int deltaZ) {
 		moveBy(deltaX, deltaY);
 		moveZ(deltaZ);

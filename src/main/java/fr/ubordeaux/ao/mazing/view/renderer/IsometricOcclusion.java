@@ -33,6 +33,9 @@ import java.util.Map;
  * interpenetrating models a true mesh/depth map would be required instead.
  */
 public final class IsometricOcclusion {
+
+    /** Creates an instance of IsometricOcclusion. */
+    public IsometricOcclusion() { }
     private static final double EPSILON = 1e-7;
     private static final ShadowGeometry FLOOR_SURFACE =
             ShadowGeometry.box(1.0, 1.0, 0.01);
@@ -58,7 +61,13 @@ public final class IsometricOcclusion {
         alphaZoom = -1;
     }
 
-    /** Returns an oriented object's physical proxy, or null if unavailable. */
+    /**
+     * Returns an oriented object's physical proxy, or null if unavailable.
+     * @param object object value
+     * @param renderer isometric renderer
+     * @param animationTick animationTick value
+     * @return the value or object described above
+     */
     public ShadowGeometry geometryFor(Renderable object,
             IsometricRenderer renderer, int animationTick) {
         if (object instanceof FloorTile) {
@@ -89,6 +98,12 @@ public final class IsometricOcclusion {
      * camera-facing half-plane rule (the standard BSP side-of-line test).
      * Corners are two adjoining segments, not a fictitious solid box.
      * Coordinates of the actor's feet are at the tile center (+0.5,+0.5).
+      * @param geometry geometry value
+      * @param barrierX barrierX value
+      * @param barrierY barrierY value
+      * @param actorX actorX value
+      * @param actorY actorY value
+      * @return the value or object described above
      */
     public static boolean behindBarrier(ShadowGeometry geometry,
             double barrierX, double barrierY,
@@ -121,7 +136,13 @@ public final class IsometricOcclusion {
         return false;
     }
 
-    /** Fast rejection before rendering the static object's PNG alpha. */
+    /**
+     * Fast rejection before rendering the static object's PNG alpha.
+     * @param geometry geometry value
+     * @param object object value
+     * @param actorDepth actorDepth value
+     * @return the value or object described above
+     */
     public boolean mayBeInFront(ShadowGeometry geometry, Renderable object,
             double actorDepth) {
         double front = Double.NEGATIVE_INFINITY;
@@ -137,6 +158,15 @@ public final class IsometricOcclusion {
      * Is any point in the extruded footprint closer than the actor's
      * camera-facing billboard along the ray through this screen pixel?
      * The camera looks from +X, -Y, +Z, with an orthographic 2:1 projection.
+      * @param geometry geometry value
+      * @param objectX objectX value
+      * @param objectY objectY value
+      * @param objectZ objectZ value
+      * @param actorDepth actorDepth value
+      * @param pixelX pixelX value
+      * @param pixelY pixelY value
+     * @param renderer renderer providing projection coordinates
+     * @return the resulting value
      */
     public static boolean isInFrontAtPixel(ShadowGeometry geometry,
             double objectX, double objectY, double objectZ,
@@ -205,6 +235,16 @@ public final class IsometricOcclusion {
      * as IsometricRenderer. Clipping the ray against x/y bounds, the bottom
      * plane and the inclined top gives the actual nearest depth at this pixel.
      * In particular the ramp does not cover an actor standing on its top.
+     * @param ramp ramp sprite to test
+     * @param uphill direction toward the upper part of the ramp
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     * @param actorDepth depth of the rendered actor
+     * @param pixelX horizontal screen pixel
+     * @param pixelY vertical screen pixel
+     * @param renderer renderer providing projection coordinates
+     * @return the resulting value
      */
     public static boolean rampInFrontAtPixel(RampSprite ramp,
             Orientation uphill, double x, double y, double z,
@@ -261,6 +301,10 @@ public final class IsometricOcclusion {
     /**
      * Accurate alpha bounds of a static sprite, cached independently of its
      * current world position. Animated actors are not cached here.
+     * @param object renderable object being evaluated
+     * @param renderer renderer providing projection coordinates
+     * @param animationTick current animation frame tick
+     * @return the resulting value
      */
     public Rectangle visibleBounds(Renderable object,
             IsometricRenderer renderer, int animationTick) {
@@ -332,6 +376,17 @@ public final class IsometricOcclusion {
      * the sprite contributes to the accumulated alpha coverage: a floor
      * painted over the base of a fence must prevent the hidden fence pixels
      * from erroneously erasing the actor.
+     * @param actorImage image containing the rendered actor
+     * @param actorRegion actor bounds in screen coordinates
+     * @param occluder object that may hide part of the actor
+     * @param occluderBounds screen-space bounds of the occluder
+     * @param geometry geometric representation of the occluder
+     * @param laterStaticCoverage coverage from subsequently rendered static objects
+     * @param actorDepth depth of the rendered actor
+     * @param actorX horizontal actor position
+     * @param actorY vertical actor position
+     * @param renderer renderer providing projection coordinates
+     * @param animationTick current animation frame tick
      */
     public void subtractVisibleOccluder(BufferedImage actorImage,
             Rectangle actorRegion, Renderable occluder,

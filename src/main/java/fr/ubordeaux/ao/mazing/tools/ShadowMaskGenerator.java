@@ -25,7 +25,11 @@ public final class ShadowMaskGenerator {
 
     private ShadowMaskGenerator() { }
 
-    /** Generates masks for all nonempty source images, preserving subdirectories. */
+    /**
+     * Generates masks for all nonempty source images, preserving subdirectories.
+     * @param args args value
+     * @throws java.io.IOException if the operation cannot be completed
+     */
     public static void main(String[] args) throws IOException {
         if (args.length > 2) {
             throw new IllegalArgumentException(

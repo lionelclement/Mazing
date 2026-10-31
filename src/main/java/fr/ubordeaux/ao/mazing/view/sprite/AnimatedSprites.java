@@ -13,6 +13,9 @@ import java.util.List;
  */
 public final class AnimatedSprites {
 
+    /** Creates an instance of the sprite registry holder. */
+    public AnimatedSprites() { }
+
     // The eight numbered animation groups use different directions in each pack.
     // These lists map each atlas group to its actual facing direction.
     // Crusader: 0=SE, 1=E, 2=NE, 3=N, 4=NW, 5=W, 6=SW, 7=S.
@@ -30,43 +33,79 @@ public final class AnimatedSprites {
             Orientation.SOUTH_EAST, Orientation.EAST);
 
 	private static final HashMap<String, AnimatedOrientedSprite> registry = new HashMap<>();
+	/**
+	 * Registered sprites indexed by name.
+	 */
 	public static final java.util.Map<String, AnimatedOrientedSprite> REGISTRY = java.util.Collections
 			.unmodifiableMap(registry);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_ATTACK = registerCrusaderAnimationWithShadow("crusader_attack",
 			TextureAtlases.CRUSADER_ATTACK,
 			TextureAtlases.CRUSADER_ATTACK_SHADOW, 18, 12);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_BLOCK = registerCrusaderAnimationWithShadow("crusader_block",
 			TextureAtlases.CRUSADER_BLOCK,
 			TextureAtlases.CRUSADER_BLOCK_SHADOW, 16, 11);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_DEATH = registerCrusaderAnimationWithShadow("crusader_death",
 			TextureAtlases.CRUSADER_DEATH,
 			TextureAtlases.CRUSADER_DEATH_SHADOW, 9, 8);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_HIT = registerCrusaderAnimationWithShadow("crusader_hit",
 			TextureAtlases.CRUSADER_HIT,
 			TextureAtlases.CRUSADER_HIT_SHADOW, 13, 10);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_IDLE = registerCrusaderAnimationWithShadow("crusader_idle",
 			TextureAtlases.CRUSADER_IDLE,
 			TextureAtlases.CRUSADER_IDLE_SHADOW, 16, 11);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_JUMP = registerCrusaderAnimationWithShadow("crusader_jump",
 			TextureAtlases.CRUSADER_JUMP,
 			TextureAtlases.CRUSADER_JUMP_SHADOW, 16, 11);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_RUN = registerCrusaderAnimationWithShadow("crusader_run",
 			TextureAtlases.CRUSADER_RUN,
 			TextureAtlases.CRUSADER_RUN_SHADOW, 17, 11);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite CRUSADER_WALK = registerCrusaderAnimationWithShadow("crusader_walk",
 			TextureAtlases.CRUSADER_WALK,
 			TextureAtlases.CRUSADER_WALK_SHADOW, 15, 10);
 
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite SPIDER_ATTACK = registerSpiderAnimationWithShadow("spider_attack", TextureAtlases.SPIDER_ATTACK, TextureAtlases.SPIDER_ATTACK_SHADOW, 8, 8);
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite SPIDER_DEATH = registerSpiderAnimationWithShadow("spider_death", TextureAtlases.SPIDER_DEATH, TextureAtlases.SPIDER_DEATH_SHADOW, 8, 8);
+	/**
+	 * Preconfigured animation sprite.
+	 */
 	public static final AnimatedOrientedSprite SPIDER_WALK = registerSpiderAnimationWithShadow("spider_walk", TextureAtlases.SPIDER_WALK, TextureAtlases.SPIDER_WALK_SHADOW, 25, 14);
 
 	private static AnimatedOrientedSprite.Builder configureAnimationFrames(AnimatedOrientedSprite.Builder spriteBuilder, int frameCount,

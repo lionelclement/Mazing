@@ -8,6 +8,7 @@ import java.awt.geom.Rectangle2D;
 
 /// A Debug renderer. Not to be used outside the API.
 /// Made public due to technical limitation.
+/** Documents this public type or member. */
 public class DebugIsometricRenderer implements Renderer {
 	private int origX;
 	private int origY;
@@ -19,6 +20,14 @@ public class DebugIsometricRenderer implements Renderer {
 	private int zoom;
 	private boolean debug;
 
+	/**
+	 * Creates an instance of DebugIsometricRenderer.
+	  * @param origX origX value
+	  * @param origY origY value
+	  * @param tileDiagX tileDiagX value
+	  * @param tileDiagY tileDiagY value
+	  * @param tileHeight tileHeight value
+	 */
 	public DebugIsometricRenderer(int origX, int origY, int tileDiagX, int tileDiagY, int tileHeight) {
 		this.origX = origX;
 		this.origY = origY;
@@ -62,16 +71,32 @@ public class DebugIsometricRenderer implements Renderer {
 		this.origX = originX;
 		this.origY = originY;
 	}
+	/**
+	 * Returns zoom.
+	  * @return the value or object described above
+	 */
 	public int getZoom() {
 		return zoom;
 	}
 
+	/**
+	 * Sets zoom.
+	  * @param zoom zoom factor
+	 */
 	public void setZoom(int zoom) {
 		if (zoom <= 0) {
 			throw new IllegalArgumentException("zoom must be positive");
 		}
 		this.zoom = zoom;
 	}
+	/**
+	 * Returns tilediagx.
+	  * @return the value or object described above
+	 */
 	public int getTileDiagX() { return tileDiagX; }
+	/**
+	 * Returns tilediagy.
+	  * @return the value or object described above
+	 */
 	public int getTileDiagY() { return tileDiagY; }
 }

@@ -31,6 +31,15 @@ public class AnimatedEntity implements Renderable {
 	private double scale = 1.0;
 	private final ShadowMode shadowMode;
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	  * @param orientation orientation of the sprite
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
+	  * @param blitOrder rendering tie-break order
+	 */
 	public AnimatedEntity(
 			AnimatedOrientedSprite sprite,
 			Orientation orientation,
@@ -43,6 +52,16 @@ public class AnimatedEntity implements Renderable {
 				zPosition, blitOrder, ShadowMode.WITHOUT_SHADOW);
 	}
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	  * @param orientation orientation of the sprite
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
+	  * @param blitOrder rendering tie-break order
+	  * @param shadowMode shadow rendering mode
+	 */
 	public AnimatedEntity(
 			AnimatedOrientedSprite sprite,
 			Orientation orientation,
@@ -64,19 +83,43 @@ public class AnimatedEntity implements Renderable {
 		this.lastAnimationTick = -1;
 	}
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	  * @param orientation orientation of the sprite
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
+	 */
 	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation, int xPosition, int yPosition,
 			int zPosition) {
 		this(sprite, orientation, xPosition, yPosition, zPosition, 0);
 	}
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	 */
 	public AnimatedEntity(AnimatedOrientedSprite sprite) {
 		this(sprite, Orientation.NORTH, 0, 0, 0);
 	}
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	  * @param xPosition horizontal grid position
+	  * @param yPosition vertical grid position
+	  * @param zPosition height in grid levels
+	 */
 	public AnimatedEntity(AnimatedOrientedSprite sprite, int xPosition, int yPosition, int zPosition) {
 		this(sprite, Orientation.NORTH, xPosition, yPosition, zPosition);
 	}
 
+	/**
+	 * Creates an instance of AnimatedEntity.
+	  * @param sprite sprite to draw
+	  * @param orientation orientation of the sprite
+	 */
 	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation) {
 		this(sprite, orientation, 0, 0, 0);
 	}
@@ -223,14 +266,26 @@ public class AnimatedEntity implements Renderable {
         return animationPaused;
     }
 
+/**
+ * Returns sprite.
+  * @return the value or object described above
+ */
 public Sprite getSprite() {
 		return sprite;
 	}
 
+	/**
+	 * Returns orientation.
+	  * @return the value or object described above
+	 */
 	public Orientation getOrientation() {
 		return orientation;
 	}
 
+	/**
+	 * Sets orientation.
+	  * @param orientation orientation of the sprite
+	 */
 	public void setOrientation(Orientation orientation) {
 		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
 	}
@@ -299,6 +354,10 @@ public int getX() {
 		return (int) Math.round(xPosition);
 	}
 
+	/**
+	 * Sets x.
+	  * @param xPosition horizontal grid position
+	 */
 	public void setX(int xPosition) {
 		this.xPosition = xPosition;
 	}
@@ -307,6 +366,10 @@ public int getX() {
 		return (int) Math.round(yPosition);
 	}
 
+	/**
+	 * Sets y.
+	  * @param yPosition vertical grid position
+	 */
 	public void setY(int yPosition) {
 		this.yPosition = yPosition;
 	}
@@ -329,7 +392,10 @@ public int getX() {
 		return zPosition;
 	}
 
-	/** Sets the height, including fractions of a level. */
+	/**
+	 * Sets the height, including fractions of a level.
+	 * @param zPosition height in grid levels
+	 */
 	public void setPreciseZ(double zPosition) {
 		if (!Double.isFinite(zPosition)) {
 			throw new IllegalArgumentException("Height must be finite");
@@ -342,27 +408,54 @@ public int getX() {
 		return blitOrder;
 	}
 
+	/**
+	 * Sets z.
+	  * @param zPosition height in grid levels
+	 */
 	public void setZ(int zPosition) {
 		this.zPosition = zPosition;
 	}
 
+	/**
+	 * Moves the object along the selected grid axes.
+	  * @param deltaX horizontal displacement
+	 */
 	public void moveX(int deltaX) {
 		this.xPosition += deltaX;
 	}
 
+	/**
+	 * Moves the object along the selected grid axes.
+	  * @param deltaY vertical displacement
+	 */
 	public void moveY(int deltaY) {
 		this.yPosition += deltaY;
 	}
 
+	/**
+	 * Moves the object along the selected grid axes.
+	  * @param deltaZ elevation displacement
+	 */
 	public void moveZ(int deltaZ) {
 		this.zPosition += deltaZ;
 	}
 
+	/**
+	 * Moves the object along the selected grid axes.
+	  * @param deltaX horizontal displacement
+	  * @param deltaY vertical displacement
+	 */
 	public void move(int deltaX, int deltaY) {
 		this.xPosition += deltaX;
 		this.yPosition += deltaY;
 	}
 
+	/**
+	 * Moves the object along the selected grid axes.
+	  * @param deltaX horizontal displacement
+	  * @param deltaY vertical displacement
+	  * @param deltaZ elevation displacement
+	 */
 	public void move(int deltaX, int deltaY, int deltaZ) {
 		this.xPosition += deltaX;
 		this.yPosition += deltaY;

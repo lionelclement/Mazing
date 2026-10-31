@@ -25,24 +25,72 @@ import java.util.List;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+/**
+ * Represents ViewPanel in the rendering system.
+ */
 public class ViewPanel extends JPanel {
+	/**
+	 * Provides the private int originx; value.
+	 */
 	private int originX;
+	/**
+	 * Provides the private int originy; value.
+	 */
 	private int originY;
+	/**
+	 * Provides the private int mapwidth; value.
+	 */
 	private int mapWidth;
+	/**
+	 * Provides the private int mapheight; value.
+	 */
 	private int mapHeight;
+	/**
+	 * Stores internal rendering data.
+	 */
 	private final Renderer renderer;
+	/**
+	 * Stores internal rendering data.
+	 */
 	private final boolean ownsRenderer;
+	/**
+	 * Stores internal rendering data.
+	 */
 	private final List<Renderable> renderables;
+	/**
+	 * Performs the operation operation.
+	 */
 	private final List<DebugCube> debugCubes = new ArrayList<>();
 	// The public scene retains one logical corner. Its two wall faces are
 	// stable renderables so the occlusion and static-shadow caches can reuse them.
+	/**
+	 * Stores internal rendering data.
+	 */
 	private final Map<OccludingEntity, List<OccludingEntity>> cornerFaces =
 			new IdentityHashMap<>();
+	/**
+	 * Provides the private int animationtick; value.
+	 */
 	private int animationTick;
+	/**
+	 * Creates a StaticShadows instance.
+	 */
 	private final StaticShadows staticShadows = new StaticShadows();
+	/**
+	 * Creates a IsometricOcclusion instance.
+	 */
 	private final IsometricOcclusion occlusion = new IsometricOcclusion();
+	/**
+	 * Provides the private boolean staticshadowsenabled; value.
+	 */
 	private boolean staticShadowsEnabled;
 
+	/**
+	 * Creates a ViewPanel instance.
+	 * @param width width value
+	 * @param height height value
+	 * @param renderer renderer providing projection coordinates
+	 */
 	public ViewPanel(int width, int height, Renderer renderer) {
 		this.originX = 0;
 		this.originY = height / 2;
@@ -52,6 +100,11 @@ public class ViewPanel extends JPanel {
 		this.animationTick = 0;
 	}
 
+	/**
+	 * Creates a ViewPanel instance.
+	 * @param width width value
+	 * @param height height value
+	 */
 	public ViewPanel(int width, int height) {
 		this.originX = 0;
 		this.originY = height / 2;
@@ -281,7 +334,10 @@ public class ViewPanel extends JPanel {
         graphics.drawImage(actorImage, region.x, region.y, null);
     }
 
-	/** Enables cached directional shadows on floor sprites only. */
+	/**
+	 * Enables cached directional shadows on floor sprites only.
+	 * @param enabled enabled value
+	 */
 	public void setStaticShadowsEnabled(boolean enabled) {
 		staticShadowsEnabled = enabled;
 		staticShadows.invalidate();
@@ -289,7 +345,10 @@ public class ViewPanel extends JPanel {
 		repaint();
 	}
 
-	/** Configures the direction and opacity of the cached static shadows. */
+	/**
+	 * Configures the direction and opacity of the cached static shadows.
+	 * @param light light value
+	 */
 	public void setStaticShadowLight(DirectionalLight light) {
 		staticShadows.setLight(light);
 		repaint();
@@ -309,22 +368,42 @@ public class ViewPanel extends JPanel {
 		repaint();
 	}
 
-	/** Adds a blue 1 x 1 x 1 world-space wireframe cube for debugging. */
+	/**
+	 * Adds a blue 1 x 1 x 1 world-space wireframe cube for debugging.
+	 * @param x horizontal coordinate
+	 * @param y vertical coordinate
+	 * @param z height coordinate
+	 */
 	public void addDebugCube(double x, double y, double z) {
 		debugCubes.add(new DebugCube(x, y, z));
 		repaint();
 	}
 
+	/**
+	 * Performs the addRenderables operation.
+	 * @param renderables renderables value
+	 * @return the resulting value
+	 */
 	public boolean addRenderables(List<Renderable> renderables) {
 		staticShadows.invalidate();
 		occlusion.invalidate();
 		return this.renderables.addAll(renderables);
 	}
+	/**
+	 * Performs the addRenderable operation.
+	 * @param renderable renderable value
+	 * @return the resulting value
+	 */
 	public boolean addRenderable(Renderable renderable) {
 		staticShadows.invalidate();
 		occlusion.invalidate();
 		return this.renderables.add(renderable);
 	}
+	/**
+	 * Performs the removeRenderable operation.
+	 * @param renderable renderable value
+	 * @return the resulting value
+	 */
 	public boolean removeRenderable(Renderable renderable) {
 		staticShadows.invalidate();
 		occlusion.invalidate();
@@ -333,6 +412,11 @@ public class ViewPanel extends JPanel {
 		}
 		return this.renderables.remove(renderable);
 	}
+	/**
+	 * Performs the removeRenderable operation.
+	 * @param i i value
+	 * @return the resulting value
+	 */
 	public Renderable removeRenderable(int i) {
 		staticShadows.invalidate();
 		occlusion.invalidate();
@@ -342,16 +426,27 @@ public class ViewPanel extends JPanel {
 		}
 		return removed;
 	}
+	/**
+	 * Performs the clearRenderables operation.
+	 */
 	public void clearRenderables() {
 		staticShadows.invalidate();
 		occlusion.invalidate();
 		this.renderables.clear();
 		cornerFaces.clear();
 	}
+	/**
+	 * Returns the renderable.
+	 * @param i i value
+	 * @return the resulting value
+	 */
 	public Renderable getRenderable(int i) {
 		return this.renderables.get(i);
 	}
 
+	/**
+	 * Performs the animationTick operation.
+	 */
 	public void animationTick() {
 		this.animationTick++;
 	}

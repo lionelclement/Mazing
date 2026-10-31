@@ -34,6 +34,13 @@ public final class Scene {
 
     private Timer animationTimer;
 
+    /**
+     * Creates a Scene instance.
+     * @param width width value
+     * @param height height value
+     * @param mapWidth map width value
+     * @param mapHeight map height value
+     */
     public Scene(int width, int height, int mapWidth, int mapHeight) {
         if (width <= 0 || height <= 0
                 || mapWidth <= 0 || mapHeight <= 0) {
@@ -90,7 +97,11 @@ public final class Scene {
                 : panel.getPreferredSize().height;
     }
 
-    /** Moves the scene in screen pixels. */
+    /**
+     * Moves the scene in screen pixels.
+     * @param dx dx value
+     * @param dy dy value
+     */
     public void moveScene(int dx, int dy) {
         offsetX += dx;
         offsetY += dy;
@@ -105,69 +116,123 @@ public final class Scene {
         updateOrigin(currentWidth(), currentHeight());
     }
 
-    /** Changes zoom while preserving camera displacement. */
+    /**
+     * Changes zoom while preserving camera displacement.
+     * @param zoom rendering zoom level
+     */
     public void setZoom(int zoom) {
         renderer.setZoom(zoom);
         updateOrigin(currentWidth(), currentHeight());
     }
 
+    /**
+     * Updates the debug.
+     * @param enabled enabled value
+     */
     public void setDebug(boolean enabled) {
         renderer.setDebug(enabled);
         panel.repaint();
     }
 
+    /**
+     * Performs the addRenderable operation.
+     * @param renderable renderable value
+     * @return the resulting value
+     */
     public boolean addRenderable(Renderable renderable) {
         boolean added = panel.addRenderable(renderable);
         panel.repaint();
         return added;
     }
 
+    /**
+     * Performs the addRenderables operation.
+     * @param renderables renderables value
+     * @return the resulting value
+     */
     public boolean addRenderables(List<Renderable> renderables) {
         boolean added = panel.addRenderables(renderables);
         panel.repaint();
         return added;
     }
 
+    /**
+     * Performs the removeRenderable operation.
+     * @param renderable renderable value
+     * @return the resulting value
+     */
     public boolean removeRenderable(Renderable renderable) {
         boolean removed = panel.removeRenderable(renderable);
         panel.repaint();
         return removed;
     }
 
+    /**
+     * Performs the clearRenderables operation.
+     */
     public void clearRenderables() {
         panel.clearRenderables();
         panel.repaint();
     }
 
+    /**
+     * Performs the addDebugCube operation.
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @param z height coordinate
+     */
     public void addDebugCube(double x, double y, double z) {
         panel.addDebugCube(x, y, z);
     }
 
+    /**
+     * Updates the staticshadowsenabled.
+     * @param enabled enabled value
+     */
     public void setStaticShadowsEnabled(boolean enabled) {
         panel.setStaticShadowsEnabled(enabled);
     }
 
+    /**
+     * Updates the staticshadowlight.
+     * @param light light value
+     */
     public void setStaticShadowLight(DirectionalLight light) {
         panel.setStaticShadowLight(light);
     }
 
+    /**
+     * Performs the prepareStaticShadows operation.
+     */
     public void prepareStaticShadows() {
         panel.prepareStaticShadows();
     }
 
+    /**
+     * Performs the invalidateStaticShadows operation.
+     */
     public void invalidateStaticShadows() {
         panel.invalidateStaticShadows();
     }
 
+    /**
+     * Performs the animationTick operation.
+     */
     public void animationTick() {
         panel.animationTick();
     }
 
+    /**
+     * Performs the repaint operation.
+     */
     public void repaint() {
         panel.repaint();
     }
 
-    /** Optional Swing integration point. */
+    /**
+     * Optional Swing integration point.
+     * @return the resulting value
+     */
     public JComponent getComponent() {
         return panel;
     }

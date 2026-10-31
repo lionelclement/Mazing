@@ -56,6 +56,31 @@ Les autres démonstrations sont disponibles avec les tâches suivantes :
 Sous Windows, lancez ces tâches via `gradlew.bat`. Voir aussi
 [EXAMPLES.md](EXAMPLES.md).
 
+## Premier exemple avec `Scene`
+
+L'API `Scene` gère la fenêtre Swing et le centrage de la carte. Exemple
+minimal, à lancer sur le thread de gestion des événements Swing :
+
+```java
+import javax.swing.SwingUtilities;
+import fr.ubordeaux.ao.mazing.Scene;
+
+public class HelloMazing {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Scene scene = new Scene(800, 600, 10, 10);
+            scene.setDebug(false);
+            scene.show();
+        });
+    }
+}
+```
+
+Cet exemple affiche une scène vide. Pour ajouter un sol et des sprites,
+consultez [`Main`](src/examples/java/fr/ubordeaux/ao/mazing/Main.java)
+ainsi que le [guide API](doc/GUIDE_API.md). Le lancement de `Main` via
+`./gradlew runMain` ne nécessite pas de recopier cet exemple.
+
 ## Bibliothèque et documentation
 
 Le JAR de bibliothèque est produit dans `build/libs/` par `./gradlew jar`
@@ -89,6 +114,9 @@ sous `build/generated/shadow-masks/`. Elle n'est pas exécutée par `build`.
 
 - [Guide de l'API](doc/GUIDE_API.md)
 - [Exemples](EXAMPLES.md)
+- [Contribution](CONTRIBUTING.md)
+- [Licences des ressources tierces](THIRD_PARTY_LICENSES.md)
+- [Statut des documents historiques](doc/README.md)
 
 Le code de Mazing est distribué sous licence MIT (`LICENSE`). Les ressources
 tierces conservent leurs licences respectives (voir les fichiers de licence

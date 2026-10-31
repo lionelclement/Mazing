@@ -14,9 +14,21 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.Line2D;
 import java.util.Map;
 
+/**
+ * Provides DebugWindow functionality.
+ */
 public class DebugWindow extends JFrame {
+	/**
+	 * Provides the private final viewpanel panel; value.
+	 */
 	private final ViewPanel panel;
+	/**
+	 * Provides the private int zoom = 2; value.
+	 */
 	private int zoom = 2;
+	/**
+	 * Provides the private orientation orientation = orientation.north; value.
+	 */
 	private Orientation orientation = Orientation.NORTH;
 
 	private enum Mode {
@@ -24,6 +36,9 @@ public class DebugWindow extends JFrame {
 		CRUSADER
 	}
 
+	/**
+	 * Creates an instance of DebugWindow.
+	 */
 	public DebugWindow() {
 		super("Isometric 3D Game");
 
@@ -166,6 +181,10 @@ public class DebugWindow extends JFrame {
 		}
 	}
 
+	/**
+	 * Returns panel.
+	  * @return the value or object described above
+	 */
 	public ViewPanel getPanel() {
 		return panel;
 	}

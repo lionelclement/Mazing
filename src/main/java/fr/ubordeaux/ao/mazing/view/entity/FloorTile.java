@@ -27,7 +27,14 @@ public final class FloorTile extends Entity {
         super(sprite, orientation, xPosition, yPosition, zPosition);
     }
 
-    /** Allows raised tiles at fractional world elevations, e.g. 0.75. */
+    /**
+     * Allows raised tiles at fractional world elevations, e.g. 0.75.
+     * @param sprite sprite to draw
+     * @param orientation orientation of the sprite
+     * @param xPosition horizontal grid position
+     * @param yPosition vertical grid position
+     * @param zPosition height in grid levels
+     */
     public FloorTile(Sprite sprite, Orientation orientation,
             int xPosition, int yPosition, double zPosition) {
         this(sprite, orientation, xPosition, yPosition,

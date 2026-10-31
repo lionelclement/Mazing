@@ -9,17 +9,31 @@ import java.util.Objects;
  * Approximate physical shape of a shadow caster in grid units.
  * Footprint vertices are relative to the caster's grid position.
  * The height is measured in floor levels, not sprite pixels.
+ * @param footprint vertices defining the caster footprint in grid units
+ * @param height height of the caster in grid levels
+ * @param closed whether the footprint is a closed polygon
  */
 public record ShadowGeometry(List<Vertex> footprint, double height, boolean closed) {
 
-    /** Compatibility constructor: 2 points denote a segment, 3+ a polygon. */
+    /**
+     * Compatibility constructor: 2 points denote a segment, 3+ a polygon.
+     * @param footprint footprint value
+     * @param height height value
+     */
     public ShadowGeometry(List<Vertex> footprint, double height) {
         this(footprint, height, footprint != null && footprint.size() > 2);
     }
 
-    /** One vertex of the horizontal footprint. */
+    /**
+     * One vertex of the horizontal footprint.
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     */
     public record Vertex(double x, double y) { }
 
+    /**
+     * Provides the public shadowgeometry { value.
+     */
     public ShadowGeometry {
         Objects.requireNonNull(footprint, "footprint");
         footprint = List.copyOf(footprint);
@@ -36,7 +50,13 @@ public record ShadowGeometry(List<Vertex> footprint, double height, boolean clos
         }
     }
 
-    /** A box centered on a tile, suitable for furniture and columns. */
+    /**
+     * A box centered on a tile, suitable for furniture and columns.
+     * @param width width value
+     * @param depth depth value
+     * @param height height value
+     * @return the resulting value
+     */
     public static ShadowGeometry box(double width, double depth, double height) {
         if (!Double.isFinite(width) || !Double.isFinite(depth)
                 || width <= 0.0 || depth <= 0.0) {
@@ -62,6 +82,11 @@ public record ShadowGeometry(List<Vertex> footprint, double height, boolean clos
      * not a reconstruction of hidden 3D geometry.
      *
      * @return estimated geometry, or null for a flat/degenerate silhouette
+     * @param visibleWidth visible width value
+     * @param visibleHeight visible height value
+     * @param tileDiagonalX tile diagonal x value
+     * @param tileDiagonalY tile diagonal y value
+     * @param levelHeight level height value
      */
     public static ShadowGeometry estimateFromSprite(double visibleWidth,
             double visibleHeight, double tileDiagonalX,
@@ -83,7 +108,12 @@ public record ShadowGeometry(List<Vertex> footprint, double height, boolean clos
         return box(footprintSide, footprintSide, height);
     }
 
-    /** A wall segment along the corresponding edge of a tile. */
+    /**
+     * A wall segment along the corresponding edge of a tile.
+     * @param orientation orientation of the sprite
+     * @param height height value
+     * @return the resulting value
+     */
     public static ShadowGeometry wall(Orientation orientation, double height) {
         Objects.requireNonNull(orientation, "orientation");
         return switch (orientation) {
@@ -99,6 +129,9 @@ public record ShadowGeometry(List<Vertex> footprint, double height, boolean clos
      * A thin L-shaped barrier following the two edges of a tile corner.
      * Three vertices describe an OPEN polyline (not a triangular solid).
      * This is a geometric primitive, independent of the texture used to draw it.
+     * @param orientation orientation of the sprite
+     * @param height height value
+     * @return the resulting value
      */
     public static ShadowGeometry corner(Orientation orientation, double height) {
         Objects.requireNonNull(orientation, "orientation");
@@ -112,18 +145,31 @@ public record ShadowGeometry(List<Vertex> footprint, double height, boolean clos
         return new ShadowGeometry(edges, height, false);
     }
 
-    /** An open polyline describes a wall or barrier without volume. */
+    /**
+     * An open polyline describes a wall or barrier without volume.
+     * @return the resulting value
+     */
     public boolean isThinBarrier() {
         return !closed;
     }
 
-    /** A barrier at a fixed X edge of the centered grid tile. */
+    /**
+     * A barrier at a fixed X edge of the centered grid tile.
+     * @param x horizontal coordinate
+     * @param height height value
+     * @return the resulting value
+     */
     public static ShadowGeometry edgeX(double x, double height) {
         return new ShadowGeometry(List.of(new Vertex(x, 0.0),
                 new Vertex(x, 1.0)), height);
     }
 
-    /** A barrier at a fixed Y edge of the centered grid tile. */
+    /**
+     * A barrier at a fixed Y edge of the centered grid tile.
+     * @param y vertical coordinate
+     * @param height height value
+     * @return the resulting value
+     */
     public static ShadowGeometry edgeY(double y, double height) {
         return new ShadowGeometry(List.of(new Vertex(0.0, y),
                 new Vertex(1.0, y)), height);
