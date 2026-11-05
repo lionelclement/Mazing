@@ -21,7 +21,7 @@ public class AnimatedEntity implements Renderable {
 	private double xPosition;
 	private double yPosition;
 	private double zPosition;
-	private int blitOrder;
+	private static final int DEFAULT_BLIT_ORDER = 2;
 	private int currentFrameIndex;
     private boolean animationPaused;
     private IntConsumer animationFrameListener = frame -> {};
@@ -29,71 +29,30 @@ public class AnimatedEntity implements Renderable {
     private double animationSpeed = 1.0;
     private double animationProgress = 0.0;
 	private double scale = 1.0;
-	private final ShadowMode shadowMode;
 
 	/**
-	 * Creates an instance of AnimatedEntity.
-	  * @param sprite sprite to draw
-	  * @param orientation orientation of the sprite
-	  * @param xPosition horizontal grid position
-	  * @param yPosition vertical grid position
-	  * @param zPosition height in grid levels
-	  * @param blitOrder rendering tie-break order
+	 * Creates an animated view object with its shadow enabled when the sprite
+	 * provides a shadow atlas. The rendering tie-break priority is fixed at 2.
+	 *
+	 * @param sprite animated sprite to draw
+	 * @param orientation sprite orientation
+	 * @param xPosition horizontal grid position
+	 * @param yPosition vertical grid position
+	 * @param zPosition height in grid levels
 	 */
 	public AnimatedEntity(
 			AnimatedOrientedSprite sprite,
 			Orientation orientation,
 			int xPosition,
 			int yPosition,
-			int zPosition,
-			int blitOrder) {
-
-		this(sprite, orientation, xPosition, yPosition,
-				zPosition, blitOrder, ShadowMode.WITHOUT_SHADOW);
-	}
-
-	/**
-	 * Creates an instance of AnimatedEntity.
-	  * @param sprite sprite to draw
-	  * @param orientation orientation of the sprite
-	  * @param xPosition horizontal grid position
-	  * @param yPosition vertical grid position
-	  * @param zPosition height in grid levels
-	  * @param blitOrder rendering tie-break order
-	  * @param shadowMode shadow rendering mode
-	 */
-	public AnimatedEntity(
-			AnimatedOrientedSprite sprite,
-			Orientation orientation,
-			int xPosition,
-			int yPosition,
-			int zPosition,
-			int blitOrder,
-			ShadowMode shadowMode) {
-
+			int zPosition) {
 		this.sprite = Objects.requireNonNull(sprite, "sprite must not be null");
 		this.orientation = Objects.requireNonNull(orientation, "orientation must not be null");
-		this.shadowMode = Objects.requireNonNull(shadowMode, "shadowMode must not be null");
-
 		this.xPosition = xPosition;
 		this.yPosition = yPosition;
 		this.zPosition = zPosition;
-		this.blitOrder = blitOrder;
 		this.currentFrameIndex = 0;
 		this.lastAnimationTick = -1;
-	}
-
-	/**
-	 * Creates an instance of AnimatedEntity.
-	  * @param sprite sprite to draw
-	  * @param orientation orientation of the sprite
-	  * @param xPosition horizontal grid position
-	  * @param yPosition vertical grid position
-	  * @param zPosition height in grid levels
-	 */
-	public AnimatedEntity(AnimatedOrientedSprite sprite, Orientation orientation, int xPosition, int yPosition,
-			int zPosition) {
-		this(sprite, orientation, xPosition, yPosition, zPosition, 0);
 	}
 
 	/**
@@ -126,29 +85,36 @@ public class AnimatedEntity implements Renderable {
 
 	@Override
 	public void updateAnimation(int animationTick) {
-		if (animationPaused) {
+        if (animationPaused) {
             lastAnimationTick = animationTick;
-        } else if (lastAnimationTick == -1) {
-			lastAnimationTick = animationTick;
-		} else {
-			int elapsedTicks = animationTick - lastAnimationTick;
-			if (elapsedTicks > 0) {
-				animationProgress += elapsedTicks * animationSpeed;
-				int framesToAdvance = (int) animationProgress;
-				if (framesToAdvance > 0) {
-				    for (int frame = 0; frame < framesToAdvance; frame++) {
-				        if (animationPaused) {
-				            break;
-				        }
-				        currentFrameIndex =
-				                (currentFrameIndex + 1) % sprite.animationSize();
-				        animationFrameListener.accept(currentFrameIndex);
-				    }
-				    animationProgress -= framesToAdvance;
-				}
-				lastAnimationTick = animationTick;
-			}
-		}
+            return;
+        }
+
+        // The first explicit tick advances one frame; rendering no longer
+        // primes this counter before the animation loop starts.
+        if (lastAnimationTick == -1) {
+            lastAnimationTick = animationTick - 1;
+        }
+
+        int elapsedTicks = animationTick - lastAnimationTick;
+        if (elapsedTicks <= 0) {
+            return;
+        }
+
+        animationProgress += elapsedTicks * animationSpeed;
+        int framesToAdvance = (int) animationProgress;
+        if (framesToAdvance > 0) {
+            animationProgress -= framesToAdvance;
+            for (int frame = 0; frame < framesToAdvance; frame++) {
+                if (animationPaused) {
+                    break;
+                }
+                currentFrameIndex =
+                        (currentFrameIndex + 1) % sprite.animationSize();
+                animationFrameListener.accept(currentFrameIndex);
+            }
+        }
+        lastAnimationTick = animationTick;
 	}
 
 	/**
@@ -186,10 +152,9 @@ public class AnimatedEntity implements Renderable {
 
 	@Override
 	public void renderInScreen(Graphics2D graphics, int screenX, int screenY, int animationTick, int zoom) {
-		updateAnimation(animationTick);
 		if (scale == 1.0) {
 			sprite.render(graphics, screenX, screenY, orientation,
-					currentFrameIndex, zoom, shadowMode == ShadowMode.WITH_SHADOW);
+					currentFrameIndex, zoom, true);
 			return;
 		}
 
@@ -201,7 +166,7 @@ public class AnimatedEntity implements Renderable {
 			scaled.scale(scale, scale);
 			scaled.translate(-anchorX, -screenY);
 			sprite.render(scaled, screenX, screenY, orientation,
-					currentFrameIndex, zoom, shadowMode == ShadowMode.WITH_SHADOW);
+					currentFrameIndex, zoom, true);
 		} finally {
 			scaled.dispose();
 		}
@@ -405,7 +370,7 @@ public int getX() {
 
 	@Override
 	public int getBlitOrder() {
-		return blitOrder;
+		return DEFAULT_BLIT_ORDER;
 	}
 
 	/**

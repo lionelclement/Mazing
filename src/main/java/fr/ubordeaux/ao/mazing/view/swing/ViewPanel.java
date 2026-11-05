@@ -274,7 +274,6 @@ public class ViewPanel extends JPanel {
 		}
 		Rectangle region = bounds.intersection(visible);
 		if (region.isEmpty()) {
-			actor.updateAnimation(animationTick);
 			return;
 		}
 
@@ -449,5 +448,10 @@ public class ViewPanel extends JPanel {
 	 */
 	public void animationTick() {
 		this.animationTick++;
+		// Animation changes (including frame callbacks) are independent of paint.
+		// Use a snapshot: a callback may add or remove scene objects.
+		for (Renderable renderable : new ArrayList<>(renderables)) {
+			renderable.updateAnimation(this.animationTick);
+		}
 	}
 }

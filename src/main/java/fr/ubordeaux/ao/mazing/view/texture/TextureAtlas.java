@@ -104,7 +104,7 @@ public class TextureAtlas {
 			throw new IllegalArgumentException("Path is not a directory");
 		}
 		ArrayList<File> files = new ArrayList<>();
-		Collections.addAll(files, dir.listFiles((_, name) -> name.toLowerCase().endsWith(".png")));
+		Collections.addAll(files, dir.listFiles((directory, name) -> name.toLowerCase().endsWith(".png")));
 		files.sort(Comparator.comparing(File::getName));
 		var size = files.size();
 		var textureHeight = 0;

@@ -1,123 +1,58 @@
 # Mazing
 
-Mazing est une bibliothèque Java/Swing de rendu de scènes **isométriques (dimétriques 2:1)**.
-Le moteur et ses ressources se trouvent dans `src/main/`. Trois démonstrations
-graphiques sont isolées dans `src/examples/java/` : `Main`, `Test` et `Gallery`.
-Elles ne sont pas faites pour montrer un code modèle, mais pour montrer des exemples.
+Mazing est une bibliothèque Java/Swing pour afficher des scènes isométriques (projection dimétrique 2:1).
+
+Ce dépôt contient les sources, les tests et les exemples de Mazing.
 
 ## Prérequis
 
-- **JDK 25**, utilisé pour compiler le code source. Vérifiez avec `java -version`.
-- Un environnement graphique pour exécuter les exemples Swing.
-- Une connexion Internet lors du premier lancement de Gradle, pour obtenir
-  sa distribution et les éventuelles dépendances.
+- JDK 25 pour la construction avec Gradle (toolchain téléchargeable).
+- Gradle Wrapper fourni avec le projet.
+- Un environnement graphique pour les exemples Swing.
 
-Le **Gradle Wrapper** est fourni : inutile d’installer Gradle séparément.
-Le projet configure une toolchain Java 25 : un JDK 25 doit être disponible
-localement ou via un mécanisme de téléchargement de toolchain configuré
-dans Gradle.
+La bibliothèque produite cible **Java 21 et supérieur**.
 
-## Compiler et exécuter
+## Compiler et tester
 
-Depuis la racine du dépôt (le dossier contenant `gradlew` et `build.gradle.kts`) :
-
-**macOS / Linux**
+macOS / Linux :
 
 ```sh
-chmod +x gradlew   # seulement si le fichier n'est pas exécutable
-./gradlew build
-./gradlew run
+./gradlew clean build
 ```
 
-**Windows (PowerShell)**
-
-```powershell
-.\\gradlew.bat build
-.\\gradlew.bat run
-```
-
-**Windows (CMD)**
+Windows :
 
 ```bat
-gradlew.bat build
-gradlew.bat run
+.\gradlew.bat clean build
 ```
 
-`build` compile la bibliothèque et vérifie la compilation des exemples
-via la tâche `check` ; les tests JUnit sont exécutés s’il y en a. `run` démarre la scène minimale (`fr.ubordeaux.ao.mazing.Main`).
-Les autres démonstrations sont disponibles avec les tâches suivantes :
+Le JAR est généré dans `build/libs/`.
 
-| Tâche | Classe exécutée | Contenu |
-|---|---|---|
-| `run` / `runMain` / `runDemo` | `Main` | Sol 5 × 5, personnage animé et cubes de débogage |
-| `runTest` | `Test` | Décor à plusieurs niveaux, personnages, déplacements, caméra et sons |
-| `runGallery` | `Gallery` | Galerie des sprites fixes et animés |
-
-Sous Windows, lancez ces tâches via `gradlew.bat`. Voir aussi
-[EXAMPLES.md](EXAMPLES.md).
-
-## Premier exemple avec `Scene`
-
-L'API `Scene` gère la fenêtre Swing et le centrage de la carte. Exemple
-minimal, à lancer sur le thread de gestion des événements Swing :
-
-```java
-import javax.swing.SwingUtilities;
-import fr.ubordeaux.ao.mazing.Scene;
-
-public class HelloMazing {
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Scene scene = new Scene(800, 600, 10, 10);
-            scene.setDebug(false);
-            scene.show();
-        });
-    }
-}
-```
-
-Cet exemple affiche une scène vide. Pour ajouter un sol et des sprites,
-consultez [`Main`](src/examples/java/fr/ubordeaux/ao/mazing/Main.java)
-ainsi que le [guide API](doc/GUIDE_API.md). Le lancement de `Main` via
-`./gradlew runMain` ne nécessite pas de recopier cet exemple.
-
-## Bibliothèque et documentation
-
-Le JAR de bibliothèque est produit dans `build/libs/` par `./gradlew jar`
-(ou `./gradlew build`). **Il ne contient pas les classes des exemples** et
-ne doit pas être lancé avec `java -jar`. Les ressources situées dans `src/main/resources/` sont incluses dans ce JAR.
-
-Pour générer la Javadoc :
+## Lancer les exemples
 
 ```sh
-./gradlew javadoc
-./gradlew javadocJar
+./gradlew runMain
+./gradlew runTest
+./gradlew runGallery
 ```
 
-La documentation HTML est placée dans `build/docs/javadoc/index.html` et
-l'archive Javadoc dans `build/libs/`.
+Les sources des exemples se trouvent dans `src/examples/java/`.
 
-La tâche optionnelle `./gradlew generateShadowMasks` extrait des silhouettes
-depuis les images de `src/main/resources/Dungeon-Pack/Isometric` et les écrit
-sous `build/generated/shadow-masks/`. Elle n'est pas exécutée par `build`.
+## Construire la distribution
 
-## En cas de problème
+```sh
+./gradlew apiDist
+```
 
-- **JDK incorrect / erreur de compilation** : utilisez JDK 25 et vérifiez
-  `java -version` et `JAVA_HOME`. La compilation utilise une toolchain Java 25.
-- **`Permission denied`** : exécutez `chmod +x gradlew` sur macOS/Linux.
-- **Pas de fenêtre** : les démonstrations Swing exigent une session graphique.
-- **Téléchargement impossible** : vérifiez la connexion au réseau ou la
-  configuration des dépôts et des toolchains Gradle.
+Le fichier `build/distributions/Mazing-API-2026.zip` contient le JAR, les ressources, la documentation et les licences.
 
-## Références
+Le fichier [dist/README.md](dist/README.md) explique comment utiliser cette distribution dans un autre projet Java.
+
+## Documentation et licences
 
 - [Guide de l'API](doc/GUIDE_API.md)
-- [Exemples](EXAMPLES.md)
-- [Contribution](CONTRIBUTING.md)
-- [Licences des ressources tierces](THIRD_PARTY_LICENSES.md)
-- [Statut des documents historiques](doc/README.md)
+- Javadoc : `build/docs/javadoc/index.html`
+- [Licence MIT](LICENSE)
+- [Licences tierces](THIRD_PARTY_LICENSES.md)
 
-Le code de Mazing est distribué sous licence MIT (`LICENSE`). Les ressources
-tierces conservent leurs licences respectives (voir les fichiers de licence
-présents sous `src/main/resources/`).
+Copyright (c) 2026 Lionel Clément and Nicolas Hubner.

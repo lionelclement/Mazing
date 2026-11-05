@@ -4,12 +4,11 @@ package fr.ubordeaux.ao.mazing;
 import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.entity.AnimatedEntity;
 import fr.ubordeaux.ao.mazing.view.entity.FloorTile;
-import fr.ubordeaux.ao.mazing.view.entity.ShadowMode;
 import fr.ubordeaux.ao.mazing.view.sprite.AnimatedSprites;
 import fr.ubordeaux.ao.mazing.view.sprite.IsometricSprites;
 
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.JFrame;
 
 /**
  * Exemple minimal : un sol en pierre et un personnage animé.
@@ -49,19 +48,17 @@ public final class Main {
         // Personnage animé.
         scene.addRenderable(new AnimatedEntity(
                 AnimatedSprites.CRUSADER_IDLE,
-                Orientation.SOUTH,
-                2, 2, 0, 2,
-                ShadowMode.WITH_SHADOW));
+                Orientation.SOUTH_EAST,
+                4, 5, 0));
 
         scene.startAnimation(24);
-		
-		// Affichage sans manipulation de JFrame.
+
+        // Affichage sans manipulation de JFrame.
         scene.show();
 
-        // Animation.
-        new Timer(1000 / 24, event -> {
-            scene.animationTick();
-            scene.repaint();
-        }).start();
+        // Terminer l'application lorsque la fenêtre est fermée.
+        if (SwingUtilities.getWindowAncestor(scene.getPanel()) instanceof JFrame frame) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
     }
 }

@@ -4,7 +4,6 @@ package fr.ubordeaux.ao.mazing;
 import fr.ubordeaux.ao.mazing.view.Orientation;
 import fr.ubordeaux.ao.mazing.view.entity.AnimatedEntity;
 import fr.ubordeaux.ao.mazing.view.entity.FloorTile;
-import fr.ubordeaux.ao.mazing.view.entity.ShadowMode;
 import fr.ubordeaux.ao.mazing.view.sound.CrusaderCombatSounds;
 import fr.ubordeaux.ao.mazing.view.sound.CrusaderStaticSounds;
 import fr.ubordeaux.ao.mazing.view.sound.FootstepSound;
@@ -18,6 +17,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -115,6 +115,7 @@ public final class Test {
     private final CrusaderStaticSounds staticSounds;
 
     private final JLabel legend;
+    private final JButton animationButton;
 
     private CrusaderAnimation animation = CrusaderAnimation.IDLE;
 
@@ -143,9 +144,7 @@ public final class Test {
                 Orientation.SOUTH,
                 MAP_SIZE / 2,
                 MAP_SIZE / 2,
-                0,
-                2,
-                ShadowMode.WITH_SHADOW);
+                0);
 
         scene.addRenderable(crusader);
 
@@ -156,7 +155,9 @@ public final class Test {
         registerCrusaderSounds();
 
         legend = new JLabel();
+        animationButton = new JButton("Arrêter l'animation");
         installLegend();
+        installAnimationButton();
         installKeyboard();
         updateLegend();
     }
@@ -413,7 +414,7 @@ public final class Test {
      * Adds a permanent help legend in the upper-left corner.
      */
     private void installLegend() {
-        JComponent component = scene.getComponent();
+        JComponent component = scene.getPanel();
         component.setLayout(null);
 
         legend.setOpaque(true);
@@ -426,6 +427,31 @@ public final class Test {
 
         legend.setBounds(10, 10, 355, 245);
         component.add(legend);
+    }
+
+    /** Adds a button that pauses or resumes both movement and sprite animations. */
+    private void installAnimationButton() {
+        animationButton.setBounds(10, 265, 220, 35);
+        animationButton.setFocusable(false);
+        animationButton.addActionListener(event -> toggleAnimation());
+        scene.getPanel().add(animationButton);
+    }
+
+    private void toggleAnimation() {
+        if (timer == null || closed) {
+            return;
+        }
+
+        if (timer.isRunning()) {
+            timer.stop();
+            movingThisFrame = false;
+            animationButton.setText("Relancer l'animation");
+        } else {
+            // Discard time elapsed while paused to avoid a movement jump.
+            previousFrameNanos = System.nanoTime();
+            timer.start();
+            animationButton.setText("Arrêter l'animation");
+        }
     }
 
     private void updateLegend() {
@@ -464,7 +490,7 @@ public final class Test {
      * Registers keyboard controls.
      */
     private void installKeyboard() {
-        JComponent component = scene.getComponent();
+        JComponent component = scene.getPanel();
 
         bind(component, "L", "animation",
                 this::selectNextAnimation);

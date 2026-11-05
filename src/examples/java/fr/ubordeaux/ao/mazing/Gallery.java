@@ -5,7 +5,6 @@ import fr.ubordeaux.ao.mazing.view.entity.AnimatedEntity;
 import fr.ubordeaux.ao.mazing.view.entity.Entity;
 import fr.ubordeaux.ao.mazing.view.entity.FloorTile;
 import fr.ubordeaux.ao.mazing.view.entity.OccludingEntity;
-import fr.ubordeaux.ao.mazing.view.entity.ShadowMode;
 import fr.ubordeaux.ao.mazing.view.renderer.IsometricRenderer;
 import fr.ubordeaux.ao.mazing.view.sprite.AnimatedOrientedSprite;
 import fr.ubordeaux.ao.mazing.view.sprite.AnimatedSprites;
@@ -352,7 +351,7 @@ public final class Gallery {
             int y = startY + (index / columns) * 3;
             // Keep the existing walking reference facing east.
             scene.addRenderable(new AnimatedEntity(
-                    animation, direction, x, y, 0, 2, ShadowMode.WITH_SHADOW));
+                    animation, direction, x, y, 0));
             scene.addLabel(animation, direction, x, y);
         }
     }

@@ -113,12 +113,9 @@ public class AnimatedOrientedSprite implements Sprite {
 
 		Point framePosition = framePositions.get(frameIndex);
 
-		if (drawShadow) {
-			if (shadowAtlas == null) {
-				throw new IllegalStateException(
-						"No shadow atlas configured for this sprite");
-			}
-
+		// Animated entities request shadows by default. A custom sprite without
+		// a shadow atlas remains valid and is drawn without a shadow.
+		if (drawShadow && shadowAtlas != null) {
 			shadowAtlas.blit(
 					graphics, screenX, screenY,
 					framePosition.x(), framePosition.y(), zoom);

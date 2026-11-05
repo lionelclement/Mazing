@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.Timer;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
@@ -233,7 +234,7 @@ public final class Scene {
      * Optional Swing integration point.
      * @return the resulting value
      */
-    public JComponent getComponent() {
+    public JPanel getPanel() {
         return panel;
     }
 

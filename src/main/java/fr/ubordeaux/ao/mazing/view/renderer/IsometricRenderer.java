@@ -55,8 +55,6 @@ public class IsometricRenderer implements Renderer {
         double gridX = renderable.getPreciseX();
         double gridY = renderable.getPreciseY();
 
-        // Keep animation state and frame callbacks current even off-screen.
-        renderable.updateAnimation(animationTick);
         java.awt.Rectangle visibleArea = graphics.getClipBounds();
         java.awt.Rectangle spriteBounds =
                 renderable.getScreenBounds(screenX, screenY, zoom);

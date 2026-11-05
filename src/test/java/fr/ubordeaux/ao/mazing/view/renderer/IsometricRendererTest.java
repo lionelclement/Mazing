@@ -39,6 +39,44 @@ class IsometricRendererTest {
     }
 
     @Test
+    void projectsFractionalCoordinates() {
+        IsometricRenderer renderer = new IsometricRenderer(0, 0);
+        var point = renderer.projectWorld(0.5, 0.25, 0);
+
+        assertEquals(48, point.x());
+        assertEquals(-24, point.y());
+    }
+
+    @Test
+    void projectsAltitude() {
+        IsometricRenderer renderer = new IsometricRenderer(0, 0);
+        var ground = renderer.projectWorld(1, 1, 0);
+        var raised = renderer.projectWorld(1, 1, 2);
+
+        assertEquals(ground.x(), raised.x());
+        assertEquals(ground.y() - 128, raised.y());
+    }
+
+    @Test
+    void pansOriginWithoutChangingRelativeProjection() {
+        IsometricRenderer renderer = new IsometricRenderer(0, 0);
+        var before = renderer.projectWorld(2, 3, 1);
+
+        renderer.pan(17, -9);
+        var after = renderer.projectWorld(2, 3, 1);
+
+        assertEquals(before.x() + 17, after.x());
+        assertEquals(before.y() - 9, after.y());
+    }
+
+    @Test
+    void rejectsNegativeZoom() {
+        IsometricRenderer renderer = new IsometricRenderer(0, 0);
+        assertThrows(IllegalArgumentException.class,
+                () -> renderer.setZoom(-1));
+    }
+
+    @Test
     void rejectsInvalidZoom() {
         IsometricRenderer renderer = new IsometricRenderer(0, 0);
         assertThrows(IllegalArgumentException.class,

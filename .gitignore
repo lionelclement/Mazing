@@ -29,3 +29,11 @@ bin/
 *.out
 *.synctex.gz
 
+
+# Fichiers générés
+/build/
+/out/
+/bin/
+/.gradle/
+/dist/Mazing-API-2026/
+/dist/*.zip
